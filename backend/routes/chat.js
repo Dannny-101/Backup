@@ -4,6 +4,12 @@ const ChatMessage = require('../models/ChatMessage');
 const { v4: uuidv4 } = require('uuid');
 
 // POST send message
+res.cookie('chatSessionId', chatSession, { 
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+});
 router.post('/', async (req, res) => {
     try {
         const { sessionId, name, email, message, isAdmin } = req.body;
