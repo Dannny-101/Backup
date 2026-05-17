@@ -11,6 +11,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/cookie-banner.html', express.static(path.join(__dirname, '../frontend/cookie-banner.html')));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // MongoDB Connection
