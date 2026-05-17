@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Listings - Ten&See</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 40px -10px rgba(99, 102, 241, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000; padding: 1rem 2rem;
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .nav-container {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem; font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-decoration: none;
+        }
+        .logo span { font-weight: 300; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; list-style: none; }
+        .nav-links a { color: var(--gray); text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--light); }
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem; border-radius: 12px;
+            font-weight: 600; font-size: 0.95rem; cursor: pointer;
+            transition: all 0.3s; border: none; text-decoration: none;
+        }
+        .btn-primary { background: var(--gradient); color: white; box-shadow: var(--shadow-glow); }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-outline { background: transparent; color: var(--light); border: 1.5px solid rgba(255,255,255,0.15); }
+        .btn-outline:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.1); }
+        .btn-whatsapp { background: #25d366; color: white; }
+        .btn-whatsapp:hover { background: #128c7e; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+        /* Page Header */
+        .page-header {
+            padding: 8rem 2rem 3rem;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%);
+        }
+        .page-header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 0.75rem;
+        }
+        .page-header p { color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+        /* Filters */
+        .filters-section {
+            padding: 0 2rem 2rem;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .filters-bar {
+            display: flex; gap: 1rem; flex-wrap: wrap;
+            align-items: center; justify-content: center;
+        }
+        .filter-group {
+            position: relative;
+        }
+        .filter-group select, .filter-group input {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            color: var(--light);
+            font-size: 0.9rem;
+            min-width: 180px;
+            cursor: pointer;
+            appearance: none;
+            outline: none;
+        }
+        .filter-group input { min-width: 250px; cursor: text; }
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: var(--primary);
+        }
+        .filter-group::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 1rem; top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            pointer-events: none;
+        }
+        .filter-group.input-group::after { content: '\f002'; }
+
+        .price-range {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .price-range input {
+            width: 120px; min-width: 120px;
+            padding: 0.75rem 1rem;
+        }
+        .price-range span { color: var(--gray); font-size: 0.85rem; }
+
+        .active-filters {
+            display: flex; gap: 0.5rem; flex-wrap: wrap;
+            justify-content: center; margin-top: 1rem;
+        }
+        .filter-tag {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.4rem 0.875rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+        .filter-tag button {
+            background: none; border: none; color: var(--primary);
+            cursor: pointer; font-size: 0.7rem;
+        }
+
+        /* Listings Grid */
+        .listings-section {
+            padding: 2rem;
+            max-width: 1400px; margin: 0 auto;
+        }
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .listing-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        .listing-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(99, 102, 241, 0.2);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .listing-image {
+            position: relative;
+            height: 220px;
+            overflow: hidden;
+        }
+        .listing-image img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .listing-card:hover .listing-image img { transform: scale(1.05); }
+
+        .listing-badge {
+            position: absolute;
+            top: 1rem; left: 1rem;
+            padding: 0.4rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-featured { background: var(--gradient); color: white; }
+        .badge-new { background: var(--accent); color: white; }
+
+        .listing-price {
+            position: absolute;
+            bottom: 1rem; right: 1rem;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .listing-price span {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--gray);
+        }
+
+        .listing-content {
+            padding: 1.5rem;
+        }
+        .listing-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+        .listing-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        .listing-location {
+            display: flex; align-items: center; gap: 0.4rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .listing-features {
+            display: flex; gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .listing-feature {
+            display: flex; align-items: center; gap: 0.35rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        .listing-feature i { color: var(--primary); font-size: 0.9rem; }
+
+        .listing-amenities {
+            display: flex; flex-wrap: wrap; gap: 0.4rem;
+            margin-bottom: 1.25rem;
+        }
+        .amenity-tag {
+            padding: 0.25rem 0.6rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .listing-actions {
+            display: flex; gap: 0.75rem;
+        }
+        .listing-actions .btn { flex: 1; justify-content: center; }
+
+        /* Loading & Empty States */
+        .loading-state {
+            text-align: center; padding: 4rem;
+        }
+        .loading-state i {
+            font-size: 3rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty-state {
+            text-align: center; padding: 4rem;
+            grid-column: 1 / -1;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        .empty-state h3 { margin-bottom: 0.5rem; }
+        .empty-state p { color: var(--gray); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h3 { font-size: 1.25rem; }
+        .modal-close {
+            background: none; border: none; color: var(--gray);
+            font-size: 1.5rem; cursor: pointer;
+        }
+        .modal-body { padding: 1.5rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block; margin-bottom: 0.5rem;
+            font-size: 0.9rem; font-weight: 500;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            color: var(--light);
+            font-size: 0.95rem;
+            outline: none; font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center; color: var(--gray);
+            font-size: 0.875rem; margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .filters-bar { flex-direction: column; align-items: stretch; }
+            .filter-group select, .filter-group input { width: 100%; min-width: unset; }
+            .listings-grid { grid-template-columns: 1fr; }
+            .price-range { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">Ten<span>&</span>See</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/listings.html">Listings</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1>Find Your <span style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Perfect Home</span></h1>
+        <p>Browse our curated collection of student-friendly accommodations</p>
+    </div>
+
+    <div class="filters-section">
+        <div class="filters-bar">
+            <div class="filter-group input-group">
+                <input type="text" id="searchInput" placeholder="Search by location, university..." oninput="debouncedSearch()">
+            </div>
+            <div class="filter-group">
+                <select id="cityFilter" onchange="applyFilters()">
+                    <option value="">All Cities</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select id="universityFilter" onchange="applyFilters()">
+                    <option value="">All Universities</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select id="typeFilter" onchange="applyFilters()">
+                    <option value="">All Types</option>
+                    <option value="apartment">Apartment</option>
+                    <option value="studio">Studio</option>
+                    <option value="shared_room">Shared Room</option>
+                    <option value="private_room">Private Room</option>
+                    <option value="house">House</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select id="bedroomsFilter" onchange="applyFilters()">
+                    <option value="">Any Bedrooms</option>
+                    <option value="1">1 Bedroom</option>
+                    <option value="2">2 Bedrooms</option>
+                    <option value="3">3 Bedrooms</option>
+                    <option value="4">4+ Bedrooms</option>
+                </select>
+            </div>
+            <div class="price-range">
+                <input type="number" id="minPrice" placeholder="Min $" onchange="applyFilters()">
+                <span>to</span>
+                <input type="number" id="maxPrice" placeholder="Max $" onchange="applyFilters()">
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="clearFilters()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+        <div class="active-filters" id="activeFilters"></div>
+    </div>
+
+    <div class="listings-section">
+        <div class="listings-grid" id="listingsGrid">
+            <div class="loading-state">
+                <i class="fas fa-circle-notch"></i>
+                <p style="margin-top:1rem;color:var(--gray)">Loading listings...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-check" style="color:var(--primary)"></i> Book a Viewing</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm" onsubmit="submitBooking(event)">
+                    <input type="hidden" id="bookingListingId">
+                    <input type="hidden" id="bookingListingTitle">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="bookingName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="bookingEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="bookingPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>University</label>
+                        <input type="text" id="bookingUniversity">
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Date</label>
+                        <input type="date" id="bookingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="bookingMessage" placeholder="Any specific requirements..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">
+                        <i class="fas fa-paper-plane"></i> Submit Booking Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Ten&See. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let allListings = [];
+        let searchTimeout;
+
+        // Load listings on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadListings();
+            loadFilterOptions();
+        });
+
+        async function loadListings() {
+            try {
+                const res = await fetch('/api/listings');
+                const data = await res.json();
+                allListings = data.data || [];
+                renderListings(allListings);
+            } catch (e) {
+                console.error('Error loading listings:', e);
+                document.getElementById('listingsGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Unable to load listings</h3>
+                        <p>Please check your connection and try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadFilterOptions() {
+            try {
+                const res = await fetch('/api/listings/filters/options');
+                const data = await res.json();
+                const options = data.data;
+
+                const citySelect = document.getElementById('cityFilter');
+                options.cities.forEach(city => {
+                    if (city) citySelect.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+
+                const uniSelect = document.getElementById('universityFilter');
+                options.universities.forEach(uni => {
+                    if (uni) uniSelect.innerHTML += `<option value="${uni}">${uni}</option>`;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        function renderListings(listings) {
+            const grid = document.getElementById('listingsGrid');
+
+            if (listings.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No listings found</h3>
+                        <p>Try adjusting your filters to see more results.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = listings.map(listing => `
+                <div class="listing-card" data-id="${listing._id}">
+                    <div class="listing-image">
+                        <img src="${listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" alt="${listing.title}">
+                        ${listing.isFeatured ? '<span class="listing-badge badge-featured">Featured</span>' : ''}
+                        ${isNew(listing.createdAt) ? '<span class="listing-badge badge-new" style="left:auto;right:1rem;">New</span>' : ''}
+                        <div class="listing-price">$${listing.price}<span>/${listing.pricePeriod}</span></div>
+                    </div>
+                    <div class="listing-content">
+                        <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
+                        <h3 class="listing-title">${listing.title}</h3>
+                        <div class="listing-location">
+                            <i class="fas fa-map-marker-alt" style="color:var(--primary)"></i>
+                            ${listing.location?.address || ''}, ${listing.location?.city || ''}
+                        </div>
+                        <div class="listing-features">
+                            ${listing.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${listing.bedrooms} BR</div>` : ''}
+                            ${listing.bathrooms ? `<div class="listing-feature"><i class="fas fa-bath"></i> ${listing.bathrooms} BA</div>` : ''}
+                            <div class="listing-feature"><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
+                        </div>
+                        <div class="listing-amenities">
+                            ${(listing.amenities || []).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                            ${(listing.amenities || []).length > 4 ? `<span class="amenity-tag">+${listing.amenities.length - 4} more</span>` : ''}
+                        </div>
+                        <div class="listing-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
+                                <i class="fas fa-calendar"></i> Book Viewing
+                            </button>
+                            <a href="https://wa.me/${listing.whatsappNumber || '1234567890'}" class="btn btn-whatsapp btn-sm" onclick="trackWhatsAppLead('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function isNew(date) {
+            const d = new Date(date);
+            const now = new Date();
+            return (now - d) / (1000 * 60 * 60 * 24) <= 7;
+        }
+
+        function debouncedSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 300);
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value;
+            const city = document.getElementById('cityFilter').value;
+            const university = document.getElementById('universityFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const bedrooms = document.getElementById('bedroomsFilter').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            let filtered = allListings;
+
+            if (search) {
+                const s = search.toLowerCase();
+                filtered = filtered.filter(l => 
+                    l.title.toLowerCase().includes(s) ||
+                    l.description.toLowerCase().includes(s) ||
+                    l.location?.city?.toLowerCase().includes(s) ||
+                    l.location?.university?.toLowerCase().includes(s)
+                );
+            }
+            if (city) filtered = filtered.filter(l => l.location?.city === city);
+            if (university) filtered = filtered.filter(l => l.location?.university === university);
+            if (type) filtered = filtered.filter(l => l.propertyType === type);
+            if (bedrooms) filtered = filtered.filter(l => l.bedrooms >= parseInt(bedrooms));
+            if (minPrice) filtered = filtered.filter(l => l.price >= parseInt(minPrice));
+            if (maxPrice) filtered = filtered.filter(l => l.price <= parseInt(maxPrice));
+
+            renderListings(filtered);
+            updateActiveFilters({ search, city, university, type, bedrooms, minPrice, maxPrice });
+        }
+
+        function updateActiveFilters(filters) {
+            const container = document.getElementById('activeFilters');
+            const tags = [];
+
+            if (filters.search) tags.push({ label: `Search: "${filters.search}"`, key: 'search' });
+            if (filters.city) tags.push({ label: filters.city, key: 'city' });
+            if (filters.university) tags.push({ label: filters.university, key: 'university' });
+            if (filters.type) tags.push({ label: filters.type.replace('_', ' '), key: 'type' });
+            if (filters.bedrooms) tags.push({ label: `${filters.bedrooms}+ BR`, key: 'bedrooms' });
+            if (filters.minPrice || filters.maxPrice) {
+                tags.push({ label: `$${filters.minPrice || 0} - $${filters.maxPrice || '∞'}`, key: 'price' });
+            }
+
+            container.innerHTML = tags.map(tag => `
+                <span class="filter-tag">
+                    ${tag.label}
+                    <button onclick="removeFilter('${tag.key}')"><i class="fas fa-times"></i></button>
+                </span>
+            `).join('');
+        }
+
+        function removeFilter(key) {
+            if (key === 'search') document.getElementById('searchInput').value = '';
+            if (key === 'city') document.getElementById('cityFilter').value = '';
+            if (key === 'university') document.getElementById('universityFilter').value = '';
+            if (key === 'type') document.getElementById('typeFilter').value = '';
+            if (key === 'bedrooms') document.getElementById('bedroomsFilter').value = '';
+            if (key === 'price') {
+                document.getElementById('minPrice').value = '';
+                document.getElementById('maxPrice').value = '';
+            }
+            applyFilters();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('cityFilter').value = '';
+            document.getElementById('universityFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('bedroomsFilter').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('activeFilters').innerHTML = '';
+            renderListings(allListings);
+        }
+
+        function openBooking(id, title) {
+            document.getElementById('bookingListingId').value = id;
+            document.getElementById('bookingListingTitle').value = title;
+            document.getElementById('bookingModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+            document.getElementById('bookingForm').reset();
+        }
+
+        async function submitBooking(e) {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('bookingName').value,
+                email: document.getElementById('bookingEmail').value,
+                phone: document.getElementById('bookingPhone').value,
+                university: document.getElementById('bookingUniversity').value,
+                message: `Booking request for ${document.getElementById('bookingListingTitle').value}. Preferred date: ${document.getElementById('bookingDate').value}. ${document.getElementById('bookingMessage').value}`,
+                source: 'booking_form',
+                listingId: document.getElementById('bookingListingId').value,
+                listingTitle: document.getElementById('bookingListingTitle').value
+            };
+
+            try {
+                const res = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert('Booking request submitted! We will contact you soon.');
+                    closeModal();
+                }
+            } catch (e) { alert('Error submitting booking. Please try again.'); }
+        }
+
+        async function trackWhatsAppLead(listingId, listingTitle) {
+            try {
+                await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'WhatsApp Visitor',
+                        email: 'whatsapp@visitor.com',
+                        source: 'whatsapp',
+                        listingId,
+                        listingTitle,
+                        message: `Clicked WhatsApp for: ${listingTitle}`
+                    })
+                });
+            } catch(e) { console.log(e); }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('bookingModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('bookingModal')) closeModal();
+        });
+    </script>
+</body>
+</html>
