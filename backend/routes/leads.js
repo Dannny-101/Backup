@@ -3,6 +3,15 @@ const router = express.Router();
 const Lead = require('../models/Lead');
 
 // POST create lead (from any source)
+const visitorId = req.cookies.visitorId || uuidv4();
+res.cookie('visitorId', visitorId, { 
+    maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production'
+});
+
+// Save visitorId with lead
+lead.visitorId = visitorId;
 router.post('/', async (req, res) => {
     try {
         const lead = await Lead.create({
