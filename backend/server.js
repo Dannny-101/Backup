@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
@@ -9,6 +10,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // MongoDB Connection
