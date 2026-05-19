@@ -20,6 +20,11 @@ app.get('/debug', (req, res) => {
     frontendFiles: fs.existsSync(frontendPath) ? fs.readdirSync(frontendPath) : 'NOT FOUND'
   });
 });
+app.get('/debug-html', (req, res) => {
+  const fs = require('fs');
+  const content = fs.readFileSync(path.join(__dirname, '../frontend/index.html'), 'utf8');
+  res.type('text').send(content.substring(0, 500));
+});
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee', {
   useNewUrlParser: true,
