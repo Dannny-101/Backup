@@ -10,6 +10,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.get('/debug', (req, res) => {
+  const fs = require('fs');
+  const frontendPath = path.join(__dirname, '../frontend');
+  res.json({
+    __dirname,
+    frontendPath,
+    frontendExists: fs.existsSync(frontendPath),
+    frontendFiles: fs.existsSync(frontendPath) ? fs.readdirSync(frontendPath) : 'NOT FOUND'
+  });
+});
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee', {
   useNewUrlParser: true,
