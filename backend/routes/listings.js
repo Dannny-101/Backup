@@ -42,6 +42,18 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET unique cities and universities for filters
+router.get('/filters/options', async (req, res) => {
+    try {
+        const cities = await Listing.distinct('location.city', { isActive: true });
+        const universities = await Listing.distinct('location.university', { isActive: true });
+        const propertyTypes = await Listing.distinct('propertyType', { isActive: true });
+        res.json({ success: true, data: { cities, universities, propertyTypes } });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // GET single listing
 router.get('/:id', async (req, res) => {
     try {
@@ -86,18 +98,6 @@ router.delete('/:id', async (req, res) => {
         const listing = await Listing.findByIdAndDelete(req.params.id);
         if (!listing) return res.status(404).json({ success: false, error: 'Listing not found' });
         res.json({ success: true, message: 'Listing deleted' });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// GET unique cities and universities for filters
-router.get('/filters/options', async (req, res) => {
-    try {
-        const cities = await Listing.distinct('location.city', { isActive: true });
-        const universities = await Listing.distinct('location.university', { isActive: true });
-        const propertyTypes = await Listing.distinct('propertyType', { isActive: true });
-        res.json({ success: true, data: { cities, universities, propertyTypes } });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

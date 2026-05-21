@@ -97,6 +97,15 @@
             background: rgba(201, 168, 76, 0.1);
             color: var(--color-accent);
         }
+        .btn-outline-dark {
+            background: transparent;
+            color: var(--color-primary);
+            border: 1.5px solid var(--color-border);
+        }
+        .btn-outline-dark:hover {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
         .btn-whatsapp { background: #25d366; color: white; }
         .btn-whatsapp:hover { background: #128c7e; }
         .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
@@ -829,7 +838,7 @@
 
             grid.innerHTML = listings.map(listing => `
                 <div class="listing-card" data-id="${listing._id}" data-aos="fade-up">
-                    <div class="listing-image">
+                    <div class="listing-image" onclick="window.location='/listing.html?id=${listing._id}'" style="cursor:pointer;">
                         <img src="${listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" alt="${listing.title}">
                         ${listing.isFeatured ? '<span class="listing-badge badge-featured">Featured</span>' : ''}
                         ${isNew(listing.createdAt) ? '<span class="listing-badge badge-new" style="left:auto;right:1rem;">New</span>' : ''}
@@ -856,8 +865,11 @@
                             ${(listing.amenities || []).length > 4 ? `<span class="amenity-tag">+${listing.amenities.length - 4} more</span>` : ''}
                         </div>
                         <div class="listing-actions">
+                            <a href="/listing.html?id=${listing._id}" class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
                             <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
-                                <i class="fas fa-calendar"></i> Enquire via Ten&See
+                                <i class="fas fa-calendar"></i> Enquire
                             </button>
                         </div>
                     </div>
