@@ -856,8 +856,11 @@
                             ${(listing.amenities || []).length > 4 ? `<span class="amenity-tag">+${listing.amenities.length - 4} more</span>` : ''}
                         </div>
                         <div class="listing-actions">
+                            <a href="/listing.html?id=${listing._id}" class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
                             <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
-                                <i class="fas fa-calendar"></i> Enquire via Ten&See
+                                <i class="fas fa-calendar"></i> Enquire
                             </button>
                         </div>
                     </div>
