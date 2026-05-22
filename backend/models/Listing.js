@@ -22,6 +22,8 @@ const listingSchema = new mongoose.Schema({
     bedrooms: Number,
     bathrooms: Number,
     maxOccupants: Number,
+    totalRooms: { type: Number, required: true, default: 1 },
+    availableRooms: { type: Number, required: true, default: 1 },
     availableFrom: Date,
     availableUntil: Date,
     isActive: { type: Boolean, default: true },
