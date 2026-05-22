@@ -431,9 +431,11 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    // ── FIXED SUBMIT FUNCTION ──
     async function submitEnquiry() {
         const name = document.getElementById('eqName').value.trim();
         const email = document.getElementById('eqEmail').value.trim();
+        
         if (!name || !email) { 
             showToast('Please enter your name and email.', 'error');
             return; 
@@ -453,28 +455,70 @@
         };
 
         try {
+            // 10 second timeout to prevent infinite loading
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
             const res = await fetch('/api/leads', { 
                 method: 'POST', 
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(body) 
+                body: JSON.stringify(body),
+                signal: controller.signal
             });
             
-            if (res.ok) {
+            clearTimeout(timeoutId);
+
+            // Handle non-JSON responses
+            let data;
+            try {
+                data = await res.json();
+            } catch {
+                data = { success: res.ok };
+            }
+
+            console.log('Response:', res.status, data);
+
+            if (res.ok || data.success) {
                 setBtnState('success');
                 showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
+                
+                // Close modal and clear form after 1.5 seconds
                 setTimeout(() => {
                     closeModal();
-                    document.getElementById('bookingForm').reset();
+                    document.getElementById('eqName').value = '';
+                    document.getElementById('eqEmail').value = '';
+                    document.getElementById('eqPhone').value = '';
+                    document.getElementById('eqUni').value = '';
+                    document.getElementById('eqDate').value = '';
+                    document.getElementById('eqMsg').value = '';
                 }, 1500);
+                
             } else {
-                throw new Error('Failed');
+                throw new Error(data.message || 'Server error');
             }
-        } catch {
+            
+        } catch (err) {
+            console.error('Submit error:', err);
             setBtnState('error');
-            showToast('Something went wrong. Please try WhatsApp.', 'error');
-            resetBtn();
+            
+            if (err.name === 'AbortError') {
+                showToast('Request timed out. Please try again.', 'error');
+            } else {
+                showToast('Something went wrong. Please try WhatsApp.', 'error');
+            }
+            
+            resetBtn(); // Auto-reset after 3 seconds
         }
     }
+
+    // Emergency reset — prevents infinite loading if something goes wrong
+    setInterval(() => {
+        const btn = document.getElementById('enquiryBtn');
+        if (btn && btn.disabled && btn.classList.contains('loading')) {
+            console.log('Force resetting stuck button');
+            setBtnState('idle');
+        }
+    }, 15000);
 
     function showError(msg) {
         document.getElementById('pageWrap').innerHTML = `
