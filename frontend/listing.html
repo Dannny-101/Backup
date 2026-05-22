@@ -454,36 +454,26 @@
         listingTitle: currentListing?.title
     };
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-        
-        const res = await fetch('/api/leads', { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(body),
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
+    fetch('/api/leads', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(body)
+    })
+    .then(async (res) => {
+        // Read response as text first (never crashes)
+        const responseText = await res.text();
+        console.log('=== ENQUIRY RESPONSE ===');
+        console.log('Status:', res.status);
+        console.log('Status Text:', res.statusText);
+        console.log('Response body:', responseText);
 
-        // Parse JSON response
-        let data;
-        try {
-            data = await res.json();
-        } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            throw new Error('Invalid server response');
-        }
-
-        console.log('Response:', res.status, data);
-
-        // Check HTTP status AND server success flag
-        if (res.ok && data.success === true) {
+        // Check if HTTP status is 200-299 (success range)
+        // Your backend returns 201 for created leads
+        if (res.ok) {
+            console.log('✅ Request succeeded!');
             setBtnState('success');
             showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
             
-            // Clear form and close modal
             setTimeout(() => {
                 closeModal();
                 document.getElementById('eqName').value = '';
@@ -493,26 +483,18 @@
                 document.getElementById('eqDate').value = '';
                 document.getElementById('eqMsg').value = '';
             }, 1500);
-            
         } else {
-            // Server returned error (400, 500, or success: false)
-            const errorMsg = data.error || data.message || `Server error (${res.status})`;
-            console.error('Server error:', errorMsg);
-            throw new Error(errorMsg);
+            // Server returned error status (400, 500, etc.)
+            console.error('❌ Server returned error status:', res.status);
+            throw new Error(`Server error: ${res.status}`);
         }
-        
-    } catch (err) {
-        console.error('Submit error:', err);
+    })
+    .catch((err) => {
+        console.error('❌ Fetch error:', err);
         setBtnState('error');
-        
-        if (err.name === 'AbortError') {
-            showToast('Request timed out. Please try again.', 'error');
-        } else {
-            showToast(err.message || 'Something went wrong. Please try WhatsApp.', 'error');
-        }
-        
+        showToast('Something went wrong. Please try WhatsApp.', 'error');
         resetBtn();
-    }
+    });
 }
     // Emergency reset — prevents infinite loading if something goes wrong
     setInterval(() => {
