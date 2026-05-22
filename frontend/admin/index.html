@@ -781,6 +781,91 @@
   </div>
 </div>
 
+<!-- Task Modal -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="taskModalTitle">New Task</span>
+      <button class="modal-close" onclick="closeModal('taskModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input class="form-input" id="taskTitle" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="taskDesc"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select class="form-select" id="taskPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="taskCategory">
+            <option value="general">General</option>
+            <option value="listings">Listings</option>
+            <option value="leads">Leads</option>
+            <option value="bookings">Bookings</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input class="form-input" type="date" id="taskDueDate">
+      </div>
+      <button class="btn btn-gold" style="width:100%;" onclick="saveTask()">
+        <i class="fas fa-save"></i> Save Task
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div class="modal-overlay" id="teamModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Add Team Member</span>
+      <button class="modal-close" onclick="closeModal('teamModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Username *</label>
+        <input class="form-input" id="teamUsername" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <input class="form-input" type="password" id="teamPassword" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="form-input" id="teamName">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="teamEmail">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-select" id="teamRole">
+          <option value="admin">Admin</option>
+          <option value="superadmin">Super Admin</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" style="width:100%;" onclick="saveTeamMember()">
+        <i class="fas fa-user-plus"></i> Add Member
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Booking Modal -->
 <div class="modal-overlay" id="bookingModal">
   <div class="modal modal-sm">
@@ -960,7 +1045,7 @@ const TITLES = {
   chat: ['Live Chat', 'Customer conversations'],
   analytics: ['Analytics', 'Performance insights'],
   reports: ['Reports', 'Detailed data reports'],
-  audit: ['Audit Log', 'Admin activity history']
+  audit: ['Audit Log', 'Admin activity history'],
   tasks: ['Task Board', 'Team task management'],
   team: ['Team', 'Manage admin users']
 };
@@ -979,8 +1064,8 @@ function showSection(sec) {
   const loaders = {
     dashboard: loadDashboard, listings: loadListings, leads: loadLeads,
     bookings: loadBookings, chat: () => { loadChat(); S.chatInterval = setInterval(() => { loadChatSessions(); if (S.currentSession) loadMessages(S.currentSession); }, 5000); },
-    analytics: loadAnalytics, reports: loadReports, audit: loadAudit tasks: loadTasks,
-team: loadTeam
+    analytics: loadAnalytics, reports: loadReports, audit: loadAudit, tasks: loadTasks,
+    team: loadTeam
   };
   loaders[sec]?.();
 
