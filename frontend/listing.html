@@ -432,7 +432,7 @@
     }
 
     // ── FIXED SUBMIT FUNCTION ──
-    async function submitEnquiry() {
+   async function submitEnquiry() {
     const name = document.getElementById('eqName').value.trim();
     const email = document.getElementById('eqEmail').value.trim();
     
@@ -455,33 +455,26 @@
     };
 
     try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
         const res = await fetch('/api/leads', { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify(body),
-            signal: controller.signal
+            body: JSON.stringify(body)
         });
+
+        // Try to parse JSON, fall back to text
+        let data;
+        const contentType = res.headers.get('content-type');
         
-        clearTimeout(timeoutId);
-
-        // Read response as TEXT first (never crashes)
-        const responseText = await res.text();
-        console.log('Raw response:', responseText);
-        console.log('Status:', res.status, res.statusText);
-
-        // Try to parse JSON if possible
-        let data = {};
-        try {
-            data = JSON.parse(responseText);
-        } catch {
-            data = { rawResponse: responseText };
+        if (contentType && contentType.includes('application/json')) {
+            data = await res.json();
+        } else {
+            data = { raw: await res.text() };
         }
 
-        // SUCCESS: status 200-299 means it worked (admin got the notification)
-        if (res.ok || res.status === 200 || res.status === 201) {
+        console.log('Status:', res.status, 'Data:', data);
+
+        // SUCCESS: HTTP 200-299 OR explicit success flag
+        if (res.ok || data.success === true || data.status === 'success') {
             setBtnState('success');
             showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
             
@@ -494,22 +487,21 @@
                 document.getElementById('eqDate').value = '';
                 document.getElementById('eqMsg').value = '';
             }, 1500);
-            return;
+            
+        } else {
+            // Server returned error (400, 500, etc.)
+            const errorMsg = data.message || data.error || `Server error ${res.status}`;
+            console.error('Server error:', errorMsg);
+            setBtnState('error');
+            showToast(errorMsg, 'error');
+            resetBtn();
         }
-
-        // Only show error if status is actually bad (400, 500, etc.)
-        throw new Error(`Server ${res.status}: ${responseText.substring(0, 100)}`);
         
     } catch (err) {
-        console.error('Submit error:', err);
+        // Network error, CORS, etc.
+        console.error('Network error:', err);
         setBtnState('error');
-        
-        if (err.name === 'AbortError') {
-            showToast('Request timed out. Please try again.', 'error');
-        } else {
-            showToast('Something went wrong. Please try WhatsApp.', 'error');
-        }
-        
+        showToast('Network error. Please try WhatsApp.', 'error');
         resetBtn();
     }
 }
