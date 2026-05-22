@@ -433,84 +433,86 @@
 
     // ── FIXED SUBMIT FUNCTION ──
     async function submitEnquiry() {
-        const name = document.getElementById('eqName').value.trim();
-        const email = document.getElementById('eqEmail').value.trim();
-        
-        if (!name || !email) { 
-            showToast('Please enter your name and email.', 'error');
-            return; 
-        }
-
-        setBtnState('loading');
-
-        const body = {
-            name,
-            email,
-            phone: document.getElementById('eqPhone').value,
-            university: document.getElementById('eqUni').value,
-            message: `Enquiry for "${currentListing?.title}". Move-in: ${document.getElementById('eqDate').value || 'Flexible'}. ${document.getElementById('eqMsg').value}`,
-            source: 'booking_form',
-            listingId: currentListing?._id,
-            listingTitle: currentListing?.title
-        };
-
-        try {
-            // 10 second timeout to prevent infinite loading
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
-            const res = await fetch('/api/leads', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(body),
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-
-            // Handle non-JSON responses
-            let data;
-            try {
-                data = await res.json();
-            } catch {
-                data = { success: res.ok };
-            }
-
-            console.log('Response:', res.status, data);
-
-            if (res.ok || data.success) {
-                setBtnState('success');
-                showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
-                
-                // Close modal and clear form after 1.5 seconds
-                setTimeout(() => {
-                    closeModal();
-                    document.getElementById('eqName').value = '';
-                    document.getElementById('eqEmail').value = '';
-                    document.getElementById('eqPhone').value = '';
-                    document.getElementById('eqUni').value = '';
-                    document.getElementById('eqDate').value = '';
-                    document.getElementById('eqMsg').value = '';
-                }, 1500);
-                
-            } else {
-                throw new Error(data.message || 'Server error');
-            }
-            
-        } catch (err) {
-            console.error('Submit error:', err);
-            setBtnState('error');
-            
-            if (err.name === 'AbortError') {
-                showToast('Request timed out. Please try again.', 'error');
-            } else {
-                showToast('Something went wrong. Please try WhatsApp.', 'error');
-            }
-            
-            resetBtn(); // Auto-reset after 3 seconds
-        }
+    const name = document.getElementById('eqName').value.trim();
+    const email = document.getElementById('eqEmail').value.trim();
+    
+    if (!name || !email) { 
+        showToast('Please enter your name and email.', 'error');
+        return; 
     }
 
+    setBtnState('loading');
+
+    const body = {
+        name,
+        email,
+        phone: document.getElementById('eqPhone').value,
+        university: document.getElementById('eqUni').value,
+        message: `Enquiry for "${currentListing?.title}". Move-in: ${document.getElementById('eqDate').value || 'Flexible'}. ${document.getElementById('eqMsg').value}`,
+        source: 'booking_form',
+        listingId: currentListing?._id,
+        listingTitle: currentListing?.title
+    };
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const res = await fetch('/api/leads', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(body),
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+
+        // Read response as TEXT first (never crashes)
+        const responseText = await res.text();
+        console.log('Raw response:', responseText);
+        console.log('Status:', res.status, res.statusText);
+
+        // Try to parse JSON if possible
+        let data = {};
+        try {
+            data = JSON.parse(responseText);
+        } catch {
+            data = { rawResponse: responseText };
+        }
+
+        // SUCCESS: status 200-299 means it worked (admin got the notification)
+        if (res.ok || res.status === 200 || res.status === 201) {
+            setBtnState('success');
+            showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
+            
+            setTimeout(() => {
+                closeModal();
+                document.getElementById('eqName').value = '';
+                document.getElementById('eqEmail').value = '';
+                document.getElementById('eqPhone').value = '';
+                document.getElementById('eqUni').value = '';
+                document.getElementById('eqDate').value = '';
+                document.getElementById('eqMsg').value = '';
+            }, 1500);
+            return;
+        }
+
+        // Only show error if status is actually bad (400, 500, etc.)
+        throw new Error(`Server ${res.status}: ${responseText.substring(0, 100)}`);
+        
+    } catch (err) {
+        console.error('Submit error:', err);
+        setBtnState('error');
+        
+        if (err.name === 'AbortError') {
+            showToast('Request timed out. Please try again.', 'error');
+        } else {
+            showToast('Something went wrong. Please try WhatsApp.', 'error');
+        }
+        
+        resetBtn();
+    }
+}
     // Emergency reset — prevents infinite loading if something goes wrong
     setInterval(() => {
         const btn = document.getElementById('enquiryBtn');
