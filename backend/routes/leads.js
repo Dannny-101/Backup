@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Lead = require('../models/Lead');
-const { createNotification } = require('./notifications');
+const Notification = require('../models/Notification');
 const emailService = require('../utils/email');
 
+// POST /api/leads — Create new lead
 router.post('/', async (req, res) => {
   try {
     const lead = await Lead.create({
@@ -17,19 +18,35 @@ router.post('/', async (req, res) => {
       await Listing.findByIdAndUpdate(req.body.listingId, { $inc: { inquiries: 1 } });
     }
 
-    await createNotification(
-      'new_lead',
-      'New Lead Received',
-      `${lead.name} submitted an inquiry via ${lead.source}`,
-      { leadId: lead._id, listingId: lead.listingId }
-    );
+    // Create notification for admin dashboard
+    await Notification.create({
+      type: 'new_lead',
+      title: 'New Lead Received',
+      message: `${lead.name} submitted an inquiry via ${lead.source}`,
+      data: { 
+        leadId: lead._id, 
+        listingId: lead.listingId 
+      },
+      isRead: false
+    });
 
     await emailService.sendNewLeadAlert(
       process.env.ADMIN_EMAIL || 'admin@tenandsee.com',
-      { name: lead.name, email: lead.email, phone: lead.phone, university: lead.university, source: lead.source, listingTitle: lead.listingTitle, message: lead.message }
+      { 
+        name: lead.name, 
+        email: lead.email, 
+        phone: lead.phone, 
+        university: lead.university, 
+        source: lead.source, 
+        listingTitle: lead.listingTitle, 
+        message: lead.message 
+      }
     );
 
-    await emailService.sendStudentConfirmation(lead.email, { name: lead.name, listingTitle: lead.listingTitle });
+    await emailService.sendStudentConfirmation(lead.email, { 
+      name: lead.name, 
+      listingTitle: lead.listingTitle 
+    });
 
     res.status(201).json({ success: true, data: lead });
   } catch (error) {
@@ -37,10 +54,12 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /api/leads — Get all leads
 router.get('/', async (req, res) => {
   try {
-    const { status, source, search } = req.query;
+    const { status, source, search, limit } = req.query;
     let query = {};
+    
     if (status) query.status = status;
     if (source) query.source = source;
     if (search) {
@@ -50,13 +69,18 @@ router.get('/', async (req, res) => {
         { phone: new RegExp(search, 'i') }
       ];
     }
-    const leads = await Lead.find(query).sort({ createdAt: -1 });
+    
+    let leadsQuery = Lead.find(query).sort({ createdAt: -1 });
+    if (limit) leadsQuery = leadsQuery.limit(parseInt(limit));
+    
+    const leads = await leadsQuery;
     res.json({ success: true, count: leads.length, data: leads });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
+// GET /api/leads/:id — Get single lead
 router.get('/:id', async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
@@ -67,6 +91,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// PUT /api/leads/:id — Update lead
 router.put('/:id', async (req, res) => {
   try {
     const oldLead = await Lead.findById(req.params.id);
@@ -75,17 +100,28 @@ router.put('/:id', async (req, res) => {
     req.body.updatedAt = Date.now();
     const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
+    // Create notification if status changed
     if (req.body.status && req.body.status !== oldLead.status) {
-      await createNotification(
-        'lead_status_change',
-        'Lead Status Updated',
-        `${lead.name}'s status changed from ${oldLead.status} to ${lead.status}`,
-        { leadId: lead._id, listingId: lead.listingId }
-      );
+      await Notification.create({
+        type: 'lead_status_change',
+        title: 'Lead Status Updated',
+        message: `${lead.name}'s status changed from ${oldLead.status} to ${lead.status}`,
+        data: { 
+          leadId: lead._id, 
+          listingId: lead.listingId 
+        },
+        isRead: false
+      });
 
       await emailService.sendStatusUpdate(
         process.env.ADMIN_EMAIL || 'admin@tenandsee.com',
-        { name: lead.name, email: lead.email, oldStatus: oldLead.status, status: lead.status, notes: lead.notes }
+        { 
+          name: lead.name, 
+          email: lead.email, 
+          oldStatus: oldLead.status, 
+          status: lead.status, 
+          notes: lead.notes 
+        }
       );
     }
 
@@ -95,6 +131,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/leads/:id — Delete lead
 router.delete('/:id', async (req, res) => {
   try {
     const lead = await Lead.findByIdAndDelete(req.params.id);
