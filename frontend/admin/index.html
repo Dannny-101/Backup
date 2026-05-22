@@ -625,11 +625,15 @@
     }
     @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr 1fr; } .three-col { grid-template-columns: 1fr; } }
   </style>
+<base target="_blank">
 </head>
 <body>
 
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- Notification Sound -->
+<audio id="notifSound" preload="auto"><source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg"></audio>
 
 <!-- Notification Panel -->
 <div class="notif-panel" id="notifPanel">
@@ -1640,19 +1644,33 @@ async function loadAudit() {
 async function pollNotifications() {
   try {
     const data = await api('/api/notifications/recent');
-    S.notifications = data.data || [];
+    const newNotifs = data.data || [];
+    const unreadCount = data.unreadCount || 0;
+    
+    // Track previous unread count to detect new notifications
+    const prevUnread = S.notifications._unreadCount || 0;
+    
+    // Play sound if new unread notifications arrived
+    if (unreadCount > prevUnread && prevUnread > 0) {
+      const sound = document.getElementById('notifSound');
+      if (sound) sound.play().catch(() => {});
+    }
+    
+    // Store unread count on the array for next poll
+    newNotifs._unreadCount = unreadCount;
+    S.notifications = newNotifs;
+    
     const dot = document.getElementById('notifDot');
-    if (dot) dot.classList.toggle('visible', (data.unreadCount||0) > 0);
+    if (dot) dot.classList.toggle('visible', unreadCount > 0);
     renderNotifPanel();
   } catch {}
 }
-
 function renderNotifPanel() {
   const list = document.getElementById('notifList');
   if (!list) return;
   if (!S.notifications.length) { list.innerHTML = `<div class="empty-state"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>`; return; }
   list.innerHTML = S.notifications.map(n => `
-    <div class="notif-item ${!n.isRead?'unread':''}" onclick="markRead('${n._id}')">
+    <div class="notif-item ${!n.isRead?'unread':''}" onclick="handleNotifClick('${n._id}', '${(n.leadId||'').toString().replace(/'/g, "\\'")}')">
       <div class="notif-icon si-gold" style="background:var(--gold-dim);color:var(--gold);width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <i class="fas ${notifIcon(n.type)}" style="font-size:0.75rem;"></i>
       </div>
@@ -1665,17 +1683,40 @@ function renderNotifPanel() {
   `).join('');
 }
 
+async function handleNotifClick(id, leadId) {
+  // Mark as read first
+  await markRead(id);
+  
+  // If notification has a leadId, navigate to leads section and open that lead
+  if (leadId && leadId !== 'undefined' && leadId !== 'null') {
+    // Close notification panel
+    document.getElementById('notifPanel').classList.remove('active');
+    
+    // Switch to leads section
+    showSection('leads');
+    
+    // Wait for leads to load, then open the lead modal
+    setTimeout(() => {
+      viewLead(leadId);
+    }, 500);
+  }
+}
+
 function toggleNotifPanel() {
   document.getElementById('notifPanel').classList.toggle('active');
 }
 
 async function markRead(id) {
   await api(`/api/notifications/${id}/read`, { method: 'PUT' });
-  pollNotifications();
+  // Only re-poll if panel is not being hovered (avoid conflict with click handler)
+  const panel = document.getElementById('notifPanel');
+  if (!panel || !panel.matches(':hover')) {
+    pollNotifications();
+  }
 }
 
 async function markAllRead() {
-  await api('/api/notifications/mark-all-read', { method: 'PUT' });
+  await api('/api/notifications/read-all', { method: 'PUT' });
   pollNotifications();
 }
 
