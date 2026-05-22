@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Listings — Ten&See</title>
-<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232C3830'/><text y='.9em' font-size='55' x='50%' text-anchor='middle' font-family='serif' fill='%23B8954A'>T</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- AOS Animate On Scroll -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
-    <link rel="stylesheet" href="/cookie-consent.css">
     <style>
         :root {
             --color-primary: #2C3830;
@@ -58,10 +57,8 @@
             font-size: 1.75rem; font-weight: 700;
             color: var(--color-accent);
             text-decoration: none;
-            display: inline-flex; align-items: center;
         }
         .logo span { font-weight: 300; color: white; }
-        .logo img { width: 54px; height: 54px; object-fit: contain; display: block; border-radius: 10px; }
         .nav-links { display: flex; gap: 2.5rem; align-items: center; list-style: none; }
         .nav-links a {
             color: rgba(255,255,255,0.7);
@@ -501,7 +498,6 @@
             margin-bottom: 0.75rem;
         }
         .footer-col h4 span { font-weight: 300; color: white; }
-        .footer-logo img { width: 64px; height: 64px; object-fit: contain; display: block; border-radius: 12px; }
         .footer-col p {
             color: rgba(255,255,255,0.6);
             font-size: 0.9rem;
@@ -571,7 +567,7 @@
 <body>
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="/" class="logo" target="_self" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
+            <a href="/" class="logo" target="_self">Ten<span>&</span>See</a>
             <button class="hamburger" onclick="toggleMobileNav()">☰</button>
             <ul class="nav-links" id="navLinks">
                 <li><a href="/" target="_self">Home</a></li>
@@ -785,7 +781,7 @@
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <h4 class="footer-logo"><img src="/assets/logo.png" alt="Ten&See logo"></h4>
+                <h4>Ten<span>&</span>See</h4>
                 <p>The trusted student housing platform in Malaysia.</p>
                 <p>Registered in Malaysia.</p>
             </div>
@@ -1072,14 +1068,20 @@
                 });
 
                 if (res.ok) {
-                    // Close booking modal, show success modal
+                    // SUCCESS: Close booking modal, show success modal
                     closeModal();
                     document.getElementById('successModal').classList.add('active');
                     document.getElementById('bookingForm').reset();
+                    
+                    // RESET BUTTON — THIS WAS THE BUG THAT WAS MISSING!
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
                 } else {
-                    throw new Error('Server error');
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Server error: ${res.status}`);
                 }
             } catch (e) {
+                console.error('Booking error:', e);
                 // Error state
                 submitBtn.classList.add('btn-error');
                 submitBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed — Try Again';
@@ -1101,6 +1103,5 @@
             if (e.target === document.getElementById('successModal')) closeSuccessModal();
         });
     </script>
-    <script src="/cookie-consent.js"></script>
 </body>
 </html>
