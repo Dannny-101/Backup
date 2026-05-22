@@ -67,3 +67,5 @@ router.post('/create', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+// At the bottom, after module.exports = router;
+module.exports.authMiddleware = authMiddleware;
