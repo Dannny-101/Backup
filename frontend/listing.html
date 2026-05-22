@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Room Details — Ten&See</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232C3830'/><text y='.9em' font-size='55' x='50%' text-anchor='middle' font-family='serif' fill='%23B8954A'>T</text></svg>">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/cookie-consent.css">
     <style>
         :root {
             --color-primary: #2C3830;
@@ -34,8 +35,9 @@
             max-width: 1200px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--color-accent); text-decoration: none; }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--color-accent); text-decoration: none; display: inline-flex; align-items: center; }
         .logo span { font-weight: 300; color: white; }
+        .logo img { width: 54px; height: 54px; object-fit: contain; display: block; border-radius: 10px; }
         .nav-back { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s; }
         .nav-back:hover { color: var(--color-accent); }
 
@@ -136,7 +138,7 @@
 
 <nav class="navbar">
     <div class="nav-container">
-        <a href="/" class="logo">Ten<span>&</span>See</a>
+        <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
         <a href="/listings.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Listings</a>
     </div>
 </nav>
@@ -363,5 +365,6 @@
 
     init();
 </script>
+<script src="/cookie-consent.js"></script>
 </body>
 </html>

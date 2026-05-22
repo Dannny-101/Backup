@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ten&See — Admin</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -66,7 +67,11 @@
       font-size: 1.4rem;
       color: var(--gold);
       letter-spacing: -0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
     }
+    .logo-text img { width: 44px; height: 44px; object-fit: contain; border-radius: 10px; display: block; }
     .logo-sub { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
 
     .sidebar-nav { flex: 1; padding: 0.75rem 0; overflow-y: auto; }
@@ -605,7 +610,8 @@
       box-shadow: var(--shadow);
     }
     .login-logo { text-align: center; margin-bottom: 2rem; }
-    .login-logo .logo-text { font-size: 2rem; }
+    .login-logo .logo-text { font-size: 2rem; justify-content: center; flex-direction: column; gap: 0.75rem; }
+    .login-logo .logo-text img { width: 86px; height: 86px; border-radius: 16px; }
     .login-logo p { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
     .login-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius); padding: 0.625rem 0.875rem; font-size: 0.825rem; color: var(--danger); margin-bottom: 1rem; display: none; }
 
@@ -798,7 +804,7 @@ function renderLogin() {
     <div class="login-page">
       <div class="login-card">
         <div class="login-logo">
-          <div class="logo-text">Ten&See</div>
+          <div class="logo-text"><img src="/assets/logo.png" alt="Ten&See logo"><span>Ten&See</span></div>
           <p>Admin Dashboard</p>
         </div>
         <div class="login-error" id="loginError"></div>
@@ -851,7 +857,7 @@ function renderApp() {
     <div class="layout">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-          <div class="logo-text">Ten&See</div>
+          <div class="logo-text"><img src="/assets/logo.png" alt="Ten&See logo"><span>Ten&See</span></div>
           <div class="logo-sub">Admin Panel</div>
         </div>
         <nav class="sidebar-nav">
