@@ -98,9 +98,36 @@
         .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; border: none; text-decoration: none; width: 100%; justify-content: center; margin-bottom: 0.75rem; font-family: inherit; }
         .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
         .btn-primary { background: var(--color-accent); color: var(--color-primary); box-shadow: 0 4px 15px rgba(201,168,74,0.3); }
+        .btn-primary:hover { background: #D4B55D; box-shadow: 0 6px 20px rgba(201,168,74,0.4); }
         .btn-whatsapp { background: #25d366; color: white; }
         .btn-outline-dark { background: transparent; color: var(--color-primary); border: 1.5px solid var(--color-border); }
         .btn-outline-dark:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+        /* ── ENQUIRY BUTTON STATES ── */
+        .btn-primary:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            transform: scale(0.98) !important;
+            filter: none !important;
+        }
+        .btn-primary.loading {
+            background: #6c757d !important;
+            color: white !important;
+            box-shadow: none !important;
+        }
+        .btn-primary.success {
+            background: var(--color-success) !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3) !important;
+        }
+        .btn-primary.error {
+            background: #dc3545 !important;
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(220,53,69,0.3) !important;
+        }
+        .btn-primary:active:not(:disabled) {
+            transform: scale(0.96);
+        }
 
         .agent-block { padding-top: 1.25rem; border-top: 1px solid var(--color-border); display: flex; align-items: center; gap: 0.875rem; }
         .agent-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(201,168,74,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--color-accent); flex-shrink: 0; }
@@ -122,6 +149,32 @@
         .form-group textarea { min-height: 90px; resize: vertical; }
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--color-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { border-left: 4px solid var(--color-success); }
+        .toast.error { border-left: 4px solid #dc3545; }
+
         /* Loading / Error */
         .state-block { text-align: center; padding: 5rem 2rem; }
         .state-block i { font-size: 3rem; color: var(--color-text-muted); margin-bottom: 1rem; display: block; opacity: 0.4; }
@@ -136,7 +189,7 @@
 </head>
 <body>
 
-<nav class="navbar">
+<<nav class="navbar">
     <div class="nav-container">
         <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
         <a href="/listings.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Listings</a>
@@ -181,12 +234,16 @@
                 <label>Message</label>
                 <textarea id="eqMsg" placeholder="Any questions or special requirements..."></textarea>
             </div>
-            <button class="btn btn-primary" onclick="submitEnquiry()" style="margin-bottom:0;">
-                <i class="fas fa-paper-plane"></i> Send Enquiry
+            <button class="btn btn-primary" id="enquiryBtn" onclick="submitEnquiry()" style="margin-bottom:0;">
+                <span id="btnText"><i class="fas fa-paper-plane"></i> Send Enquiry</span>
+                <span id="btnSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Sending...</span>
             </button>
         </div>
     </div>
 </div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
 <script>
     let currentListing = null;
@@ -319,15 +376,70 @@
     }
     function closeModal() {
         document.getElementById('enquiryModal').classList.remove('active');
+        resetBtn();
     }
     document.getElementById('enquiryModal').addEventListener('click', e => {
         if (e.target === document.getElementById('enquiryModal')) closeModal();
     });
 
+    // ── BUTTON STATE MANAGEMENT ──
+    function setBtnState(state) {
+        const btn = document.getElementById('enquiryBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        btn.classList.remove('loading', 'success', 'error');
+        btn.disabled = false;
+
+        switch(state) {
+            case 'loading':
+                btn.classList.add('loading');
+                btn.disabled = true;
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'inline';
+                break;
+            case 'success':
+                btn.classList.add('success');
+                btnText.innerHTML = '<i class="fas fa-check"></i> Sent!';
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+                break;
+            case 'error':
+                btn.classList.add('error');
+                btnText.innerHTML = '<i class="fas fa-times"></i> Failed';
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+                break;
+            default: // idle
+                btnText.innerHTML = '<i class="fas fa-paper-plane"></i> Send Enquiry';
+                btnText.style.display = 'inline';
+                btnSpinner.style.display = 'none';
+        }
+    }
+
+    function resetBtn() {
+        setTimeout(() => setBtnState('idle'), 3000);
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = type === 'success' 
+            ? `<i class="fas fa-check-circle" style="color:var(--color-success)"></i> ${message}`
+            : `<i class="fas fa-exclamation-circle" style="color:#dc3545"></i> ${message}`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
     async function submitEnquiry() {
         const name = document.getElementById('eqName').value.trim();
         const email = document.getElementById('eqEmail').value.trim();
-        if (!name || !email) { alert('Please enter your name and email.'); return; }
+        if (!name || !email) { 
+            showToast('Please enter your name and email.', 'error');
+            return; 
+        }
+
+        setBtnState('loading');
 
         const body = {
             name,
@@ -341,15 +453,26 @@
         };
 
         try {
-            const res = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            const res = await fetch('/api/leads', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(body) 
+            });
+            
             if (res.ok) {
-                closeModal();
-                alert('Enquiry sent! We\'ll get back to you within 24 hours.');
+                setBtnState('success');
+                showToast('Enquiry sent! We\'ll get back to you within 24 hours.');
+                setTimeout(() => {
+                    closeModal();
+                    document.getElementById('bookingForm').reset();
+                }, 1500);
             } else {
-                alert('Something went wrong. Please try again.');
+                throw new Error('Failed');
             }
         } catch {
-            alert('Network error. Please try WhatsApp instead.');
+            setBtnState('error');
+            showToast('Something went wrong. Please try WhatsApp.', 'error');
+            resetBtn();
         }
     }
 
