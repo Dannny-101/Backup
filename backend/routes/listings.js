@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Listing = require('../models/Listing');
 
-// GET all listings with filters
+// GET all listings with filters + room aggregation
 router.get('/', async (req, res) => {
     try {
         const { 
@@ -36,7 +36,20 @@ router.get('/', async (req, res) => {
         }
 
         const listings = await Listing.find(query).sort({ isFeatured: -1, createdAt: -1 });
-        res.json({ success: true, count: listings.length, data: listings });
+        
+        // Calculate total rooms across all listings
+        const totalRoomsAvailable = listings.reduce((sum, listing) => sum + (listing.availableRooms || 0), 0);
+        const totalRoomsProperty = listings.reduce((sum, listing) => sum + (listing.totalRooms || 0), 0);
+
+        res.json({ 
+            success: true, 
+            count: listings.length,
+            roomsData: {
+                totalAvailableRooms: totalRoomsAvailable,
+                totalRoomsProperty: totalRoomsProperty
+            },
+            data: listings 
+        });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
