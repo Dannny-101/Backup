@@ -7,20 +7,10 @@
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" href="/cookie-consent.css">
     <style>
-        :root {
-            --color-primary: #2C3830;
-            --color-accent: #B8954A;
-            --color-accent-light: #F0D9A0;
-            --color-bg: #F7F8FA;
-            --color-surface: #FFFFFF;
-            --color-text-main: #1C2420;
-            --color-text-muted: #6B7280;
-            --color-success: #10B981;
-            --color-border: #E5E7EB;
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: var(--color-text-main); line-height: 1.6; }
         h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; }
@@ -56,7 +46,7 @@
         .gallery { border-radius: 20px; overflow: hidden; margin-bottom: 2rem; background: var(--color-primary); }
         .gallery-main { position: relative; height: 400px; overflow: hidden; }
         .gallery-main img { width: 100%; height: 100%; object-fit: cover; }
-        .gallery-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #2C3830, #1C2420); }
+        .gallery-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--color-primary), var(--color-bg)); }
         .gallery-placeholder i { font-size: 5rem; color: rgba(184,149,74,0.3); }
 
         /* Info block */
@@ -189,9 +179,13 @@
 </head>
 <body>
 
-<<nav class="navbar">
+<nav class="navbar">
     <div class="nav-container">
         <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+            <i class="fas fa-moon" aria-hidden="true"></i>
+            <i class="fas fa-sun" aria-hidden="true"></i>
+        </button>
         <a href="/listings.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Listings</a>
     </div>
 </nav>

@@ -1,0 +1,166 @@
+/* Ten&See — global light / dark theme tokens */
+html {
+  color-scheme: light dark;
+}
+
+[data-theme="light"] {
+  --color-primary: #2C3830;
+  --color-accent: #B8954A;
+  --color-accent-light: #F0D9A0;
+  --color-bg: #F7F8FA;
+  --color-surface: #FFFFFF;
+  --color-text-main: #1C2420;
+  --color-text-muted: #6B7280;
+  --color-success: #10B981;
+  --color-border: #E5E7EB;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+
+  /* Admin dashboard aliases (light) */
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --surface2: #EEF1EF;
+  --border: var(--color-border);
+  --border-accent: rgba(184, 149, 74, 0.35);
+  --gold: var(--color-accent);
+  --gold-light: var(--color-accent-light);
+  --gold-dim: rgba(184, 149, 74, 0.12);
+  --text: var(--color-text-main);
+  --text-muted: var(--color-text-muted);
+  --text-dim: #4B5563;
+  --success: var(--color-success);
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --navy: var(--color-primary);
+  --shadow-admin: 0 4px 24px rgb(44 56 48 / 0.08);
+  --radius: 12px;
+  --radius-lg: 18px;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Cookie banner */
+  --cookie-panel-bg: rgb(28 36 32 / 0.96);
+  --cookie-heading: var(--color-accent-light);
+  --cookie-text: rgb(255 255 255 / 0.72);
+  --cookie-btn-text: #fff;
+  --cookie-border: rgb(255 255 255 / 0.12);
+}
+
+[data-theme="dark"] {
+  --color-primary: #2C3830;
+  --color-accent: #B8954A;
+  --color-accent-light: #D4B87A;
+  --color-bg: #0F1210;
+  --color-surface: #1A201C;
+  --color-text-main: #E8ECE9;
+  --color-text-muted: #9CA89F;
+  --color-success: #34D399;
+  --color-border: rgb(255 255 255 / 0.1);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.35);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+
+  /* Admin dashboard aliases (dark — matches prior admin look) */
+  --bg: #0c0e12;
+  --surface: #13161d;
+  --surface2: #1a1e28;
+  --border: rgb(255 255 255 / 0.06);
+  --border-accent: rgb(201 168 76 / 0.3);
+  --gold: #C9A84C;
+  --gold-light: #e8c97a;
+  --gold-dim: rgb(201 168 76 / 0.12);
+  --text: #e8eaf0;
+  --text-muted: #6b7280;
+  --text-dim: #9ca3af;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --navy: #1B2E4B;
+  --shadow-admin: 0 4px 24px rgb(0 0 0 / 0.4);
+  --radius: 12px;
+  --radius-lg: 18px;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Cookie banner */
+  --cookie-panel-bg: rgb(12 14 18 / 0.97);
+  --cookie-heading: var(--color-accent-light);
+  --cookie-text: rgb(255 255 255 / 0.72);
+  --cookie-btn-text: #fff;
+  --cookie-border: rgb(255 255 255 / 0.12);
+}
+
+/* ── Theme toggle (public nav + admin) ── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.08);
+  color: var(--color-accent-light);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  background: rgb(184 149 74 / 0.15);
+  color: var(--color-accent);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle i {
+  font-size: 1rem;
+  line-height: 1;
+  pointer-events: none;
+}
+
+[data-theme="light"] .theme-toggle .fa-sun { display: none; }
+[data-theme="light"] .theme-toggle .fa-moon { display: inline-block; }
+
+[data-theme="dark"] .theme-toggle .fa-moon { display: none; }
+[data-theme="dark"] .theme-toggle .fa-sun { display: inline-block; }
+
+/* Admin / light page surfaces */
+[data-theme="light"] .theme-toggle--admin,
+[data-theme="light"] .topbar .theme-toggle {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+[data-theme="light"] .theme-toggle--admin:hover,
+[data-theme="light"] .topbar .theme-toggle:hover {
+  border-color: var(--color-accent);
+  background: var(--gold-dim);
+  color: var(--color-accent);
+}
+
+.theme-toggle--login {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+}
+
+@media (min-width: 769px) {
+  .nav-container .theme-toggle {
+    margin-left: auto;
+    margin-right: 0.35rem;
+  }
+}
+
+.nav-container:has(.nav-back) .theme-toggle {
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
