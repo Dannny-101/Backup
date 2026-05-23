@@ -1872,21 +1872,28 @@
             
             // Listen for all messages (both own and admin replies)
             chatSocket.on('message_received', (data) => {
-                console.log('Message received:', data);
-                const area = document.getElementById('chatMessagesArea');
-                if (!area || area.style.display === 'none') return;
+                console.log('=== MESSAGE RECEIVED ===', data);
+                console.log('Session:', data.sessionId, 'Current:', chatSessionId);
+                console.log('isAdmin:', data.isAdmin, 'senderType:', data.senderType);
+                console.log('Message:', data.message?.substring(0, 50));
                 
-                // Simple time-based deduplication - prevent messages within 1 second
-                const now = Date.now();
-                const msgTime = data.createdAt ? new Date(data.createdAt).getTime() : now;
-                if (Math.abs(now - msgTime) < 500 && data.senderType !== 'visitor') {
-                    // Very recent message, check if we already got it
-                    if (lastMessageTime === msgTime) {
-                        console.log('Skipping likely duplicate message');
-                        return;
-                    }
+                const area = document.getElementById('chatMessagesArea');
+                if (!area) {
+                    console.log('ERROR: chatMessagesArea not found');
+                    return;
                 }
-                lastMessageTime = msgTime;
+                if (area.style.display === 'none') {
+                    console.log('ERROR: chatMessagesArea is hidden');
+                    return;
+                }
+                
+                // Create unique message ID for deduplication
+                const msgId = data._id || `${data.sessionId}-${data.message?.substring(0, 30)}-${data.createdAt || Date.now()}`;
+                if (processedMessageIds.has(msgId)) {
+                    console.log('Skipping duplicate message:', msgId);
+                    return;
+                }
+                processedMessageIds.add(msgId);
                 
                 // Remove typing indicator if present
                 const typingIndicator = document.querySelector('.chat-typing-indicator');
@@ -1896,9 +1903,11 @@
                 
                 // Determine style based on senderType
                 const senderType = data.senderType || (data.isAdmin ? 'human' : 'visitor');
+                console.log('Determined senderType:', senderType);
                 
                 if (senderType === 'visitor') {
                     // Visitor's own message - already shown optimistically, skip
+                    console.log('Skipping visitor message (already shown optimistically)');
                     return;
                 } else if (senderType === 'ai') {
                     // AI message - blue/purple, left side (skip if admin connected)
@@ -1913,6 +1922,7 @@
                     `;
                 } else {
                     // Human admin - gray, left side
+                    console.log('Displaying admin message');
                     bubble.className = 'chat-bubble chat-bubble-human';
                     const adminName = data.name || 'Agent';
                     bubble.innerHTML = `
@@ -1923,7 +1933,7 @@
                 
                 area.appendChild(bubble);
                 area.scrollTop = area.scrollHeight;
-                console.log('Message displayed in chat');
+                console.log('=== Message successfully added to chat ===');
             });
             
             // Also listen for admin_reply event (fallback - for direct admin messages)
@@ -2053,13 +2063,25 @@
                     
                     // Show chat interface with saved session
                     showChatInterface();
-                    // Load history from server
-                    loadChatHistory(chatSessionId).then(() => {
-                        // Join socket room after loading history
-                        if (chatSocket && chatSocket.connected) {
+                    
+                    // Ensure we join the socket room (whether socket is already connected or not)
+                    if (chatSocket) {
+                        if (chatSocket.connected) {
+                            console.log('Socket already connected, joining room:', chatSessionId);
                             chatSocket.emit('join_chat', chatSessionId);
+                        } else {
+                            console.log('Socket not yet connected, will join when connected');
+                            // The connect handler will join the room once connected
+                            // But also listen for connect to join immediately when it happens
+                            chatSocket.once('connect', () => {
+                                console.log('Socket now connected, joining room:', chatSessionId);
+                                chatSocket.emit('join_chat', chatSessionId);
+                            });
                         }
-                    });
+                    }
+                    
+                    // Load history from server
+                    loadChatHistory(chatSessionId);
                 } else {
                     // Show pre-chat form
                     showPreChatForm();
