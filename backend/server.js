@@ -63,7 +63,8 @@ io.on('connection', (socket) => {
                 email,
                 message,
                 createdAt: chatMessage.createdAt,
-                isAdmin: false
+                isAdmin: false,
+                senderType: 'visitor'
             });
             
             // Emit back to visitor as 'message_received'
@@ -71,6 +72,7 @@ io.on('connection', (socket) => {
                 sessionId,
                 message,
                 isAdmin: false,
+                senderType: 'visitor',
                 createdAt: chatMessage.createdAt
             });
             
@@ -89,6 +91,7 @@ io.on('connection', (socket) => {
                 sessionId,
                 message,
                 isAdmin: true,
+                senderType: 'human',
                 createdAt: new Date().toISOString()
             });
             console.log(`Admin reply emitted to chat_${sessionId} as message_received`);

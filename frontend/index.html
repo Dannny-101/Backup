@@ -1480,17 +1480,18 @@
                 const typingIndicator = document.querySelector('.chat-typing-indicator');
                 if (typingIndicator) typingIndicator.remove();
                 
-                // Don't re-render own messages (they're added optimistically)
-                // isAdmin=true means it's from admin, isAdmin=false means it's our own echoed back
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble';
                 
-                if (data.isAdmin) {
-                    // Admin message - left side
-                    bubble.style.cssText = 'background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px 12px 12px 4px;';
-                } else {
-                    // Own message echoed back - already shown optimistically, skip
+                // Determine alignment based on senderType
+                const senderType = data.senderType || (data.isAdmin ? 'human' : 'visitor');
+                
+                if (senderType === 'visitor') {
+                    // Visitor's own message - right side, skip if already shown optimistically
                     return;
+                } else {
+                    // Admin (human) or AI message - left side
+                    bubble.style.cssText = 'background:var(--color-surface);border:1px solid var(--color-border);border-radius:12px 12px 12px 4px;';
                 }
                 
                 bubble.textContent = data.message;
