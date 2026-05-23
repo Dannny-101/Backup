@@ -2383,28 +2383,43 @@ async function takeOverSession(id, name) {
     return;
   }
   
+  // Emit takeover event FIRST (before UI changes, so AI stops immediately)
+  if (socket && socket.connected) {
+    socket.emit('admin_takeover', { sessionId: id, adminName: S.user?.name || 'Agent' });
+  }
+  
   // Hide banner
   const banner = document.getElementById('adminTakeoverBanner');
   if (banner) banner.style.display = 'none';
   
-  // Show input
-  document.getElementById('chatInputArea').style.display = 'flex';
-  
-  // Emit takeover event
-  if (socket && socket.connected) {
-    socket.emit('admin_takeover', { sessionId: id, adminName: S.user?.name || 'Agent' });
+  // Show input area - force visible with multiple style properties
+  const inputArea = document.getElementById('chatInputArea');
+  if (inputArea) {
+    inputArea.style.display = 'flex';
+    inputArea.style.visibility = 'visible';
+    inputArea.style.opacity = '1';
+    // Focus the input
+    setTimeout(() => {
+      const input = document.getElementById('chatInput');
+      if (input) input.focus();
+    }, 100);
   }
+  
+  // Mark that we have an active admin session (to prevent AI messages)
+  currentAdminSession = id;
   
   // Show confirmation toast
   toast('You are now connected to the visitor', 'success');
   
   // Add system message to chat
   const container = document.getElementById('chatMessages');
-  const systemMsg = document.createElement('div');
-  systemMsg.style.cssText = 'text-align:center;padding:0.5rem;margin:0.5rem 0;font-size:0.75rem;color:var(--success);font-style:italic;';
-  systemMsg.innerHTML = '<i class="fas fa-check-circle"></i> You have taken over this conversation. AI is now disabled.';
-  container.appendChild(systemMsg);
-  container.scrollTop = container.scrollHeight;
+  if (container) {
+    const systemMsg = document.createElement('div');
+    systemMsg.style.cssText = 'text-align:center;padding:0.5rem;margin:0.5rem 0;font-size:0.75rem;color:var(--success);font-style:italic;';
+    systemMsg.innerHTML = '<i class="fas fa-check-circle"></i> You have taken over this conversation. AI is now disabled.';
+    container.appendChild(systemMsg);
+    container.scrollTop = container.scrollHeight;
+  }
 }
 
 function leaveChatSession() {
@@ -2443,10 +2458,20 @@ async function loadMessages(sessionId) {
   if (!container) return;
   const msgs = data.data || [];
   if (!msgs.length) { container.innerHTML = `<div class="chat-empty"><i class="fas fa-comment-slash"></i><span>No messages yet</span></div>`; return; }
+  
+  // Get visitor name from first message that has a name (usually system message or first visitor message)
+  const firstMsgWithName = msgs.find(m => m.name && m.name !== 'AI Assistant' && m.name !== 'System');
+  const visitorName = firstMsgWithName?.name || 'Visitor';
+  
   container.innerHTML = msgs.filter(m => m.senderType !== 'system').map(m => {
     const senderType = m.senderType || (m.isAdmin ? 'human' : 'visitor');
     let senderLabel = '';
-    const senderName = m.name || (senderType === 'visitor' ? 'Visitor' : 'Agent');
+    
+    // Determine sender name based on type
+    let senderName;
+    if (senderType === 'ai') senderName = 'AI Assistant';
+    else if (senderType === 'human') senderName = m.name || 'Agent';
+    else senderName = m.name || visitorName; // Use discovered visitor name
     
     if (senderType === 'ai') senderLabel = `<span style="font-size:0.7rem;color:#6366f1;"><i class="fas fa-robot"></i> ${senderName}</span>`;
     else if (senderType === 'human') senderLabel = `<span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-user-headset"></i> ${senderName}</span>`;
@@ -2926,16 +2951,34 @@ function initSocket() {
     if (S.section === 'tasks') fetchAndRenderTasks();
   });
   
+  // Track visitor name for current session
+  let currentVisitorName = 'Visitor';
+  
   // Chat events
   socket.on('new_chat_message', (data) => {
     console.log('new_chat_message received:', data);
     
-    // Update chat badge
-    const badge = document.getElementById('chatBadge');
-    if (badge) {
-      const current = parseInt(badge.textContent) || 0;
-      badge.textContent = current + 1;
-      badge.style.display = '';
+    const senderType = data.senderType || (data.isAdmin ? 'human' : 'visitor');
+    
+    // Skip AI messages if admin has taken over this session
+    if (senderType === 'ai' && currentAdminSession === data.sessionId) {
+      console.log('Skipping AI message - admin has taken over this session');
+      return;
+    }
+    
+    // Update visitor name if this is a visitor message with a name
+    if (senderType === 'visitor' && data.name && data.name !== 'AI Assistant' && data.name !== 'System') {
+      currentVisitorName = data.name;
+    }
+    
+    // Update chat badge (only for non-AI messages or if no admin active)
+    if (senderType !== 'ai' || !currentAdminSession) {
+      const badge = document.getElementById('chatBadge');
+      if (badge) {
+        const current = parseInt(badge.textContent) || 0;
+        badge.textContent = current + 1;
+        badge.style.display = '';
+      }
     }
     
     // If on chat section, update sessions and messages
@@ -2947,8 +2990,11 @@ function initSocket() {
       if (wasCurrentSession) {
         const container = document.getElementById('chatMessages');
         if (container) {
-          const senderType = data.senderType || (data.isAdmin ? 'human' : 'visitor');
-          const senderName = data.name || (senderType === 'visitor' ? 'Visitor' : 'Agent');
+          // Determine sender name
+          let senderName;
+          if (senderType === 'ai') senderName = 'AI Assistant';
+          else if (senderType === 'human') senderName = data.name || 'Agent';
+          else senderName = data.name || currentVisitorName;
           
           let senderLabel = '';
           if (senderType === 'ai') senderLabel = `<span style="font-size:0.7rem;color:#6366f1;"><i class="fas fa-robot"></i> ${senderName}</span>`;
@@ -2968,30 +3014,32 @@ function initSocket() {
       }
     }
     
-    // Show toast notification
-    toast(`New message from ${data.name}: ${data.message.substring(0, 40)}${data.message.length > 40 ? '...' : ''}`);
-    
-    // Play notification sound with debugging
-    const sound = document.getElementById('notifSound');
-    if (sound) {
-      console.log('Playing notification sound...');
-      sound.volume = 1.0;
-      sound.currentTime = 0;
-      const playPromise = sound.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log('Notification sound played successfully');
-        }).catch(err => {
-          console.error('Notification sound failed:', err.message);
-          // Try to unblock audio context on user interaction
-          document.addEventListener('click', function unblockAudio() {
-            sound.play().catch(() => {});
-            document.removeEventListener('click', unblockAudio);
-          }, { once: true });
-        });
+    // Show toast notification (skip for AI if admin is active)
+    if (senderType !== 'ai' || !currentAdminSession) {
+      toast(`New message from ${data.name || senderType}: ${data.message.substring(0, 40)}${data.message.length > 40 ? '...' : ''}`);
+      
+      // Play notification sound with debugging
+      const sound = document.getElementById('notifSound');
+      if (sound) {
+        console.log('Playing notification sound...');
+        sound.volume = 1.0;
+        sound.currentTime = 0;
+        const playPromise = sound.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            console.log('Notification sound played successfully');
+          }).catch(err => {
+            console.error('Notification sound failed:', err.message);
+            // Try to unblock audio context on user interaction
+            document.addEventListener('click', function unblockAudio() {
+              sound.play().catch(() => {});
+              document.removeEventListener('click', unblockAudio);
+            }, { once: true });
+          });
+        }
+      } else {
+        console.error('notifSound element not found');
       }
-    } else {
-      console.error('notifSound element not found');
     }
   });
   
