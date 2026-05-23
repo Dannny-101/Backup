@@ -1527,8 +1527,8 @@
 
         function toggleChat() {
             chatOpen = !chatOpen;
-            const widget = document.getElementById('chatWidget') || document.getElementById('chatPopup');
-            if (widget) widget.classList.toggle('active', chatOpen);
+            const popup = document.getElementById('chatPopup');
+            if (popup) popup.classList.toggle('active', chatOpen);
             const icon = document.getElementById('chatIcon');
             if (icon) icon.className = chatOpen ? 'fas fa-times' : 'fas fa-comments';
             if (chatOpen && !chatSocket) {
