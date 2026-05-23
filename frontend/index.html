@@ -289,33 +289,37 @@
         }
 
         /* ── HOW IT WORKS ── */
-        .how-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem;
+        .how-timeline {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
+            position: relative;
         }
-        .how-card {
+        .how-timeline::before {
+            content: ''; position: absolute; top: 28px; left: 12.5%; right: 12.5%;
+            height: 2px; background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent) 100%);
+            opacity: 0.3;
+        }
+        .how-step {
+            text-align: center; position: relative; z-index: 1;
+        }
+        .how-step-num {
+            width: 56px; height: 56px; border-radius: 50%;
             background: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: 20px; padding: 2rem 1.5rem;
-            text-align: center; position: relative;
-            transition: all 0.25s ease;
-        }
-        .how-card:hover {
-            border-color: var(--color-accent);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-        .how-num {
-            width: 42px; height: 42px; border-radius: 12px;
-            background: rgba(201,168,76,0.1);
-            border: 1px solid rgba(201,168,76,0.2);
+            border: 2px solid var(--color-accent);
             display: flex; align-items: center; justify-content: center;
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700; font-size: 1rem;
-            color: var(--color-accent); margin: 0 auto 1.25rem;
+            font-weight: 700; font-size: 1.1rem;
+            color: var(--color-accent); margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 20px rgba(201,168,76,0.15);
         }
-        .how-icon { font-size: 2rem; color: var(--color-accent); margin-bottom: 1rem; }
-        .how-card h3 { font-size: 1.05rem; color: var(--color-text-main); margin-bottom: 0.5rem; }
-        .how-card p { font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; }
+        .how-step h3 { font-size: 1.1rem; color: var(--color-text-main); margin-bottom: 0.75rem; font-weight: 600; }
+        .how-step p { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; max-width: 220px; margin: 0 auto; }
+        @media (max-width: 900px) {
+            .how-timeline { grid-template-columns: 1fr 1fr; }
+            .how-timeline::before { display: none; }
+        }
+        @media (max-width: 600px) {
+            .how-timeline { grid-template-columns: 1fr; gap: 2rem; }
+        }
 
         /* ── FEATURES ── */
         .features-grid {
@@ -344,27 +348,37 @@
         .feature-card p { font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; }
 
         /* ── UNIVERSITIES ── */
-        .unis-section { background: var(--color-primary); }
-        .unis-section .section-title { color: white; }
-        .unis-section .section-desc { color: rgba(255,255,255,0.6); }
+        .unis-section { background: var(--color-surface); }
+        .unis-section .section-title { color: var(--color-text-main); }
+        .unis-section .section-desc { color: var(--color-text-muted); }
         .unis-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;
         }
         .uni-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px; padding: 1.25rem 1rem;
-            text-align: center; transition: all 0.25s ease;
-            cursor: default;
+            position: relative; border-radius: 20px; overflow: hidden;
+            min-height: 200px; display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 1.5rem; transition: all 0.3s ease; cursor: pointer; text-decoration: none;
         }
-        .uni-card:hover {
-            background: rgba(201,168,76,0.08);
-            border-color: rgba(201,168,76,0.25);
-            transform: translateY(-2px);
+        .uni-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
         }
-        .uni-icon { font-size: 1.75rem; margin-bottom: 0.625rem; color: var(--color-accent); }
-        .uni-name { font-size: 0.85rem; font-weight: 600; color: white; margin-bottom: 0.25rem; }
-        .uni-city { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+        .uni-card-taylors { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .uni-card-monash { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); }
+        .uni-card-inti { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .uni-card-help { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); }
+        .uni-card-segi { background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); }
+        .uni-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .uni-card-content { position: relative; z-index: 2; }
+        .uni-name { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.25rem; }
+        .uni-city { font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+        .uni-badge { position: absolute; top: 1rem; right: 1rem; z-index: 2;
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+            padding: 0.35rem 0.75rem; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
 
         /* ── FEATURED LISTINGS ── */
         .listings-grid {
@@ -785,33 +799,29 @@
         <div class="section-inner">
             <div class="section-header" data-aos="fade-up">
                 <span class="section-label">Simple Process</span>
-                <h2 class="section-title">How <span class="accent">Ten&See</span> Works</h2>
-                <p class="section-desc">Finding student accommodation in Malaysia has never been this easy. Four steps and you're home.</p>
+                <h2 class="section-title">How <span class="accent">Tenandsee</span> Works</h2>
+                <p class="section-desc">Finding student accommodation in KL & Selangor has never been this easy. Four steps and you're home.</p>
             </div>
-            <div class="how-grid">
-                <div class="how-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="how-num">01</div>
-                    <div class="how-icon"><i class="fas fa-search"></i></div>
-                    <h3>Browse Listings</h3>
-                    <p>Search by city, university, property type, or price range to find rooms that match your needs.</p>
+            <div class="how-timeline">
+                <div class="how-step" data-aos="fade-up" data-aos-delay="0">
+                    <div class="how-step-num">01</div>
+                    <h3>Search</h3>
+                    <p>Find verified rooms near your campus in minutes</p>
                 </div>
-                <div class="how-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="how-num">02</div>
-                    <div class="how-icon"><i class="fas fa-comments"></i></div>
-                    <h3>Enquire Instantly</h3>
-                    <p>Send a booking enquiry or chat with us directly. We respond quickly and keep it simple.</p>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="100">
+                    <div class="how-step-num">02</div>
+                    <h3>Connect</h3>
+                    <p>Message us on WhatsApp or enquire instantly</p>
                 </div>
-                <div class="how-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="how-num">03</div>
-                    <div class="how-icon"><i class="fas fa-calendar-check"></i></div>
-                    <h3>Confirm & Secure</h3>
-                    <p>Lock in your room with a secure deposit. We handle the paperwork so you can focus on uni.</p>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="200">
+                    <div class="how-step-num">03</div>
+                    <h3>View & Finalize</h3>
+                    <p>Tour your unit and confirm by paying the first month's rent as your deposit — no extra payment needed for move-in month</p>
                 </div>
-                <div class="how-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="how-num">04</div>
-                    <div class="how-icon"><i class="fas fa-home"></i></div>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="how-step-num">04</div>
                     <h3>Move In</h3>
-                    <p>Get your keys and settle in. Our team is available if you need anything after you move.</p>
+                    <p>Sign your agreement, pay the refundable deposit, and collect your keys</p>
                 </div>
             </div>
         </div>
@@ -842,35 +852,45 @@
         <div class="section-inner">
             <div class="section-header" data-aos="fade-up" style="text-align:center;">
                 <span class="section-label" style="color:var(--color-accent);">Our Coverage</span>
-                <h2 class="section-title">We Serve Students At</h2>
-                <p class="section-desc" style="margin:0 auto;">Rooms available near these Malaysian universities, with more locations being added regularly.</p>
+                <h2 class="section-title">KL & Selangor Coverage</h2>
+                <p class="section-desc" style="margin:0 auto;">Verified rooms within walking distance of these universities. Currently focused on the Klang Valley with more locations coming soon.</p>
             </div>
             <div class="unis-grid">
-                <div class="uni-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="uni-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="uni-name">Taylor's University</div>
-                    <div class="uni-city">Subang Jaya</div>
-                </div>
-                <div class="uni-card" data-aos="fade-up" data-aos-delay="60">
-                    <div class="uni-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="uni-name">Monash University Malaysia</div>
-                    <div class="uni-city">Subang Jaya</div>
-                </div>
-                <div class="uni-card" data-aos="fade-up" data-aos-delay="180">
-                    <div class="uni-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="uni-name">INTI International College</div>
-                    <div class="uni-city">Subang Jaya</div>
-                </div>
-                <div class="uni-card" data-aos="fade-up" data-aos-delay="240">
-                    <div class="uni-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="uni-name">Help University</div>
-                    <div class="uni-city">Kuala Lumpur</div>
-                </div>
-                <div class="uni-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="uni-icon"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="uni-name">SEGi University</div>
-                    <div class="uni-city">Petaling Jaya</div>
-                </div>
+                <a href="/listings.html?university=Taylor's University" class="uni-card uni-card-taylors" data-aos="fade-up" data-aos-delay="0">
+                    <span class="uni-badge">Subang Jaya</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">Taylor's University</div>
+                        <div class="uni-city">Premium lakeside campus living</div>
+                    </div>
+                </a>
+                <a href="/listings.html?university=Monash University Malaysia" class="uni-card uni-card-monash" data-aos="fade-up" data-aos-delay="80">
+                    <span class="uni-badge">Subang Jaya</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">Monash University Malaysia</div>
+                        <div class="uni-city">Walkable student housing</div>
+                    </div>
+                </a>
+                <a href="/listings.html?university=INTI International College" class="uni-card uni-card-inti" data-aos="fade-up" data-aos-delay="160">
+                    <span class="uni-badge">Subang Jaya</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">INTI International College</div>
+                        <div class="uni-city">Campus-proximate rooms</div>
+                    </div>
+                </a>
+                <a href="/listings.html?university=Help University" class="uni-card uni-card-help" data-aos="fade-up" data-aos-delay="240">
+                    <span class="uni-badge">Kuala Lumpur</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">Help University</div>
+                        <div class="uni-city">City centre convenience</div>
+                    </div>
+                </a>
+                <a href="/listings.html?university=SEGi University" class="uni-card uni-card-segi" data-aos="fade-up" data-aos-delay="320">
+                    <span class="uni-badge">Petaling Jaya</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">SEGi University</div>
+                        <div class="uni-city">Accessible from Kota Damansara</div>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
@@ -879,89 +899,87 @@
     <section class="section" id="features">
         <div class="section-inner">
             <div class="section-header" data-aos="fade-up">
-                <span class="section-label">Why Ten&See</span>
-                <h2 class="section-title">Built For <span class="accent">Malaysian Students</span></h2>
-                <p class="section-desc">Every feature is designed around the real challenges students face when finding accommodation here in Malaysia.</p>
+                <span class="section-label">Why Tenandsee</span>
+                <h2 class="section-title">Built For <span class="accent">KL & Selangor Students</span></h2>
+                <p class="section-desc">Every feature is designed around the real challenges students face when finding accommodation in the Klang Valley.</p>
             </div>
-            <div class="features-grid">
+            <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
                     <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
                     <h3>Verified Listings Only</h3>
-                    <p>Every property is reviewed before going live. No fake listings, no misleading photos — what you see is what you get.</p>
+                    <p>Every property is personally reviewed before going live. No fake listings, no misleading photos — what you see is what you get.</p>
                 </div>
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
                     <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <h3>Near Your Campus</h3>
-                    <p>Filter by university to find rooms within commuting distance. We focus on areas around Malaysian student hubs.</p>
-                </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
-                    <div class="feature-icon"><i class="fab fa-whatsapp"></i></div>
-                    <h3>WhatsApp Support</h3>
-                    <p>Reach our team directly on WhatsApp for quick answers. No call centres, no hold music — just a real person.</p>
+                    <h3>Campus-Adjacent</h3>
+                    <p>All listings are within walking distance or short commute to partner universities in KL and Selangor.</p>
                 </div>
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
-                    <h3>Premium Matching</h3>
-                    <p>Submit a booking enquiry in under a minute. Secure your room with a deposit and we handle the rest.</p>
+                    <div class="feature-icon"><i class="fab fa-whatsapp"></i></div>
+                    <h3>WhatsApp First</h3>
+                    <p>Direct line to our team. No call centres, no hold music — just real people who understand student needs.</p>
                 </div>
                 <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
-                    <div class="feature-icon"><i class="fas fa-comments"></i></div>
-                    <h3>Live Chat Support</h3>
-                    <p>Got questions? Our live chat is available directly on the platform so you never have to wait for answers.</p>
-                </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
-                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
-                    <h3>Secure Payments</h3>
-                    <p>Your deposit is handled safely. We use a transparent 30% deposit system with full receipts and records.</p>
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Fast Matching</h3>
+                    <p>Submit an enquiry and get responses the same day. We know housing deadlines don't wait.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- ── WHY US ── -->
-    <section class="section why-section">
+    <section class="section why-section" style="background:var(--color-primary);padding:6rem 2rem;">
         <div class="section-inner">
-            <div class="why-grid">
+            <div class="why-premium-grid" style="display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:center;">
                 <div data-aos="fade-right">
-                    <span class="section-label">Our Difference</span>
-                    <h2 class="section-title">A Platform That <span class="accent">Actually Helps</span></h2>
-                    <p class="section-desc">We started Ten&See because finding student housing in Malaysia is genuinely stressful. We're here to fix that.</p>
-                    <div class="why-list">
-                        <div class="why-item">
-                            <div class="why-icon"><i class="fas fa-user-check"></i></div>
-                            <div class="why-content">
-                                <h4>No Middlemen</h4>
-                                <p>Direct partnerships with property owners ensure transparent pricing with no hidden fees or commission markups. Every listing is personally vetted by our team to guarantee quality and authenticity.</p>
+                    <span class="section-label" style="color:var(--color-accent);border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.1);">Our Difference</span>
+                    <h2 class="section-title" style="color:white;margin-top:1rem;">Built Different for <span class="accent">KL Students</span></h2>
+                    <p class="section-desc" style="color:rgba(255,255,255,0.65);margin-top:1rem;">We started Tenandsee because finding quality student housing in the Klang Valley shouldn't be a nightmare. Direct partnerships, transparent pricing, same-day responses.</p>
+                    <div class="why-pillars" style="margin-top:2.5rem;display:flex;flex-direction:column;gap:1.5rem;">
+                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
+                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-user-check" style="color:var(--color-accent);font-size:1.25rem;"></i>
+                            </div>
+                            <div>
+                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Direct Partnerships</h4>
+                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">No agents. No hidden fees. Just verified properties from owners we know personally.</p>
                             </div>
                         </div>
-                        <div class="why-item">
-                            <div class="why-icon"><i class="fas fa-clock"></i></div>
-                            <div class="why-content">
-                                <h4>Fast Response Times</h4>
-                                <p>We aim to respond to every enquiry within the same business day — often much faster.</p>
+                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
+                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-bolt" style="color:var(--color-accent);font-size:1.25rem;"></i>
+                            </div>
+                            <div>
+                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Same-Day Response</h4>
+                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">We know housing deadlines don't wait. Get answers when you need them.</p>
                             </div>
                         </div>
-                        <div class="why-item">
-                            <div class="why-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                            <div class="why-content">
-                                <h4>Student-First Approach</h4>
-                                <p>Flexible move-in dates and pricing structured around student budgets. We understand the academic calendar and align our services to support your educational journey.</p>
+                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
+                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fas fa-graduation-cap" style="color:var(--color-accent);font-size:1.25rem;"></i>
+                            </div>
+                            <div>
+                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Student-Built</h4>
+                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">Flexible terms that work with your semester calendar and student budget.</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="why-visual" data-aos="fade-left">
-                    <div class="wv-stat">
-                        <div class="wv-stat-num" id="wvTotalRooms">—</div>
-                        <div class="wv-stat-label">Verified individual rooms available</div>
+                <div data-aos="fade-left" style="display:flex;flex-direction:column;gap:1rem;">
+                    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;text-align:center;">
+                        <div class="wv-stat-num" id="wvTotalRooms" style="font-size:3rem;color:var(--color-accent);font-weight:700;">—</div>
+                        <div style="color:rgba(255,255,255,0.7);font-size:0.95rem;margin-top:0.5rem;">Verified rooms available now</div>
                     </div>
-                    <div class="wv-stat">
-                        <div class="wv-stat-num">6</div>
-                        <div class="wv-stat-label">Partner Universities</div>
-                    </div>
-                    <div class="wv-stat" style="margin-bottom:0;background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.2);">
-                        <div class="wv-stat-num" style="font-size:1.25rem;">Currently serving KL</div>
-                        <div class="wv-stat-label">Focused expansion to more cities soon</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;text-align:center;">
+                            <div style="font-size:2rem;color:var(--color-accent);font-weight:700;">5</div>
+                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Partner Universities</div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;text-align:center;">
+                            <div style="font-size:2rem;color:var(--color-accent);font-weight:700;">KL</div>
+                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Focused Coverage</div>
+                        </div>
                     </div>
                 </div>
             </div>
