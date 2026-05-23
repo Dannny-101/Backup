@@ -863,24 +863,61 @@
     }
     @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr 1fr; } .three-col { grid-template-columns: 1fr; } }
   /* ── TASK BOARD ── */
-.task-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.task-column { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; min-height: 400px; }
+.task-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; overflow-x: auto; }
+@media (max-width: 1200px) {
+  .task-board { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .task-board { grid-template-columns: repeat(4, 280px); gap: 0.75rem; padding-bottom: 0.5rem; }
+}
+.task-column { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; min-height: 400px; display: flex; flex-direction: column; }
+.task-column.drag-over { background: rgba(201, 168, 76, 0.1); border-color: var(--gold); }
 .task-column-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
 .task-column-header h4 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
 .task-column-header span { background: var(--surface); padding: 2px 8px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; color: var(--text-dim); }
-.task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; transition: all var(--transition); border-left: 3px solid var(--gold); }
+.task-column-content { flex: 1; min-height: 100px; }
+
+.task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; cursor: grab; transition: all var(--transition); border-left: 3px solid var(--gold); position: relative; }
 .task-card:hover { border-color: var(--border-accent); transform: translateY(-2px); box-shadow: var(--shadow-admin); }
-.task-card.priority-urgent { border-left-color: var(--danger); }
-.task-card.priority-high { border-left-color: var(--warning); }
+.task-card.dragging { opacity: 0.5; cursor: grabbing; transform: rotate(2deg); }
+.task-card.priority-urgent { border-left-color: var(--danger); border-left-width: 4px; }
+.task-card.priority-high { border-left-color: var(--warning); border-left-width: 4px; }
 .task-card.priority-medium { border-left-color: var(--info); }
 .task-card.priority-low { border-left-color: var(--success); }
+.task-card.due-overdue { border-color: var(--danger); box-shadow: 0 0 0 1px var(--danger); }
+.task-card.due-soon { border-color: #f59e0b; box-shadow: 0 0 0 1px #f59e0b; }
 .task-card h5 { font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
 .task-card p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4; }
-.task-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: var(--text-muted); }
+
+.task-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem; }
+.task-priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.task-priority-dot.urgent { background: #dc2626; }
+.task-priority-dot.high { background: #ea580c; }
+.task-priority-dot.medium { background: #2563eb; }
+.task-priority-dot.low { background: #16a34a; }
+
+.task-assignee { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.task-assignee-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--gold-dim); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; color: var(--gold); }
+.task-assignee-name { font-size: 0.7rem; color: var(--text-muted); }
+
+.task-due-date { display: flex; align-items: center; gap: 0.35rem; font-size: 0.7rem; margin-top: 0.5rem; }
+.task-due-date.overdue { color: var(--danger); }
+.task-due-date.soon { color: #f59e0b; }
+.task-due-date.upcoming { color: var(--text-muted); }
+
+.task-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: var(--text-muted); margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid var(--border); }
 .task-meta .creator { color: var(--gold); font-weight: 500; }
 .task-completed { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border); font-size: 0.7rem; color: var(--success); }
 .task-actions { display: flex; gap: 0.4rem; margin-top: 0.75rem; }
 .task-actions .btn { padding: 0.25rem 0.5rem; font-size: 0.7rem; }
+
+/* Task Filters */
+.task-filters { display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.task-filters select { min-width: 140px; }
+
+/* Undo Button */
+.task-undo-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: var(--radius); font-size: 0.7rem; cursor: pointer; transition: all 0.2s; }
+.task-undo-btn:hover { background: var(--gold-dim); color: var(--gold); border-color: var(--gold); }
 .team-avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; color: var(--navy); }
 .notif-item { cursor: pointer; }
 .notif-item.unread { background: var(--gold-dim); }
@@ -1035,13 +1072,14 @@
       <button class="modal-close" onclick="closeModal('taskModal')">&times;</button>
     </div>
     <div class="modal-body">
+      <input type="hidden" id="taskId">
       <div class="form-group">
         <label class="form-label">Title *</label>
         <input class="form-input" id="taskTitle" required>
       </div>
       <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea class="form-textarea" id="taskDesc"></textarea>
+        <textarea class="form-textarea" id="taskDesc" rows="3"></textarea>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1054,21 +1092,40 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Category</label>
-          <select class="form-select" id="taskCategory">
-            <option value="general">General</option>
-            <option value="listings">Listings</option>
-            <option value="leads">Leads</option>
-            <option value="bookings">Bookings</option>
+          <label class="form-label">Status</label>
+          <select class="form-select" id="taskStatus">
+            <option value="todo" selected>To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
           </select>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="taskCategory">
+            <option value="general">General</option>
+            <option value="listing">Listings</option>
+            <option value="lead">Leads</option>
+            <option value="booking">Bookings</option>
+            <option value="chat">Chat</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input class="form-input" type="date" id="taskDueDate">
+        </div>
+      </div>
       <div class="form-group">
-        <label class="form-label">Due Date</label>
-        <input class="form-input" type="date" id="taskDueDate">
+        <label class="form-label">Assigned To</label>
+        <select class="form-select" id="taskAssignedTo">
+          <option value="">Unassigned</option>
+        </select>
       </div>
       <button class="btn btn-gold" style="width:100%;" onclick="saveTask()">
-        <i class="fas fa-save"></i> Save Task
+        <i class="fas fa-save"></i> <span id="taskSaveBtnText">Save Task</span>
       </button>
     </div>
   </div>
@@ -2302,106 +2359,378 @@ function initSocket() {
     toast(`New task: ${data.title} by ${data.createdBy.name || data.createdBy.username}`);
     const sound = document.getElementById('notifSound');
     if (sound) sound.play().catch(() => {});
-    if (S.section === 'tasks') loadTasks();
+    if (S.section === 'tasks') fetchAndRenderTasks();
   });
   
   socket.on('task_completed', (data) => {
     toast(`Task completed: ${data.title} by ${data.completedBy.name || data.completedBy.username}`);
     const sound = document.getElementById('notifSound');
     if (sound) sound.play().catch(() => {});
-    if (S.section === 'tasks') loadTasks();
+    if (S.section === 'tasks') fetchAndRenderTasks();
   });
   
   socket.on('task_updated', () => {
-    if (S.section === 'tasks') loadTasks();
+    if (S.section === 'tasks') fetchAndRenderTasks();
+  });
+  
+  socket.on('task_moved', (data) => {
+    toast(`Task moved to ${data.to.replace('_', ' ')}: ${data.title}`);
+    if (S.section === 'tasks') fetchAndRenderTasks();
+  });
+  
+  socket.on('task_assigned', (data) => {
+    const assignee = data.assignedTo?.name || data.assignedTo?.username || 'Unassigned';
+    toast(`Task assigned to ${assignee}: ${data.title}`);
+    if (S.section === 'tasks') fetchAndRenderTasks();
+  });
+  
+  socket.on('task_undone', (data) => {
+    toast(`Task restored to ${data.restoredTo.replace('_', ' ')}: ${data.title}`);
+    if (S.section === 'tasks') fetchAndRenderTasks();
   });
 }
 
 // ── TASKS ──
+// Initialize task-specific state (S is declared globally)
+S.taskFilters = { assignee: '', priority: '', dueDateFrom: '', dueDateTo: '' };
+S.teamMembers = S.teamMembers || [];
+S.allTasks = S.allTasks || [];
+
+// Load team members for assignee dropdown
+async function loadTeamMembers() {
+  try {
+    const data = await api('/api/admin');
+    S.teamMembers = data.data || [];
+    return S.teamMembers;
+  } catch { return []; }
+}
+
 async function loadTasks() {
   const sec = document.getElementById('sec-tasks');
   sec.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:1rem;">
       <h2 style="font-size:1.1rem;font-weight:600;">Task Board</h2>
       <button class="btn btn-gold" onclick="openTaskModal()"><i class="fas fa-plus"></i> New Task</button>
     </div>
+    <div class="task-filters" id="taskFilters">
+      <select class="form-select" id="filterAssignee" onchange="applyTaskFilters()">
+        <option value="">All Assignees</option>
+      </select>
+      <select class="form-select" id="filterPriority" onchange="applyTaskFilters()">
+        <option value="">All Priorities</option>
+        <option value="urgent">Urgent</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <input type="date" class="form-input" id="filterDueFrom" onchange="applyTaskFilters()" placeholder="Due from">
+      <input type="date" class="form-input" id="filterDueTo" onchange="applyTaskFilters()" placeholder="Due to">
+      <button class="btn btn-ghost btn-sm" onclick="clearTaskFilters()"><i class="fas fa-times"></i> Clear</button>
+    </div>
     <div class="task-board" id="taskBoard"><div class="loading"><div class="spinner"></div></div></div>
   `;
+  
   try {
-    const data = await api('/api/tasks');
-    const tasks = data.data || [];
-    const columns = ['todo', 'in_progress', 'done', 'cancelled'];
-    const titles = { todo: 'To Do', in_progress: 'In Progress', done: 'Done', cancelled: 'Cancelled' };
+    // Load team members first
+    await loadTeamMembers();
     
-    document.getElementById('taskBoard').innerHTML = columns.map(col => `
-      <div class="task-column">
-        <div class="task-column-header">
-          <h4>${titles[col]}</h4>
-          <span>${tasks.filter(t => t.status === col).length}</span>
-        </div>
-        ${tasks.filter(t => t.status === col).map(t => `
-          <div class="task-card priority-${t.priority}" onclick="viewTask('${t._id}')">
-            <h5>${t.title}</h5>
+    // Populate assignee filter
+    const assigneeSelect = document.getElementById('filterAssignee');
+    S.teamMembers.forEach(m => {
+      assigneeSelect.innerHTML += `<option value="${m._id}">${m.name || m.username}</option>`;
+    });
+    
+    // Load tasks
+    await fetchAndRenderTasks();
+  } catch (e) { 
+    console.error(e);
+    sec.innerHTML = `<div class="empty-state"><i class="fas fa-tasks"></i><p>Failed to load tasks</p></div>`; 
+  }
+}
+
+async function fetchAndRenderTasks() {
+  try {
+    let url = '/api/tasks';
+    const params = [];
+    if (S.taskFilters.assignee) params.push(`assignedTo=${S.taskFilters.assignee}`);
+    if (S.taskFilters.priority) params.push(`priority=${S.taskFilters.priority}`);
+    if (S.taskFilters.dueDateFrom) params.push(`dueDateFrom=${S.taskFilters.dueDateFrom}`);
+    if (S.taskFilters.dueDateTo) params.push(`dueDateTo=${S.taskFilters.dueDateTo}`);
+    if (params.length) url += '?' + params.join('&');
+    
+    const data = await api(url);
+    S.allTasks = data.data || [];
+    renderTaskBoard();
+  } catch (e) {
+    console.error('Failed to fetch tasks', e);
+  }
+}
+
+function applyTaskFilters() {
+  S.taskFilters.assignee = document.getElementById('filterAssignee').value;
+  S.taskFilters.priority = document.getElementById('filterPriority').value;
+  S.taskFilters.dueDateFrom = document.getElementById('filterDueFrom').value;
+  S.taskFilters.dueDateTo = document.getElementById('filterDueTo').value;
+  fetchAndRenderTasks();
+}
+
+function clearTaskFilters() {
+  document.getElementById('filterAssignee').value = '';
+  document.getElementById('filterPriority').value = '';
+  document.getElementById('filterDueFrom').value = '';
+  document.getElementById('filterDueTo').value = '';
+  S.taskFilters = { assignee: '', priority: '', dueDateFrom: '', dueDateTo: '' };
+  fetchAndRenderTasks();
+}
+
+function renderTaskBoard() {
+  const tasks = S.allTasks;
+  const columns = ['todo', 'in_progress', 'review', 'done'];
+  const titles = { todo: 'To Do', in_progress: 'In Progress', review: 'Review', done: 'Done' };
+  
+  // Helper to check due date status
+  const getDueStatus = (dueDate) => {
+    if (!dueDate) return null;
+    const now = new Date();
+    const due = new Date(dueDate);
+    const hoursUntil = (due - now) / (1000 * 60 * 60);
+    if (hoursUntil < 0) return 'overdue';
+    if (hoursUntil <= 24) return 'soon';
+    return 'upcoming';
+  };
+  
+  const getDueClass = (status) => {
+    if (status === 'overdue') return 'due-overdue';
+    if (status === 'soon') return 'due-soon';
+    return '';
+  };
+  
+  const formatDueDate = (dueDate) => {
+    if (!dueDate) return '';
+    const date = new Date(dueDate);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  };
+  
+  document.getElementById('taskBoard').innerHTML = columns.map(col => `
+    <div class="task-column" 
+         data-status="${col}"
+         ondragover="handleTaskDragOver(event)" 
+         ondragleave="handleTaskDragLeave(event)"
+         ondrop="handleTaskDrop(event, '${col}')">
+      <div class="task-column-header">
+        <h4>${titles[col]}</h4>
+        <span id="count-${col}">${tasks.filter(t => t.status === col).length}</span>
+      </div>
+      <div class="task-column-content" id="column-${col}">
+        ${tasks.filter(t => t.status === col).map(t => {
+          const dueStatus = getDueStatus(t.dueDate);
+          const dueClass = getDueClass(dueStatus);
+          const assignee = t.assignedTo;
+          const assigneeInitials = assignee?.name ? assignee.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : (assignee?.username?.substring(0, 2).toUpperCase() || '?');
+          
+          return `
+          <div class="task-card priority-${t.priority} ${dueClass}" 
+               draggable="true"
+               data-task-id="${t._id}"
+               ondragstart="handleTaskDragStart(event, '${t._id}')"
+               ondragend="handleTaskDragEnd(event)"
+               onclick="editTask('${t._id}')">
+            <div class="task-card-header">
+              <h5>${t.title}</h5>
+              <div class="task-priority-dot ${t.priority}"></div>
+            </div>
             <p>${t.description?.substring(0, 80) || ''}${t.description?.length > 80 ? '...' : ''}</p>
+            
+            ${t.dueDate ? `
+            <div class="task-due-date ${dueStatus}">
+              <i class="fas fa-calendar-alt"></i>
+              <span>${formatDueDate(t.dueDate)}</span>
+              ${dueStatus === 'overdue' ? '<span style="margin-left:0.25rem;">(Overdue)</span>' : ''}
+              ${dueStatus === 'soon' ? '<span style="margin-left:0.25rem;">(Due soon)</span>' : ''}
+            </div>
+            ` : ''}
+            
+            ${assignee ? `
+            <div class="task-assignee">
+              <div class="task-assignee-avatar">${assigneeInitials}</div>
+              <span class="task-assignee-name">${assignee.name || assignee.username}</span>
+            </div>
+            ` : ''}
+            
             <div class="task-meta">
               <span class="creator">By ${t.createdBy?.name || t.createdBy?.username}</span>
               <span style="text-transform:capitalize;">${t.priority}</span>
             </div>
-            ${t.completedBy?.username ? `
-              <div class="task-completed">
-                <i class="fas fa-check-circle"></i> Completed by ${t.completedBy.name || t.completedBy.username}
+            
+            ${t.status === 'done' ? `
+              <div style="margin-top:0.5rem;display:flex;justify-content:space-between;align-items:center;">
+                <span class="task-completed">
+                  <i class="fas fa-check-circle"></i> Completed
+                </span>
+                <button class="task-undo-btn" onclick="event.stopPropagation();undoCompleteTask('${t._id}')">
+                  <i class="fas fa-undo"></i> Undo
+                </button>
               </div>
-            ` : `
-              <div class="task-actions">
-                ${t.status !== 'done' ? `<button class="btn btn-success-ghost" onclick="event.stopPropagation();completeTask('${t._id}')"><i class="fas fa-check"></i> Complete</button>` : ''}
-                ${t.status === 'todo' ? `<button class="btn btn-ghost" onclick="event.stopPropagation();startTask('${t._id}')"><i class="fas fa-play"></i> Start</button>` : ''}
-              </div>
-            `}
+            ` : ''}
           </div>
-        `).join('') || '<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem;">No tasks</p>'}
+        `}).join('') || '<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem;">No tasks</p>'}
       </div>
-    `).join('');
-  } catch { sec.innerHTML = `<div class="empty-state"><i class="fas fa-tasks"></i><p>Failed to load tasks</p></div>`; }
+    </div>
+  `).join('');
 }
 
-function openTaskModal() {
+// Drag and Drop handlers
+let draggedTaskId = null;
+
+function handleTaskDragStart(e, taskId) {
+  draggedTaskId = taskId;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', taskId);
+}
+
+function handleTaskDragEnd(e) {
+  e.target.classList.remove('dragging');
+  draggedTaskId = null;
+  // Remove all drag-over classes
+  document.querySelectorAll('.task-column').forEach(col => col.classList.remove('drag-over'));
+}
+
+function handleTaskDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function handleTaskDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+async function handleTaskDrop(e, newStatus) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  
+  const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
+  if (!taskId) return;
+  
+  const task = S.allTasks.find(t => t._id === taskId);
+  if (!task || task.status === newStatus) return;
+  
+  try {
+    const r = await api(`/api/tasks/${taskId}/status`, { 
+      method: 'PATCH', 
+      body: JSON.stringify({ status: newStatus }) 
+    });
+    if (r.success) {
+      toast(`Task moved to ${newStatus.replace('_', ' ')}`);
+      fetchAndRenderTasks();
+    }
+  } catch { toast('Error moving task', 'error'); }
+}
+
+async function openTaskModal() {
+  // Reset form for new task
+  document.getElementById('taskId').value = '';
   document.getElementById('taskModalTitle').textContent = 'New Task';
+  document.getElementById('taskSaveBtnText').textContent = 'Save Task';
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskDesc').value = '';
   document.getElementById('taskPriority').value = 'medium';
+  document.getElementById('taskStatus').value = 'todo';
   document.getElementById('taskCategory').value = 'general';
   document.getElementById('taskDueDate').value = '';
+  
+  // Populate assignee dropdown
+  const assigneeSelect = document.getElementById('taskAssignedTo');
+  assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
+  S.teamMembers.forEach(m => {
+    assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
+  });
+  assigneeSelect.value = '';
+  
+  openModal('taskModal');
+}
+
+async function editTask(id) {
+  const task = S.allTasks.find(t => t._id === id);
+  if (!task) return;
+  
+  // Populate form for edit
+  document.getElementById('taskId').value = task._id;
+  document.getElementById('taskModalTitle').textContent = 'Edit Task';
+  document.getElementById('taskSaveBtnText').textContent = 'Update Task';
+  document.getElementById('taskTitle').value = task.title;
+  document.getElementById('taskDesc').value = task.description || '';
+  document.getElementById('taskPriority').value = task.priority;
+  document.getElementById('taskStatus').value = task.status;
+  document.getElementById('taskCategory').value = task.category;
+  document.getElementById('taskDueDate').value = task.dueDate ? task.dueDate.split('T')[0] : '';
+  
+  // Populate assignee dropdown
+  const assigneeSelect = document.getElementById('taskAssignedTo');
+  assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
+  S.teamMembers.forEach(m => {
+    assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
+  });
+  assigneeSelect.value = task.assignedTo?.userId || '';
+  
   openModal('taskModal');
 }
 
 async function saveTask() {
+  const taskId = document.getElementById('taskId').value;
+  const isEdit = !!taskId;
+  
+  const assigneeSelect = document.getElementById('taskAssignedTo');
+  const assigneeOption = assigneeSelect.options[assigneeSelect.selectedIndex];
+  const assignedTo = assigneeSelect.value ? {
+    userId: assigneeSelect.value,
+    name: assigneeOption.dataset.name || '',
+    username: assigneeOption.dataset.username
+  } : null;
+  
   const body = {
     title: document.getElementById('taskTitle').value,
     description: document.getElementById('taskDesc').value,
     priority: document.getElementById('taskPriority').value,
+    status: document.getElementById('taskStatus').value,
     category: document.getElementById('taskCategory').value,
-    dueDate: document.getElementById('taskDueDate').value || undefined
+    dueDate: document.getElementById('taskDueDate').value || undefined,
+    assignedTo
   };
+  
   if (!body.title) { toast('Title is required', 'error'); return; }
+  
   try {
-    const r = await api('/api/tasks', { method: 'POST', body: JSON.stringify(body) });
-    if (r.success) { closeModal('taskModal'); toast('Task created'); loadTasks(); }
+    let r;
+    if (isEdit) {
+      r = await api(`/api/tasks/${taskId}`, { method: 'PUT', body: JSON.stringify(body) });
+    } else {
+      r = await api('/api/tasks', { method: 'POST', body: JSON.stringify(body) });
+    }
+    
+    if (r.success) { 
+      closeModal('taskModal'); 
+      toast(isEdit ? 'Task updated' : 'Task created'); 
+      fetchAndRenderTasks(); 
+    }
     else toast(r.error || 'Error', 'error');
-  } catch { toast('Error creating task', 'error'); }
+  } catch { toast(isEdit ? 'Error updating task' : 'Error creating task', 'error'); }
 }
 
-async function completeTask(id) {
-  const r = await api(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify({ status: 'done' }) });
-  if (r.success) { toast('Task completed'); loadTasks(); }
-}
-
-async function startTask(id) {
-  const r = await api(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify({ status: 'in_progress' }) });
-  if (r.success) { toast('Task started'); loadTasks(); }
+async function undoCompleteTask(id) {
+  try {
+    const r = await api(`/api/tasks/${id}/undo`, { method: 'POST' });
+    if (r.success) { 
+      toast('Task restored to previous status'); 
+      fetchAndRenderTasks(); 
+    }
+    else toast(r.error || 'Error', 'error');
+  } catch { toast('Error undoing completion', 'error'); }
 }
 
 function viewTask(id) {
-  alert('Task details - implement enhanced view if needed');
+  editTask(id);
 }
 
 // ── TEAM ──
