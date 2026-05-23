@@ -2079,12 +2079,23 @@ async function updateBooking(id) {
 }
 
 // ── CHAT ──
+let chatFilter = 'active'; // 'active', 'closed', 'all'
+
 async function loadChat() {
   const sec = document.getElementById('sec-chat');
   sec.innerHTML = `
     <div class="card" style="height:600px;">
       <div class="chat-layout">
-        <div class="chat-sessions" id="chatSessions"><div class="loading"><div class="spinner"></div></div></div>
+        <div class="chat-sessions" id="chatSessions">
+          <div style="padding:0.75rem;border-bottom:1px solid var(--border);background:var(--surface);">
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+              <button onclick="setChatFilter('active')" id="filterActive" class="btn btn-sm ${chatFilter==='active'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">Active</button>
+              <button onclick="setChatFilter('closed')" id="filterClosed" class="btn btn-sm ${chatFilter==='closed'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">Closed</button>
+              <button onclick="setChatFilter('all')" id="filterAll" class="btn btn-sm ${chatFilter==='all'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">All</button>
+            </div>
+          </div>
+          <div id="chatSessionsList"><div class="loading"><div class="spinner"></div></div></div>
+        </div>
         <div class="chat-main">
           <div class="card-header" id="chatHeader">
             <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">Select a conversation</span></span>
@@ -2107,42 +2118,68 @@ async function loadChat() {
   await loadChatSessions();
 }
 
+function setChatFilter(filter) {
+  chatFilter = filter;
+  // Update button styles
+  ['Active', 'Closed', 'All'].forEach(f => {
+    const btn = document.getElementById(`filter${f}`);
+    if (btn) btn.className = `btn btn-sm ${chatFilter === f.toLowerCase() ? 'btn-gold' : ''}`;
+  });
+  loadChatSessions();
+}
+
 async function loadChatSessions() {
   const data = await api('/api/chat/admin/sessions');
-  const sessions = data.data || [];
-  const container = document.getElementById('chatSessions');
+  let sessions = data.data || [];
+  const container = document.getElementById('chatSessionsList');
   if (!container) return;
+
+  // Filter sessions based on current filter
+  if (chatFilter === 'active') {
+    sessions = sessions.filter(s => s.status !== 'closed');
+  } else if (chatFilter === 'closed') {
+    sessions = sessions.filter(s => s.status === 'closed');
+  }
+  // 'all' shows everything
 
   const totalUnread = sessions.reduce((a, s) => a + (s.unreadCount || 0), 0);
   const badge = document.getElementById('chatBadge');
   if (badge) { badge.textContent = totalUnread; badge.style.display = totalUnread > 0 ? '' : 'none'; }
 
-  if (!sessions.length) { container.innerHTML = `<div class="empty-state"><i class="fas fa-comments"></i><p>No conversations yet</p></div>`; return; }
+  if (!sessions.length) { 
+    container.innerHTML = `<div class="empty-state" style="padding:2rem;text-align:center;color:var(--text-muted);"><i class="fas fa-comments" style="font-size:2rem;margin-bottom:0.5rem;opacity:0.5;"></i><p>No ${chatFilter === 'all' ? '' : chatFilter} conversations</p></div>`; 
+    return; 
+  }
+  
   container.innerHTML = sessions.map(s => {
+    const isClosed = s.status === 'closed';
     const contactInfo = [];
     if (s.phone) contactInfo.push(`📞 ${s.phone}`);
     if (s.email) contactInfo.push(`✉️ ${s.email}`);
     const contactStr = contactInfo.join(' • ');
     
     return `
-    <div class="chat-session-item ${S.currentSession===s._id?'active':''}" onclick="openSession('${s._id}','${(s.name||'Anonymous').replace(/'/g,"\\'")}')">
-      <div class="session-avatar">${(s.name||'A').charAt(0).toUpperCase()}</div>
+    <div class="chat-session-item ${S.currentSession===s._id?'active':''} ${isClosed?'closed':''}" 
+         onclick="openSession('${s._id}','${(s.name||'Anonymous').replace(/'/g,"\\'")}', ${isClosed})"
+         style="${isClosed?'opacity:0.6;background:var(--surface);':''}">
+      <div class="session-avatar" style="${isClosed?'background:var(--border);':''}">${(s.name||'A').charAt(0).toUpperCase()}</div>
       <div class="session-info">
-        <div class="session-name">${s.name||'Anonymous'}</div>
+        <div class="session-name">${s.name||'Anonymous'} ${isClosed?'<span style="font-size:0.7rem;color:var(--text-muted);margin-left:4px;">(Closed)</span>':''}</div>
         ${contactStr ? `<div class="session-contact" style="font-size:0.7rem;color:var(--gold);margin-bottom:2px;">${contactStr}</div>` : ''}
-        <div class="session-preview">${s.lastMessage||'...'}</div>
+        <div class="session-preview" style="${isClosed?'color:var(--text-muted);':''}">${s.lastMessage||'...'}</div>
       </div>
       <div class="session-meta">
         <div class="session-time">${fmtTime(s.lastMessageAt)}</div>
-        ${s.unreadCount>0?`<div class="unread-count">${s.unreadCount}</div>`:''}
+        ${!isClosed && s.unreadCount>0?`<div class="unread-count">${s.unreadCount}</div>`:''}
       </div>
     </div>
   `}).join('');
 }
 
 let currentAdminSession = null; // Track if admin is actively managing a session
+let currentSessionIsClosed = false; // Track if current session is closed
 
-async function openSession(id, name) {
+async function openSession(id, name, isClosed = false) {
   // If already in a session, leave it first
   if (currentAdminSession && currentAdminSession !== id) {
     if (socket && socket.connected) {
@@ -2152,13 +2189,14 @@ async function openSession(id, name) {
   
   S.currentSession = id;
   currentAdminSession = id;
+  currentSessionIsClosed = isClosed;
   
   // Fetch session details to get contact info
   const sessionData = await api(`/api/chat/${id}`);
   const msgs = sessionData.data || [];
   const firstMsg = msgs[0] || {};
   
-  // Build header with contact info and leave button
+  // Build header with contact info and action buttons
   const contactInfo = [];
   if (firstMsg.phone) contactInfo.push(`📞 ${firstMsg.phone}`);
   if (firstMsg.email) contactInfo.push(`✉️ ${firstMsg.email}`);
@@ -2170,43 +2208,173 @@ async function openSession(id, name) {
   if (headerEl) {
     headerEl.innerHTML = `
       <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">${headerText}</span></span>
-      <button onclick="leaveChatSession()" class="btn btn-sm" style="background:var(--danger);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">
-        <i class="fas fa-sign-out-alt"></i> Leave Chat
-      </button>
+      <div style="display:flex;gap:0.5rem;">
+        ${isClosed 
+          ? `<button onclick="reopenChatSession('${id}')" class="btn btn-sm" style="background:var(--success);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-redo"></i> Reopen</button>`
+          : `<button onclick="closeChatSession('${id}')" class="btn btn-sm" style="background:var(--danger);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-check"></i> Close Chat</button>`
+        }
+        <button onclick="leaveChatSession()" class="btn btn-sm" style="background:var(--text-muted);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">
+          <i class="fas fa-sign-out-alt"></i> Leave
+        </button>
+      </div>
     `;
   }
   
-  // Show takeover banner
   const chatContainer = document.querySelector('.chat-main');
   let banner = document.getElementById('adminTakeoverBanner');
-  if (!banner) {
-    banner = document.createElement('div');
-    banner.id = 'adminTakeoverBanner';
-    banner.style.cssText = 'background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
-    chatContainer.insertBefore(banner, chatContainer.children[1]);
-  }
-  banner.innerHTML = `
-    <div style="display:flex;align-items:center;gap:0.75rem;">
-      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f59e0b);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
-        <i class="fas fa-robot"></i>
-      </div>
-      <div>
-        <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">AI is currently responding</div>
-        <div style="font-size:0.8rem;color:var(--text-muted);">Take over to chat directly with the visitor</div>
-      </div>
-    </div>
-    <button onclick="takeOverSession('${id}', '${name.replace(/'/g,"\\'")}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
-      <i class="fas fa-hand-paper"></i> Take Over
-    </button>
-  `;
-  banner.style.display = 'flex';
   
-  // Hide input until takeover
-  document.getElementById('chatInputArea').style.display = 'none';
+  if (isClosed) {
+    // Show closed banner
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'adminTakeoverBanner';
+      chatContainer.insertBefore(banner, chatContainer.children[1]);
+    }
+    banner.style.cssText = 'background:linear-gradient(135deg, #fee2e2, #fecaca);border:1px solid #fca5a5;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--danger);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+          <i class="fas fa-lock"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">This chat is closed</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">No new messages can be sent</div>
+        </div>
+      </div>
+      <button onclick="reopenChatSession('${id}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+        <i class="fas fa-redo"></i> Reopen Chat
+      </button>
+    `;
+    banner.style.display = 'flex';
+    document.getElementById('chatInputArea').style.display = 'none';
+  } else {
+    // Show takeover banner for active chats
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'adminTakeoverBanner';
+      chatContainer.insertBefore(banner, chatContainer.children[1]);
+    }
+    banner.style.cssText = 'background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f59e0b);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">AI is currently responding</div>
+          <div style="font-size:0.8rem;color:var(--text-muted);">Take over to chat directly with the visitor</div>
+        </div>
+      </div>
+      <button onclick="takeOverSession('${id}', '${name.replace(/'/g,"\\'")}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+        <i class="fas fa-hand-paper"></i> Take Over
+      </button>
+    `;
+    banner.style.display = 'flex';
+    document.getElementById('chatInputArea').style.display = 'none';
+  }
   
   await loadMessages(id);
   await api(`/api/chat/read/${id}`, { method: 'PUT' });
   loadChatSessions();
+}
+
+async function closeChatSession(id) {
+  if (!confirm('Close this chat? The visitor will not be able to send new messages.')) {
+    return;
+  }
+  
+  try {
+    await api(`/api/chat/close/${id}`, { method: 'PUT', body: JSON.stringify({ closedBy: S.user?.name || 'admin' }) });
+    toast('Chat closed successfully', 'success');
+    currentSessionIsClosed = true;
+    loadChatSessions();
+    
+    // Update UI to show closed state
+    const banner = document.getElementById('adminTakeoverBanner');
+    if (banner) {
+      banner.style.cssText = 'background:linear-gradient(135deg, #fee2e2, #fecaca);border:1px solid #fca5a5;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--danger);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">This chat is closed</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">No new messages can be sent</div>
+          </div>
+        </div>
+        <button onclick="reopenChatSession('${id}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+          <i class="fas fa-redo"></i> Reopen Chat
+        </button>
+      `;
+    }
+    document.getElementById('chatInputArea').style.display = 'none';
+    
+    // Update header buttons
+    const headerEl = document.getElementById('chatHeader');
+    if (headerEl) {
+      const name = document.getElementById('chatHeaderName').textContent;
+      headerEl.innerHTML = `
+        <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">${name}</span></span>
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="reopenChatSession('${id}')" class="btn btn-sm" style="background:var(--success);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-redo"></i> Reopen</button>
+          <button onclick="leaveChatSession()" class="btn btn-sm" style="background:var(--text-muted);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-sign-out-alt"></i> Leave</button>
+        </div>
+      `;
+    }
+  } catch (e) {
+    console.error('Failed to close chat:', e);
+    toast('Failed to close chat', 'error');
+  }
+}
+
+async function reopenChatSession(id) {
+  if (!confirm('Reopen this chat? The visitor will be able to send messages again.')) {
+    return;
+  }
+  
+  try {
+    await api(`/api/chat/reopen/${id}`, { method: 'PUT' });
+    toast('Chat reopened successfully', 'success');
+    currentSessionIsClosed = false;
+    loadChatSessions();
+    
+    // Update UI to show active state
+    const banner = document.getElementById('adminTakeoverBanner');
+    if (banner) {
+      banner.style.cssText = 'background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+      banner.innerHTML = `
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f59e0b);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">AI is currently responding</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Take over to chat directly with the visitor</div>
+          </div>
+        </div>
+        <button onclick="takeOverSession('${id}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+          <i class="fas fa-hand-paper"></i> Take Over
+        </button>
+      `;
+    }
+    
+    // Update header buttons
+    const headerEl = document.getElementById('chatHeader');
+    if (headerEl) {
+      const name = document.getElementById('chatHeaderName').textContent;
+      headerEl.innerHTML = `
+        <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">${name}</span></span>
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="closeChatSession('${id}')" class="btn btn-sm" style="background:var(--danger);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-check"></i> Close Chat</button>
+          <button onclick="leaveChatSession()" class="btn btn-sm" style="background:var(--text-muted);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;"><i class="fas fa-sign-out-alt"></i> Leave</button>
+        </div>
+      `;
+    }
+  } catch (e) {
+    console.error('Failed to reopen chat:', e);
+    toast('Failed to reopen chat', 'error');
+  }
 }
 
 async function takeOverSession(id, name) {
@@ -2311,6 +2479,13 @@ async function sendReply() {
   const input = document.getElementById('chatInput');
   const msg = input.value.trim();
   if (!msg || !S.currentSession) return;
+  
+  // Check if session is closed
+  if (currentSessionIsClosed) {
+    toast('Cannot send message - this chat is closed. Please reopen it first.', 'error');
+    return;
+  }
+  
   input.value = '';
   clearTimeout(adminTypingTimeout);
   if (socket && socket.connected) {

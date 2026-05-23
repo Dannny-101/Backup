@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ChatMessage = require('../models/ChatMessage');
+const ChatSession = require('../models/ChatSession');
 const { v4: uuidv4 } = require('uuid');
 const { createNotification } = require('./notifications');
 const emailService = require('../utils/email');
@@ -67,6 +68,15 @@ router.post('/session', async (req, res) => {
     const sessionId = uuidv4();
     const { name, phone, email } = req.body;
     
+    // Create session record
+    await ChatSession.create({
+      sessionId,
+      name: name || 'Visitor',
+      email,
+      phone,
+      status: 'active'
+    });
+    
     // Store initial user info in first message (system message)
     if (name || phone || email) {
       await ChatMessage.create({
@@ -89,6 +99,7 @@ router.post('/session', async (req, res) => {
 
 router.get('/admin/sessions', async (req, res) => {
   try {
+    // Get all sessions with their status
     const sessions = await ChatMessage.aggregate([
       { $sort: { createdAt: -1 } },
       { $group: {
@@ -103,7 +114,84 @@ router.get('/admin/sessions', async (req, res) => {
       { $match: { name: { $ne: null } } }, // Only show sessions with user info
       { $sort: { lastMessageAt: -1 } }
     ]);
-    res.json({ success: true, data: sessions });
+    
+    // Get session statuses
+    const sessionIds = sessions.map(s => s._id);
+    const sessionStatuses = await ChatSession.find({ sessionId: { $in: sessionIds } });
+    const statusMap = new Map(sessionStatuses.map(s => [s.sessionId, s]));
+    
+    // Merge status into sessions
+    const sessionsWithStatus = sessions.map(s => ({
+      ...s,
+      status: statusMap.get(s._id)?.status || 'active',
+      closedAt: statusMap.get(s._id)?.closedAt,
+      closedBy: statusMap.get(s._id)?.closedBy
+    }));
+    
+    res.json({ success: true, data: sessionsWithStatus });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Close chat session
+router.put('/close/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { closedBy } = req.body;
+    
+    // Update session status
+    await ChatSession.findOneAndUpdate(
+      { sessionId },
+      { status: 'closed', closedAt: new Date(), closedBy: closedBy || 'admin' },
+      { upsert: true }
+    );
+    
+    // Add system message
+    await ChatMessage.create({
+      sessionId,
+      name: 'System',
+      message: `Chat closed by ${closedBy || 'admin'}`,
+      isAdmin: true,
+      senderType: 'system',
+      ipAddress: req.ip
+    });
+    
+    // Notify admins
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`chat_${sessionId}`).emit('chat_closed', { sessionId, closedBy });
+    }
+    
+    res.json({ success: true, message: 'Chat closed successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Reopen chat session
+router.put('/reopen/:sessionId', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // Update session status
+    await ChatSession.findOneAndUpdate(
+      { sessionId },
+      { status: 'active', closedAt: null, closedBy: null },
+      { upsert: true }
+    );
+    
+    // Add system message
+    await ChatMessage.create({
+      sessionId,
+      name: 'System',
+      message: 'Chat reopened',
+      isAdmin: true,
+      senderType: 'system',
+      ipAddress: req.ip
+    });
+    
+    res.json({ success: true, message: 'Chat reopened successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
