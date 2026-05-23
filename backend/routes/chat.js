@@ -44,19 +44,8 @@ router.post('/', async (req, res) => {
           senderType: 'visitor'
         });
       }
-    } else {
-      // Emit admin reply to visitor using message_received event
-      const io = req.app.get('io');
-      if (io) {
-        io.to(`chat_${chatSession}`).emit('message_received', {
-          sessionId: chatSession,
-          message,
-          isAdmin: true,
-          senderType: senderType || 'human',
-          createdAt: chatMessage.createdAt
-        });
-      }
     }
+    // Note: Admin replies are emitted via socket 'admin_reply' event to avoid duplication
 
     res.status(201).json({ success: true, data: chatMessage, sessionId: chatSession });
   } catch (error) {

@@ -23,6 +23,9 @@ const io = new Server(server, {
 // Make io accessible to routes
 app.set('io', io);
 
+// Track active admin sessions (sessionId -> adminSocketId)
+const activeAdminSessions = new Map();
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
     console.log('Client connected:', socket.id);
@@ -37,7 +40,41 @@ io.on('connection', (socket) => {
     // Visitor joins their chat session room
     socket.on('join_chat', (sessionId) => {
         socket.join(`chat_${sessionId}`);
+        socket.sessionId = sessionId;
         console.log(`Session ${sessionId} joined chat room`);
+        
+        // Check if admin is already in this session and notify visitor
+        if (activeAdminSessions.has(sessionId)) {
+            io.to(`chat_${sessionId}`).emit('admin_connected', { sessionId });
+        }
+    });
+    
+    // Admin takes over a chat session
+    socket.on('admin_takeover', (data) => {
+        const { sessionId, adminName } = data;
+        if (!sessionId) return;
+        
+        // Mark session as having admin
+        activeAdminSessions.set(sessionId, socket.id);
+        socket.adminSessionId = sessionId;
+        
+        // Notify visitor that admin has connected
+        io.to(`chat_${sessionId}`).emit('admin_connected', { sessionId, adminName });
+        
+        // Notify all admins
+        emitToAdmins('admin_took_over', { sessionId, adminName, adminSocketId: socket.id });
+        
+        console.log(`Admin ${adminName} took over session ${sessionId}`);
+    });
+    
+    // Admin leaves chat session
+    socket.on('admin_leave', (sessionId) => {
+        if (activeAdminSessions.has(sessionId)) {
+            activeAdminSessions.delete(sessionId);
+            io.to(`chat_${sessionId}`).emit('admin_disconnected', { sessionId });
+            emitToAdmins('admin_left', { sessionId });
+            console.log(`Admin left session ${sessionId}`);
+        }
     });
     
     // Visitor sends message - save to DB and notify admins
@@ -79,8 +116,14 @@ io.on('connection', (socket) => {
             
             console.log(`Visitor message saved and emitted for session ${sessionId}`);
             
-            // ── AI AUTO-REPLY ──
+            // ── AI AUTO-REPLY (only if no admin is active) ──
             setTimeout(async () => {
+                // Skip AI if admin is already connected
+                if (activeAdminSessions.has(sessionId)) {
+                    console.log(`Skipping AI reply for session ${sessionId} - admin is active`);
+                    return;
+                }
+                
                 try {
                     const lowerMsg = message.toLowerCase();
                     let aiResponse = '';
@@ -99,6 +142,12 @@ io.on('connection', (socket) => {
                         aiResponse = "Reach us on WhatsApp at +60 XX-XXXX XXXX.";
                     } else {
                         aiResponse = "Thanks! A human agent will join shortly. Tell me your university and budget.";
+                    }
+                    
+                    // Double-check admin still not connected before saving
+                    if (activeAdminSessions.has(sessionId)) {
+                        console.log(`Aborting AI reply for session ${sessionId} - admin connected during processing`);
+                        return;
                     }
                     
                     // Save AI message to DB
@@ -177,6 +226,14 @@ io.on('connection', (socket) => {
     
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
+        
+        // If admin disconnects, clean up their session
+        if (socket.adminSessionId) {
+            activeAdminSessions.delete(socket.adminSessionId);
+            io.to(`chat_${socket.adminSessionId}`).emit('admin_disconnected', { sessionId: socket.adminSessionId });
+            emitToAdmins('admin_left', { sessionId: socket.adminSessionId });
+            console.log(`Admin disconnected from session ${socket.adminSessionId}`);
+        }
     });
 });
 

@@ -2140,15 +2140,25 @@ async function loadChatSessions() {
   `}).join('');
 }
 
+let currentAdminSession = null; // Track if admin is actively managing a session
+
 async function openSession(id, name) {
+  // If already in a session, leave it first
+  if (currentAdminSession && currentAdminSession !== id) {
+    if (socket && socket.connected) {
+      socket.emit('admin_leave', currentAdminSession);
+    }
+  }
+  
   S.currentSession = id;
+  currentAdminSession = id;
   
   // Fetch session details to get contact info
   const sessionData = await api(`/api/chat/${id}`);
   const msgs = sessionData.data || [];
   const firstMsg = msgs[0] || {};
   
-  // Build header with contact info
+  // Build header with contact info and leave button
   const contactInfo = [];
   if (firstMsg.phone) contactInfo.push(`📞 ${firstMsg.phone}`);
   if (firstMsg.email) contactInfo.push(`✉️ ${firstMsg.email}`);
@@ -2156,11 +2166,107 @@ async function openSession(id, name) {
     ? `${name} <span style="font-size:0.75rem;color:var(--text-muted);margin-left:8px;">${contactInfo.join(' • ')}</span>`
     : name;
   
-  document.getElementById('chatHeaderName').innerHTML = headerText;
-  document.getElementById('chatInputArea').style.display = 'flex';
+  const headerEl = document.getElementById('chatHeader');
+  if (headerEl) {
+    headerEl.innerHTML = `
+      <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">${headerText}</span></span>
+      <button onclick="leaveChatSession()" class="btn btn-sm" style="background:var(--danger);color:white;border:none;padding:0.4rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.75rem;">
+        <i class="fas fa-sign-out-alt"></i> Leave Chat
+      </button>
+    `;
+  }
+  
+  // Show takeover banner
+  const chatContainer = document.querySelector('.chat-main');
+  let banner = document.getElementById('adminTakeoverBanner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'adminTakeoverBanner';
+    banner.style.cssText = 'background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+    chatContainer.insertBefore(banner, chatContainer.children[1]);
+  }
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f59e0b);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div>
+        <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">AI is currently responding</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);">Take over to chat directly with the visitor</div>
+      </div>
+    </div>
+    <button onclick="takeOverSession('${id}', '${name.replace(/'/g,"\\'")}')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+      <i class="fas fa-hand-paper"></i> Take Over
+    </button>
+  `;
+  banner.style.display = 'flex';
+  
+  // Hide input until takeover
+  document.getElementById('chatInputArea').style.display = 'none';
+  
   await loadMessages(id);
   await api(`/api/chat/read/${id}`, { method: 'PUT' });
   loadChatSessions();
+}
+
+async function takeOverSession(id, name) {
+  // Confirm before taking over
+  if (!confirm('Take over this chat? The visitor will be notified that a human agent has connected, and AI will stop responding.')) {
+    return;
+  }
+  
+  // Hide banner
+  const banner = document.getElementById('adminTakeoverBanner');
+  if (banner) banner.style.display = 'none';
+  
+  // Show input
+  document.getElementById('chatInputArea').style.display = 'flex';
+  
+  // Emit takeover event
+  if (socket && socket.connected) {
+    socket.emit('admin_takeover', { sessionId: id, adminName: S.user?.name || 'Agent' });
+  }
+  
+  // Show confirmation toast
+  toast('You are now connected to the visitor', 'success');
+  
+  // Add system message to chat
+  const container = document.getElementById('chatMessages');
+  const systemMsg = document.createElement('div');
+  systemMsg.style.cssText = 'text-align:center;padding:0.5rem;margin:0.5rem 0;font-size:0.75rem;color:var(--success);font-style:italic;';
+  systemMsg.innerHTML = '<i class="fas fa-check-circle"></i> You have taken over this conversation. AI is now disabled.';
+  container.appendChild(systemMsg);
+  container.scrollTop = container.scrollHeight;
+}
+
+function leaveChatSession() {
+  if (!currentAdminSession) return;
+  
+  if (confirm('Leave this chat session? AI will resume responding to the visitor.')) {
+    if (socket && socket.connected) {
+      socket.emit('admin_leave', currentAdminSession);
+    }
+    
+    // Reset UI
+    currentAdminSession = null;
+    S.currentSession = null;
+    document.getElementById('chatHeaderName').textContent = 'Select a conversation';
+    document.getElementById('chatInputArea').style.display = 'none';
+    document.getElementById('chatMessages').innerHTML = '<div class="chat-empty"><i class="fas fa-comments"></i><span>Select a conversation to start</span></div>';
+    
+    // Reset header
+    const headerEl = document.getElementById('chatHeader');
+    if (headerEl) {
+      headerEl.innerHTML = '<span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">Select a conversation</span></span>';
+    }
+    
+    // Remove banner if exists
+    const banner = document.getElementById('adminTakeoverBanner');
+    if (banner) banner.remove();
+    
+    loadChatSessions();
+    toast('You have left the chat', 'info');
+  }
 }
 
 async function loadMessages(sessionId) {
@@ -2715,6 +2821,60 @@ function initSocket() {
     if (!data.isAdmin) {
       const indicator = document.getElementById('typingIndicator');
       if (indicator) indicator.style.display = 'none';
+    }
+  });
+  
+  // Admin took over a session (another admin)
+  socket.on('admin_took_over', (data) => {
+    if (data.sessionId === S.currentSession && data.adminSocketId !== socket.id) {
+      toast(`Another agent has taken over this conversation`, 'info');
+      
+      // Disable input
+      document.getElementById('chatInputArea').style.display = 'none';
+      
+      // Show banner
+      const banner = document.getElementById('adminTakeoverBanner');
+      if (banner) {
+        banner.style.cssText = 'background:linear-gradient(135deg, #fee2e2, #fecaca);border:1px solid #fca5a5;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;gap:1rem;';
+        banner.innerHTML = `
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--danger);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+            <i class="fas fa-user-slash"></i>
+          </div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">Another agent is handling this</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">You can view but cannot respond</div>
+          </div>
+        `;
+        banner.style.display = 'flex';
+      }
+    }
+  });
+  
+  // Admin left a session
+  socket.on('admin_left', (data) => {
+    if (data.sessionId === S.currentSession) {
+      toast('Agent has left the conversation', 'info');
+      
+      // Show takeover banner again
+      const banner = document.getElementById('adminTakeoverBanner');
+      if (banner && S.currentSession) {
+        banner.style.cssText = 'background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #f59e0b;border-radius:8px;padding:1rem;margin:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+        banner.innerHTML = `
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#f59e0b);display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:0.9rem;color:var(--text-main);">AI is currently responding</div>
+              <div style="font-size:0.8rem;color:var(--text-muted);">Take over to chat directly with the visitor</div>
+            </div>
+          </div>
+          <button onclick="takeOverSession('${data.sessionId}', 'Visitor')" class="btn" style="background:var(--success);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap;">
+            <i class="fas fa-hand-paper"></i> Take Over
+          </button>
+        `;
+        banner.style.display = 'flex';
+      }
     }
   });
 }

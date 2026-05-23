@@ -731,7 +731,7 @@
         .chat-popup-header h4 { color: white; font-size: 0.9rem; }
         .chat-popup-header p { color: rgba(255,255,255,0.6); font-size: 0.75rem; }
         .chat-online { width: 8px; height: 8px; background: var(--color-success); border-radius: 50%; margin-left: auto; }
-        .chat-messages-area { padding: 1rem; min-height: 120px; }
+        .chat-messages-area { padding: 1rem; flex: 1; overflow-y: auto; max-height: 300px; min-height: 120px; }
         .chat-bubble {
             background: var(--color-bg);
             border-radius: 12px 12px 12px 4px;
@@ -761,6 +761,20 @@
         .chat-bubble-human {
             background: var(--color-surface);
             border: 1px solid var(--color-border);
+        }
+        /* Agent connected banner */
+        .chat-agent-banner {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 1px solid #6ee7b7;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: #065f46;
+            text-align: center;
+        }
+        .chat-agent-banner i {
+            margin-right: 0.3rem;
         }
         .chat-bubble-human .sender-label {
             font-size: 0.7rem; color: var(--color-text-muted);
@@ -1559,6 +1573,8 @@
         let chatSocket = null;
         let chatUserInfo = { name: '', phone: '', email: '' };
         let typingTimeout = null;
+        let adminConnected = false;
+        let processedMessageIds = new Set(); // Track message IDs to prevent duplicates
 
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -1752,6 +1768,14 @@
                 const area = document.getElementById('chatMessagesArea');
                 if (!area || area.style.display === 'none') return;
                 
+                // Deduplication: Skip if we've already processed this message
+                const msgId = data._id || `${data.sessionId}-${data.message}-${data.createdAt}`;
+                if (processedMessageIds.has(msgId)) {
+                    console.log('Skipping duplicate message:', msgId);
+                    return;
+                }
+                processedMessageIds.add(msgId);
+                
                 // Remove typing indicator if present
                 const typingIndicator = document.querySelector('.chat-typing-indicator');
                 if (typingIndicator) typingIndicator.remove();
@@ -1765,7 +1789,11 @@
                     // Visitor's own message - already shown optimistically, skip
                     return;
                 } else if (senderType === 'ai') {
-                    // AI message - blue/purple, left side
+                    // AI message - blue/purple, left side (skip if admin connected)
+                    if (adminConnected) {
+                        console.log('Skipping AI message - admin is connected');
+                        return;
+                    }
                     bubble.className = 'chat-bubble chat-bubble-ai';
                     bubble.innerHTML = `
                         <div class="sender-label"><i class="fas fa-robot"></i> AI Assistant</div>
@@ -1782,6 +1810,47 @@
                 
                 area.appendChild(bubble);
                 area.scrollTop = area.scrollHeight;
+            });
+            
+            // Admin connected - show banner and disable AI
+            chatSocket.on('admin_connected', (data) => {
+                console.log('Admin connected:', data);
+                adminConnected = true;
+                const area = document.getElementById('chatMessagesArea');
+                if (!area || area.style.display === 'none') return;
+                
+                // Remove any existing AI typing indicators
+                const typingIndicator = document.querySelector('.chat-typing-indicator');
+                if (typingIndicator) typingIndicator.remove();
+                
+                // Show admin connected banner
+                const banner = document.createElement('div');
+                banner.className = 'chat-agent-banner';
+                banner.innerHTML = `<i class="fas fa-user-headset"></i> A human agent has connected and will assist you.`;
+                area.appendChild(banner);
+                area.scrollTop = area.scrollHeight;
+                
+                // Update header status
+                document.getElementById('chatHeaderStatus').textContent = 'Agent online';
+            });
+            
+            // Admin disconnected
+            chatSocket.on('admin_disconnected', (data) => {
+                console.log('Admin disconnected:', data);
+                adminConnected = false;
+                const area = document.getElementById('chatMessagesArea');
+                if (!area || area.style.display === 'none') return;
+                
+                const banner = document.createElement('div');
+                banner.className = 'chat-agent-banner';
+                banner.style.background = 'linear-gradient(135deg, #fee2e2, #fecaca)';
+                banner.style.borderColor = '#fca5a5';
+                banner.style.color = '#991b1b';
+                banner.innerHTML = `<i class="fas fa-info-circle"></i> Agent has disconnected. AI will resume shortly.`;
+                area.appendChild(banner);
+                area.scrollTop = area.scrollHeight;
+                
+                document.getElementById('chatHeaderStatus').textContent = chatUserInfo.name || 'Online';
             });
             
             // Typing indicator from admin
