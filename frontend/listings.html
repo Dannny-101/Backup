@@ -35,7 +35,10 @@
             box-shadow: 0 2px 20px rgba(0,0,0,0.15);
             padding: 0.75rem 2rem;
         }
-        /* nav-container grid layout is defined in theme.css */
+        .nav-container {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
         .logo {
             font-family: 'Space Grotesk', sans-serif;
             font-size: 1.75rem; font-weight: 700;
@@ -500,6 +503,8 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--color-primary); flex-direction: column; padding: 1rem 2rem; gap: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+            .nav-links.active { display: flex; }
             .hamburger { display: block; }
             .filters-bar { flex-direction: column; align-items: stretch; }
             .filter-group select, .filter-group input { width: 100%; min-width: unset; }
