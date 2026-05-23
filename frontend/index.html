@@ -1192,16 +1192,20 @@
                 areas = ALL_AREAS;
             }
             
-            // Build options
-            let options = '<option value="">Select Area</option>';
+            // Build options - show placeholder only when no university selected
+            let options = uni ? '' : '<option value="">Select Area</option>';
             areas.forEach(area => {
                 options += `<option value="${area}">${area}</option>`;
             });
             areaSelect.innerHTML = options;
             
-            // Restore selection if still valid
-            if (areas.includes(currentArea)) {
-                areaSelect.value = currentArea;
+            // Auto-select first area if university is selected and no valid current selection
+            if (uni && areas.length > 0) {
+                if (!currentArea || !areas.includes(currentArea)) {
+                    areaSelect.value = areas[0]; // Auto-select first area
+                } else {
+                    areaSelect.value = currentArea; // Keep valid selection
+                }
             }
         }
 
