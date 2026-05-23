@@ -66,10 +66,17 @@
 
   apply(resolveTheme());
 
-  mq.addEventListener('change', () => {
+  function handleSystemChange(e) {
     localStorage.removeItem(STORAGE_KEY);
-    apply(systemTheme());
-  });
+    apply(e.matches ? 'dark' : 'light');
+  }
+
+  // iOS Safari compatibility: try addEventListener first, fallback to addListener
+  if (mq.addEventListener) {
+    mq.addEventListener('change', handleSystemChange);
+  } else if (mq.addListener) {
+    mq.addListener(handleSystemChange);
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bindToggles);
