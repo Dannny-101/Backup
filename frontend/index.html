@@ -1574,7 +1574,8 @@
         let chatUserInfo = { name: '', phone: '', email: '' };
         let typingTimeout = null;
         let adminConnected = false;
-        let lastMessageTime = 0; // Simple time-based dedup instead of complex Set
+        let lastMessageTime = 0; // Simple time-based dedup (legacy)
+        const processedMessageIds = new Set(); // Track displayed messages to prevent duplicates
 
         function escapeHtml(text) {
             if (!text) return '';
