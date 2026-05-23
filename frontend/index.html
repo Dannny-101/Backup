@@ -1567,16 +1567,17 @@
             } catch { alert('Something went wrong. Please try WhatsApp instead.'); }
         }
 
-        // Chat widget
+        // Chat widget - COMPLETE REWRITE FOR RELIABILITY
         let chatOpen = false;
         let chatSessionId = null;
         let chatSocket = null;
         let chatUserInfo = { name: '', phone: '', email: '' };
         let typingTimeout = null;
         let adminConnected = false;
-        let processedMessageIds = new Set(); // Track message IDs to prevent duplicates
+        let lastMessageTime = 0; // Simple time-based dedup instead of complex Set
 
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
@@ -1584,28 +1585,40 @@
 
         // Load saved session from localStorage
         function loadChatSession() {
-            const saved = localStorage.getItem('chatSession');
-            if (saved) {
-                try {
+            try {
+                const saved = localStorage.getItem('chatSession');
+                if (saved) {
                     const session = JSON.parse(saved);
-                    chatSessionId = session.sessionId;
-                    chatUserInfo = session.userInfo || { name: '', phone: '', email: '' };
-                    return true;
-                } catch (e) {
-                    console.error('Failed to load chat session:', e);
+                    if (session && session.sessionId) {
+                        chatSessionId = session.sessionId;
+                        chatUserInfo = session.userInfo || { name: '', phone: '', email: '' };
+                        console.log('Chat session loaded:', chatSessionId, chatUserInfo);
+                        return true;
+                    }
                 }
+            } catch (e) {
+                console.error('Failed to load chat session:', e);
+                localStorage.removeItem('chatSession');
             }
+            chatSessionId = null;
+            chatUserInfo = { name: '', phone: '', email: '' };
             return false;
         }
 
         // Save session to localStorage
         function saveChatSession() {
-            if (chatSessionId) {
-                localStorage.setItem('chatSession', JSON.stringify({
-                    sessionId: chatSessionId,
-                    userInfo: chatUserInfo,
-                    savedAt: new Date().toISOString()
-                }));
+            try {
+                if (chatSessionId && chatUserInfo.name) {
+                    const sessionData = {
+                        sessionId: chatSessionId,
+                        userInfo: chatUserInfo,
+                        savedAt: new Date().toISOString()
+                    };
+                    localStorage.setItem('chatSession', JSON.stringify(sessionData));
+                    console.log('Chat session saved:', sessionData);
+                }
+            } catch (e) {
+                console.error('Failed to save chat session:', e);
             }
         }
 
@@ -1614,27 +1627,39 @@
             localStorage.removeItem('chatSession');
             chatSessionId = null;
             chatUserInfo = { name: '', phone: '', email: '' };
+            adminConnected = false;
+            lastMessageTime = 0;
+            console.log('Chat session cleared');
         }
 
         // Load chat history from server
         async function loadChatHistory(sessionId) {
+            if (!sessionId) return;
             try {
+                console.log('Loading chat history for:', sessionId);
                 const res = await fetch(`/api/chat/${sessionId}`);
                 const data = await res.json();
-                if (data.success && data.data) {
+                if (data.success && data.data && data.data.length > 0) {
                     renderChatHistory(data.data);
+                    return true;
                 }
             } catch (e) {
                 console.error('Failed to load chat history:', e);
             }
+            return false;
         }
 
         // Render chat history
         function renderChatHistory(messages) {
             const area = document.getElementById('chatMessagesArea');
+            if (!area) return;
+            
+            // Clear and add welcome message
             area.innerHTML = '<div class="chat-welcome">Welcome back! Continuing your conversation...</div>';
             
             messages.forEach(msg => {
+                if (msg.senderType === 'system') return; // Skip system messages
+                
                 const bubble = document.createElement('div');
                 const senderType = msg.senderType || (msg.isAdmin ? 'human' : 'visitor');
                 
@@ -1649,8 +1674,9 @@
                     `;
                 } else {
                     bubble.className = 'chat-bubble chat-bubble-human';
+                    const adminName = msg.name || 'Agent';
                     bubble.innerHTML = `
-                        <div class="sender-label"><i class="fas fa-user-headset"></i> Agent</div>
+                        <div class="sender-label"><i class="fas fa-user-headset"></i> ${escapeHtml(adminName)}</div>
                         <div>${escapeHtml(msg.message)}</div>
                     `;
                 }
@@ -1658,13 +1684,23 @@
             });
             
             area.scrollTop = area.scrollHeight;
+            console.log('Chat history rendered:', messages.length, 'messages');
         }
 
         // Start new chat session with user info
         async function startChatSession() {
-            const name = document.getElementById('chatUserName').value.trim();
-            const phone = document.getElementById('chatUserPhone').value.trim();
-            const email = document.getElementById('chatUserEmail').value.trim();
+            const nameInput = document.getElementById('chatUserName');
+            const phoneInput = document.getElementById('chatUserPhone');
+            const emailInput = document.getElementById('chatUserEmail');
+            
+            if (!nameInput || !phoneInput) {
+                console.error('Chat form inputs not found');
+                return;
+            }
+            
+            const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const email = emailInput.value.trim();
             
             if (!name || !phone) {
                 alert('Please enter your name and phone number');
@@ -1675,68 +1711,131 @@
             
             // Create session on server
             try {
+                console.log('Creating chat session...');
                 const res = await fetch('/api/chat/session', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ source: 'landing_page', name, phone, email })
                 });
                 const data = await res.json();
-                chatSessionId = data.data?._id;
                 
-                // Save to localStorage
-                saveChatSession();
-                
-                // Join socket room
-                if (chatSocket && chatSocket.connected) {
-                    chatSocket.emit('join_chat', chatSessionId);
+                if (!data.success || !data.data?._id) {
+                    throw new Error('Failed to create session');
                 }
+                
+                chatSessionId = data.data._id;
+                console.log('Chat session created:', chatSessionId);
+                
+                // Save to localStorage immediately
+                saveChatSession();
                 
                 // Show chat interface
                 showChatInterface();
                 
-                // Send welcome message from user to trigger AI response
+                // Send welcome message
                 const welcomeMsg = `Hi, my name is ${name}. I'm looking for a room.`;
                 const area = document.getElementById('chatMessagesArea');
                 const bubble = document.createElement('div');
                 bubble.className = 'chat-bubble chat-bubble-visitor';
                 bubble.textContent = welcomeMsg;
                 area.appendChild(bubble);
+                area.scrollTop = area.scrollHeight;
                 
-                if (chatSocket && chatSocket.connected) {
-                    chatSocket.emit('send_message', {
-                        sessionId: chatSessionId,
-                        message: welcomeMsg,
-                        name: name,
-                        email: email,
-                        phone: phone
-                    });
-                }
+                // Send via socket if connected, otherwise REST
+                await sendMessageToServer(chatSessionId, welcomeMsg, name, email, phone);
+                
             } catch (e) {
                 console.error('Failed to start chat session:', e);
                 alert('Failed to start chat. Please try again.');
             }
         }
 
+        // Helper to send message (socket or REST)
+        async function sendMessageToServer(sessionId, message, name, email, phone) {
+            if (!sessionId || !message) return;
+            
+            // Try socket first
+            if (chatSocket && chatSocket.connected) {
+                console.log('Sending via socket...');
+                chatSocket.emit('send_message', {
+                    sessionId,
+                    message,
+                    name: name || chatUserInfo.name,
+                    email: email || chatUserInfo.email,
+                    phone: phone || chatUserInfo.phone
+                });
+                return;
+            }
+            
+            // Fallback to REST
+            console.log('Socket not connected, using REST...');
+            try {
+                await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId,
+                        message,
+                        name: name || chatUserInfo.name,
+                        email: email || chatUserInfo.email,
+                        phone: phone || chatUserInfo.phone,
+                        isAdmin: false
+                    })
+                });
+            } catch (e) {
+                console.error('Failed to send message via REST:', e);
+            }
+        }
+
         // Show chat interface (hide pre-form, show messages)
         function showChatInterface() {
-            document.getElementById('chatPreForm').style.display = 'none';
-            document.getElementById('chatMessagesArea').style.display = 'block';
-            document.getElementById('chatInputRow').style.display = 'flex';
-            document.getElementById('chatHeaderStatus').textContent = chatUserInfo.name || 'Online';
+            const preForm = document.getElementById('chatPreForm');
+            const messagesArea = document.getElementById('chatMessagesArea');
+            const inputRow = document.getElementById('chatInputRow');
+            const status = document.getElementById('chatHeaderStatus');
+            
+            if (preForm) preForm.style.display = 'none';
+            if (messagesArea) messagesArea.style.display = 'block';
+            if (inputRow) inputRow.style.display = 'flex';
+            if (status) status.textContent = adminConnected ? 'Agent online' : (chatUserInfo.name || 'Online');
+            
+            console.log('Chat interface shown');
         }
 
         // Show pre-chat form
         function showPreChatForm() {
-            document.getElementById('chatPreForm').style.display = 'flex';
-            document.getElementById('chatMessagesArea').style.display = 'none';
-            document.getElementById('chatInputRow').style.display = 'none';
-            document.getElementById('chatHeaderStatus').textContent = 'Usually replies within minutes';
-            document.getElementById('chatMessagesArea').innerHTML = '<div class="chat-welcome">Hi! 👋 Looking for a room near your uni? Tell us your university and budget and we\'ll help you find something.</div>';
+            const preForm = document.getElementById('chatPreForm');
+            const messagesArea = document.getElementById('chatMessagesArea');
+            const inputRow = document.getElementById('chatInputRow');
+            const status = document.getElementById('chatHeaderStatus');
+            
+            if (preForm) preForm.style.display = 'flex';
+            if (messagesArea) {
+                messagesArea.style.display = 'none';
+                messagesArea.innerHTML = '<div class="chat-welcome">Hi! 👋 Looking for a room near your uni? Tell us your university and budget and we\'ll help you find something.</div>';
+            }
+            if (inputRow) inputRow.style.display = 'none';
+            if (status) status.textContent = 'Usually replies within minutes';
+            
+            adminConnected = false;
         }
 
         // Exit chat
         function exitChat() {
             if (confirm('End this chat session? Your conversation history will be saved.')) {
+                // Mark as closed in localStorage
+                try {
+                    const saved = localStorage.getItem('chatSession');
+                    if (saved) {
+                        const session = JSON.parse(saved);
+                        session.closed = true;
+                        session.closedAt = new Date().toISOString();
+                        localStorage.setItem('chatSession', JSON.stringify(session));
+                    }
+                } catch (e) {
+                    console.error('Failed to mark session as closed:', e);
+                }
+                
                 clearChatSession();
                 showPreChatForm();
                 toggleChat(); // Close popup
@@ -1745,21 +1844,30 @@
 
         // Initialize chat socket for real-time updates
         function initChatSocket() {
-            if (chatSocket) return;
+            if (chatSocket) {
+                console.log('Socket already initialized');
+                return;
+            }
             
+            console.log('Initializing chat socket...');
             chatSocket = io(window.location.origin, {
                 transports: ['websocket', 'polling'],
-                reconnection: true
+                reconnection: true,
+                reconnectionAttempts: 5
             });
             
             chatSocket.on('connect', () => {
                 console.log('Chat socket connected:', chatSocket.id);
-                // Join room once we have a session
+                
+                // Join room if we have a session
                 if (chatSessionId) {
+                    console.log('Joining chat room:', chatSessionId);
                     chatSocket.emit('join_chat', chatSessionId);
-                    // Reload history to catch any missed messages
-                    loadChatHistory(chatSessionId);
                 }
+            });
+            
+            chatSocket.on('disconnect', (reason) => {
+                console.log('Chat socket disconnected:', reason);
             });
             
             // Listen for all messages (both own and admin replies)
@@ -1768,20 +1876,17 @@
                 const area = document.getElementById('chatMessagesArea');
                 if (!area || area.style.display === 'none') return;
                 
-                // Deduplication: Skip if we've already processed this message
-                // Use timestamp or current time if not provided
-                const timestamp = data.createdAt ? Math.floor(new Date(data.createdAt).getTime()/1000) : Math.floor(Date.now()/1000);
-                const msgId = data._id || `${data.sessionId}-${data.message?.substring(0, 20)}-${timestamp}`;
-                if (processedMessageIds.has(msgId)) {
-                    console.log('Skipping duplicate message:', msgId);
-                    return;
+                // Simple time-based deduplication - prevent messages within 1 second
+                const now = Date.now();
+                const msgTime = data.createdAt ? new Date(data.createdAt).getTime() : now;
+                if (Math.abs(now - msgTime) < 500 && data.senderType !== 'visitor') {
+                    // Very recent message, check if we already got it
+                    if (lastMessageTime === msgTime) {
+                        console.log('Skipping likely duplicate message');
+                        return;
+                    }
                 }
-                processedMessageIds.add(msgId);
-                // Limit set size to prevent memory issues
-                if (processedMessageIds.size > 100) {
-                    const first = processedMessageIds.values().next().value;
-                    processedMessageIds.delete(first);
-                }
+                lastMessageTime = msgTime;
                 
                 // Remove typing indicator if present
                 const typingIndicator = document.querySelector('.chat-typing-indicator');
@@ -1818,11 +1923,12 @@
                 
                 area.appendChild(bubble);
                 area.scrollTop = area.scrollHeight;
+                console.log('Message displayed in chat');
             });
             
-            // Also listen for admin_reply event (fallback)
+            // Also listen for admin_reply event (fallback - for direct admin messages)
             chatSocket.on('admin_reply', (data) => {
-                console.log('Admin reply received:', data);
+                console.log('Admin reply received (admin_reply event):', data);
                 const area = document.getElementById('chatMessagesArea');
                 if (!area || area.style.display === 'none') return;
                 
@@ -1919,19 +2025,41 @@
             if (icon) icon.className = chatOpen ? 'fas fa-times' : 'fas fa-comments';
             
             if (chatOpen) {
-                if (!chatSocket) initChatSocket();
+                // Initialize socket first
+                if (!chatSocket) {
+                    initChatSocket();
+                }
                 
                 // Check if we have a saved session
                 const hasSession = loadChatSession();
+                console.log('Toggle chat - has session:', hasSession, 'sessionId:', chatSessionId);
+                
                 if (hasSession && chatSessionId) {
+                    // Check if session was closed
+                    try {
+                        const saved = localStorage.getItem('chatSession');
+                        if (saved) {
+                            const session = JSON.parse(saved);
+                            if (session.closed) {
+                                // Session was closed, show pre-chat form
+                                console.log('Session was previously closed, showing form');
+                                showPreChatForm();
+                                return;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error checking session status:', e);
+                    }
+                    
                     // Show chat interface with saved session
                     showChatInterface();
-                    // Load history
-                    loadChatHistory(chatSessionId);
-                    // Re-join socket room
-                    if (chatSocket && chatSocket.connected) {
-                        chatSocket.emit('join_chat', chatSessionId);
-                    }
+                    // Load history from server
+                    loadChatHistory(chatSessionId).then(() => {
+                        // Join socket room after loading history
+                        if (chatSocket && chatSocket.connected) {
+                            chatSocket.emit('join_chat', chatSessionId);
+                        }
+                    });
                 } else {
                     // Show pre-chat form
                     showPreChatForm();
