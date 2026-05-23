@@ -53,12 +53,12 @@
         .info-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; }
 
         .listing-type-badge { display: inline-block; padding: 0.3rem 0.875rem; background: rgba(201,168,76,0.1); border-radius: 8px; font-size: 0.75rem; color: var(--color-accent); font-weight: 600; text-transform: uppercase; margin-bottom: 0.75rem; }
-        .listing-title { font-size: 1.75rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.5rem; line-height: 1.2; }
+        .listing-title { font-size: 1.75rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem; line-height: 1.2; }
         .listing-location { display: flex; align-items: center; gap: 0.4rem; color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
         .listing-location i { color: var(--color-accent); }
 
         .price-block { display: flex; align-items: baseline; gap: 0.4rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border); }
-        .price-main { font-family: 'Space Grotesk', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--color-primary); }
+        .price-main { font-family: 'Space Grotesk', sans-serif; font-size: 2.25rem; font-weight: 700; color: var(--color-text-main); }
         .price-period { font-size: 1rem; color: var(--color-text-muted); }
 
         .stats-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
@@ -66,7 +66,7 @@
         .stat-item i { color: var(--color-accent); width: 16px; }
         .stat-item strong { color: var(--color-text-main); }
 
-        .description-block h3 { font-size: 1rem; font-weight: 600; color: var(--color-primary); margin-bottom: 0.75rem; }
+        .description-block h3 { font-size: 1rem; font-weight: 600; color: var(--color-text-main); margin-bottom: 0.75rem; }
         .description-block p { font-size: 0.95rem; color: var(--color-text-muted); line-height: 1.7; }
 
         /* Amenities */
@@ -82,7 +82,7 @@
 
         /* Sidebar */
         .sidebar-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; padding: 1.75rem; margin-bottom: 1.5rem; position: sticky; top: 6rem; }
-        .sidebar-price { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.25rem; }
+        .sidebar-price { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.25rem; }
         .sidebar-period { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
 
         .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; border: none; text-decoration: none; width: 100%; justify-content: center; margin-bottom: 0.75rem; font-family: inherit; }
@@ -90,7 +90,7 @@
         .btn-primary { background: var(--color-accent); color: var(--color-primary); box-shadow: 0 4px 15px rgba(201,168,74,0.3); }
         .btn-primary:hover { background: #D4B55D; box-shadow: 0 6px 20px rgba(201,168,74,0.4); }
         .btn-whatsapp { background: #25d366; color: white; }
-        .btn-outline-dark { background: transparent; color: var(--color-primary); border: 1.5px solid var(--color-border); }
+        .btn-outline-dark { background: transparent; color: var(--color-text-main); border: 1.5px solid var(--color-border); }
         .btn-outline-dark:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
         /* ── ENQUIRY BUTTON STATES ── */
@@ -129,7 +129,7 @@
         .modal-overlay.active { display: flex; }
         .modal { background: var(--color-surface); border-radius: 20px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { font-size: 1.1rem; color: var(--color-primary); }
+        .modal-header h3 { font-size: 1.1rem; color: var(--color-text-main); }
         .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--color-text-muted); cursor: pointer; }
         .modal-body { padding: 1.5rem; }
         .form-group { margin-bottom: 1rem; }
@@ -182,11 +182,13 @@
 <nav class="navbar">
     <div class="nav-container">
         <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
-        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
-            <i class="fas fa-moon" aria-hidden="true"></i>
-            <i class="fas fa-sun" aria-hidden="true"></i>
-        </button>
-        <a href="/listings.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Listings</a>
+        <div class="nav-actions">
+            <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+                <i class="fas fa-moon" aria-hidden="true"></i>
+                <i class="fas fa-sun" aria-hidden="true"></i>
+            </button>
+            <a href="/listings.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Listings</a>
+        </div>
     </div>
 </nav>
 
