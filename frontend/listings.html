@@ -546,17 +546,7 @@
             </div>
             <div class="filter-group">
                 <select id="universityFilter" onchange="onUniversityChange()">
-                    <option value="">All Universities</option>
-                    <option value="Taylor's University">Taylor's University</option>
-                    <option value="Sunway University">Sunway University</option>
-                    <option value="Monash University Malaysia">Monash University Malaysia</option>
-                    <option value="UCSI University">UCSI University</option>
-                    <option value="Asia Pacific University (APU)">Asia Pacific University (APU)</option>
-                    <option value="University of Malaya (UM)">University of Malaya (UM)</option>
-                    <option value="Universiti Putra Malaysia (UPM)">Universiti Putra Malaysia (UPM)</option>
-                    <option value="HELP University">HELP University</option>
-                    <option value="INTI International College">INTI International College</option>
-                    <option value="Multimedia University (MMU) Cyberjaya">Multimedia University (MMU) Cyberjaya</option>
+                    <option value="">Select University</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -814,18 +804,25 @@
             }
         }
 
+        // Available areas from database (populated by loadFilterOptions)
+        let availableAreas = [];
+
         // Update area dropdown without applying filters (for URL param loading)
         function updateAreaDropdown() {
             const uni = document.getElementById('universityFilter').value;
             const areaSelect = document.getElementById('areaFilter');
             const currentArea = areaSelect.value;
             
-            let areas = [];
+            // Get mapped areas for selected university
+            let mappedAreas = [];
             if (uni && UNIVERSITY_AREA_MAP[uni]) {
-                areas = UNIVERSITY_AREA_MAP[uni];
-            } else {
-                areas = ALL_AREAS;
+                mappedAreas = UNIVERSITY_AREA_MAP[uni];
             }
+            
+            // Filter by what's actually available in database
+            let areas = mappedAreas.length > 0 
+                ? mappedAreas.filter(area => availableAreas.includes(area))
+                : availableAreas;
             
             // Build options - show placeholder only when no university selected
             let optionsHtml = uni ? '' : '<option value="">Select Area</option>';
@@ -868,21 +865,24 @@
                 const data = await res.json();
                 const options = data.data;
 
-                // Populate area dropdown with all areas initially
+                // Store available areas for filtering
+                availableAreas = options.areas || [];
+                
+                // Populate area dropdown with areas from database
                 const areaSelect = document.getElementById('areaFilter');
                 let areaOptions = '<option value="">Select Area</option>';
-                (options.areas || ALL_AREAS).forEach(area => {
-                    areaOptions += `<option value="${area}">${area}</option>`;
+                availableAreas.forEach(area => {
+                    if (area) areaOptions += `<option value="${area}">${area}</option>`;
                 });
                 areaSelect.innerHTML = areaOptions;
 
-                // Add any additional universities from backend
+                // Populate university dropdown dynamically from database
                 const uniSelect = document.getElementById('universityFilter');
-                options.universities.forEach(uni => {
-                    if (uni && !Array.from(uniSelect.options).some(o => o.value === uni)) {
-                        uniSelect.innerHTML += `<option value="${uni}">${uni}</option>`;
-                    }
+                let uniOptions = '<option value="">Select University</option>';
+                (options.universities || []).forEach(uni => {
+                    if (uni) uniOptions += `<option value="${uni}">${uni}</option>`;
                 });
+                uniSelect.innerHTML = uniOptions;
             } catch (e) { console.error(e); }
         }
 

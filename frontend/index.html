@@ -752,17 +752,7 @@
                 <div class="search-field">
                     <label>University</label>
                     <select id="qUni" onchange="updateAreaOptions()">
-                        <option value="">Any University</option>
-                        <option value="Taylor's University">Taylor's University</option>
-                        <option value="Sunway University">Sunway University</option>
-                        <option value="Monash University Malaysia">Monash University Malaysia</option>
-                        <option value="UCSI University">UCSI University</option>
-                        <option value="Asia Pacific University (APU)">Asia Pacific University (APU)</option>
-                        <option value="University of Malaya (UM)">University of Malaya (UM)</option>
-                        <option value="Universiti Putra Malaysia (UPM)">Universiti Putra Malaysia (UPM)</option>
-                        <option value="HELP University">HELP University</option>
-                        <option value="INTI International College">INTI International College</option>
-                        <option value="Multimedia University (MMU) Cyberjaya">Multimedia University (MMU) Cyberjaya</option>
+                        <option value="">Select University</option>
                     </select>
                 </div>
                 <div class="search-field">
@@ -1185,12 +1175,17 @@
             const areaSelect = document.getElementById('qArea');
             const currentArea = areaSelect.value;
             
-            let areas = [];
+            // Get mapped areas for selected university
+            let mappedAreas = [];
             if (uni && UNIVERSITY_AREA_MAP[uni]) {
-                areas = UNIVERSITY_AREA_MAP[uni];
-            } else {
-                areas = ALL_AREAS;
+                mappedAreas = UNIVERSITY_AREA_MAP[uni];
             }
+            
+            // Filter by what's actually available in database
+            const availableAreas = window.availableAreas || ALL_AREAS;
+            let areas = mappedAreas.length > 0 
+                ? mappedAreas.filter(area => availableAreas.includes(area))
+                : availableAreas;
             
             // Build options - show placeholder only when no university selected
             let options = uni ? '' : '<option value="">Select Area</option>';
@@ -1347,7 +1342,31 @@
             area.scrollTop = area.scrollHeight;
         }
 
-        document.addEventListener('DOMContentLoaded', loadFeatured);
+        // Load filter options and featured listings on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFilterOptions();
+            loadFeatured();
+        });
+
+        // Load universities and areas from database
+        async function loadFilterOptions() {
+            try {
+                const res = await fetch('/api/listings/filters/options');
+                const data = await res.json();
+                const options = data.data;
+
+                // Populate university dropdown
+                const uniSelect = document.getElementById('qUni');
+                let uniOptions = '<option value="">Select University</option>';
+                (options.universities || []).forEach(uni => {
+                    if (uni) uniOptions += `<option value="${uni}">${uni}</option>`;
+                });
+                uniSelect.innerHTML = uniOptions;
+
+                // Store available areas for later use
+                window.availableAreas = options.areas || [];
+            } catch (e) { console.error(e); }
+        }
     </script>
     <script src="/cookie-consent.js"></script>
 </body>
