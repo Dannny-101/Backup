@@ -803,7 +803,7 @@
             
             if (university) {
                 document.getElementById('universityFilter').value = university;
-                onUniversityChange(); // This will update area dropdown
+                updateAreaDropdown(); // Update area dropdown options but don't apply filters yet
             }
             if (area) document.getElementById('areaFilter').value = area;
             if (type) document.getElementById('typeFilter').value = type;
@@ -811,6 +811,32 @@
             // Apply filters if any params were set
             if (university || area || type) {
                 setTimeout(applyFilters, 100); // Wait for listings to load
+            }
+        }
+
+        // Update area dropdown without applying filters (for URL param loading)
+        function updateAreaDropdown() {
+            const uni = document.getElementById('universityFilter').value;
+            const areaSelect = document.getElementById('areaFilter');
+            const currentArea = areaSelect.value;
+            
+            let areas = [];
+            if (uni && UNIVERSITY_AREA_MAP[uni]) {
+                areas = UNIVERSITY_AREA_MAP[uni];
+            } else {
+                areas = ALL_AREAS;
+            }
+            
+            // Build options
+            let options = '<option value="">All Areas (Klang Valley)</option>';
+            areas.forEach(area => {
+                options += `<option value="${area}">${area}</option>`;
+            });
+            areaSelect.innerHTML = options;
+            
+            // Restore selection if still valid
+            if (areas.includes(currentArea)) {
+                areaSelect.value = currentArea;
             }
         }
 
@@ -858,29 +884,7 @@
 
         // Update area dropdown based on university selection
         function onUniversityChange() {
-            const uni = document.getElementById('universityFilter').value;
-            const areaSelect = document.getElementById('areaFilter');
-            const currentArea = areaSelect.value;
-            
-            let areas = [];
-            if (uni && UNIVERSITY_AREA_MAP[uni]) {
-                areas = UNIVERSITY_AREA_MAP[uni];
-            } else {
-                areas = ALL_AREAS;
-            }
-            
-            // Build options
-            let options = '<option value="">All Areas (Klang Valley)</option>';
-            areas.forEach(area => {
-                options += `<option value="${area}">${area}</option>`;
-            });
-            areaSelect.innerHTML = options;
-            
-            // Restore selection if still valid
-            if (areas.includes(currentArea)) {
-                areaSelect.value = currentArea;
-            }
-            
+            updateAreaDropdown();
             applyFilters();
         }
 

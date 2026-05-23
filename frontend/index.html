@@ -1255,7 +1255,7 @@
                             <h3 class="listing-title">${l.title}</h3>
                             <div class="listing-location">
                                 <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
-                                ${l.location?.city || ''}
+                                ${l.location?.area || l.location?.city || 'Klang Valley'}
                             </div>
                             <div class="listing-features">
                                 ${l.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${l.bedrooms} BR</div>` : ''}
