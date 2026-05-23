@@ -2504,7 +2504,13 @@ function notifIcon(type) {
 let socket = null;
 
 function initSocket() {
-  socket = io();
+  // Connect to same origin (works on both localhost and production)
+  const socketUrl = window.location.origin;
+  socket = io(socketUrl, {
+    transports: ['websocket', 'polling'], // Fallback to polling if websocket fails
+    reconnection: true,
+    reconnectionAttempts: 5
+  });
   
   // Ensure adminId is valid
   const adminId = S.adminId || localStorage.getItem('adminId');
