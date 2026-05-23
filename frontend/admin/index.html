@@ -761,8 +761,22 @@
       min-width: 16px; text-align: center;
     }
 
-    .chat-main { display: flex; flex-direction: column; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .chat-main { display: flex; flex-direction: column; height: calc(100vh - 180px); max-height: calc(100vh - 180px); min-height: 400px; }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold) var(--surface2);
+    }
+    .chat-messages::-webkit-scrollbar { width: 8px; }
+    .chat-messages::-webkit-scrollbar-track { background: var(--surface2); border-radius: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; opacity: 0.6; }
+    .chat-messages::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
     .chat-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); gap: 0.75rem; }
     .chat-empty i { font-size: 2rem; opacity: 0.4; }
 
@@ -2529,15 +2543,8 @@ async function sendReply() {
   container.appendChild(bubble);
   container.scrollTop = container.scrollHeight;
   
-  // Try socket first, fallback to REST
-  let sentViaSocket = false;
-  if (socket && socket.connected) {
-    socket.emit('admin_reply', { sessionId: S.currentSession, message: msg, adminName: S.user?.name || 'Agent', senderType: 'human' });
-    sentViaSocket = true;
-    console.log('Admin reply sent via socket');
-  }
-  
-  // Always save to database via REST (socket just notifies the visitor)
+  // Save to database via REST - backend will emit message_received to visitor's room
+  // (Single source of truth - prevents duplicates)
   try {
     await api('/api/chat', { method: 'POST', body: JSON.stringify({ 
       sessionId: S.currentSession, 
@@ -2546,9 +2553,7 @@ async function sendReply() {
       senderType: 'human',
       name: S.user?.name || 'Agent'
     }) });
-    if (!sentViaSocket) {
-      console.log('Admin reply saved via REST (socket unavailable)');
-    }
+    console.log('Admin reply saved and broadcast via REST');
   } catch (e) {
     console.error('Failed to save reply:', e);
     toast('Failed to send message', 'error');
