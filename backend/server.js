@@ -192,12 +192,13 @@ io.on('connection', (socket) => {
     
     // Admin sends reply - broadcast to visitor's room
     socket.on('admin_reply', (data) => {
-        const { sessionId, message } = data;
+        const { sessionId, message, adminName } = data;
         if (sessionId && message) {
             // Emit as 'message_received' so visitor listener catches it
             io.to(`chat_${sessionId}`).emit('message_received', {
                 sessionId,
                 message,
+                name: adminName || 'Agent',
                 isAdmin: true,
                 senderType: 'human',
                 createdAt: new Date().toISOString()

@@ -2278,9 +2278,11 @@ async function loadMessages(sessionId) {
   container.innerHTML = msgs.filter(m => m.senderType !== 'system').map(m => {
     const senderType = m.senderType || (m.isAdmin ? 'human' : 'visitor');
     let senderLabel = '';
-    if (senderType === 'ai') senderLabel = '<span style="font-size:0.7rem;color:#6366f1;"><i class="fas fa-robot"></i> AI</span>';
-    else if (senderType === 'human') senderLabel = '<span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-user-headset"></i> Agent</span>';
-    else senderLabel = '<span style="font-size:0.7rem;color:var(--gold);"><i class="fas fa-user"></i> Visitor</span>';
+    const senderName = m.name || (senderType === 'visitor' ? 'Visitor' : 'Agent');
+    
+    if (senderType === 'ai') senderLabel = `<span style="font-size:0.7rem;color:#6366f1;"><i class="fas fa-robot"></i> ${senderName}</span>`;
+    else if (senderType === 'human') senderLabel = `<span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-user-headset"></i> ${senderName}</span>`;
+    else senderLabel = `<span style="font-size:0.7rem;color:var(--gold);"><i class="fas fa-user"></i> ${senderName}</span>`;
     
     return `
     <div class="msg-bubble ${m.isAdmin?'admin':''}">
@@ -2330,7 +2332,7 @@ async function sendReply() {
   // Try socket first, fallback to REST
   let sentViaSocket = false;
   if (socket && socket.connected) {
-    socket.emit('admin_reply', { sessionId: S.currentSession, message: msg, senderType: 'human' });
+    socket.emit('admin_reply', { sessionId: S.currentSession, message: msg, adminName: S.user?.name || 'Agent', senderType: 'human' });
     sentViaSocket = true;
     console.log('Admin reply sent via socket');
   }
@@ -2770,9 +2772,18 @@ function initSocket() {
       if (wasCurrentSession) {
         const container = document.getElementById('chatMessages');
         if (container) {
+          const senderType = data.senderType || (data.isAdmin ? 'human' : 'visitor');
+          const senderName = data.name || (senderType === 'visitor' ? 'Visitor' : 'Agent');
+          
+          let senderLabel = '';
+          if (senderType === 'ai') senderLabel = `<span style="font-size:0.7rem;color:#6366f1;"><i class="fas fa-robot"></i> ${senderName}</span>`;
+          else if (senderType === 'human') senderLabel = `<span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-user-headset"></i> ${senderName}</span>`;
+          else senderLabel = `<span style="font-size:0.7rem;color:var(--gold);"><i class="fas fa-user"></i> ${senderName}</span>`;
+          
           const bubble = document.createElement('div');
           bubble.className = 'msg-bubble';
           bubble.innerHTML = `
+            <div style="margin-bottom:2px;">${senderLabel}</div>
             <div class="msg-content">${data.message}</div>
             <div class="msg-time">${fmtTime(data.createdAt)}</div>
           `;
