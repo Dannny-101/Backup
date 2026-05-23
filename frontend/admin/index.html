@@ -2388,6 +2388,45 @@ function initSocket() {
     toast(`Task restored to ${data.restoredTo.replace('_', ' ')}: ${data.title}`);
     if (S.section === 'tasks') fetchAndRenderTasks();
   });
+  
+  // Chat events
+  socket.on('new_chat_message', (data) => {
+    // Update chat badge
+    const badge = document.getElementById('chatBadge');
+    if (badge) {
+      const current = parseInt(badge.textContent) || 0;
+      badge.textContent = current + 1;
+      badge.style.display = '';
+    }
+    
+    // If on chat section, update sessions and messages
+    if (S.section === 'chat') {
+      const wasCurrentSession = S.currentSession === data.sessionId;
+      loadChatSessions();
+      
+      // If viewing the same session, add message to chat
+      if (wasCurrentSession) {
+        const container = document.getElementById('chatMessages');
+        if (container) {
+          const bubble = document.createElement('div');
+          bubble.className = 'msg-bubble';
+          bubble.innerHTML = `
+            <div class="msg-content">${data.message}</div>
+            <div class="msg-time">${fmtTime(data.createdAt)}</div>
+          `;
+          container.appendChild(bubble);
+          container.scrollTop = container.scrollHeight;
+        }
+      }
+    }
+    
+    // Show toast notification
+    toast(`New message from ${data.name}: ${data.message.substring(0, 40)}${data.message.length > 40 ? '...' : ''}`);
+    
+    // Play notification sound
+    const sound = document.getElementById('notifSound');
+    if (sound) sound.play().catch(() => {});
+  });
 }
 
 // ── TASKS ──

@@ -27,6 +27,29 @@ router.post('/', async (req, res) => {
         process.env.ADMIN_EMAIL || 'admin@tenandsee.com',
         { name, email, message }
       );
+      
+      // Emit socket event to all admins for real-time updates
+      const io = req.app.get('io');
+      if (io) {
+        io.to('all_admins').emit('new_chat_message', {
+          sessionId: chatSession,
+          name: name || 'Anonymous',
+          email,
+          message,
+          createdAt: chatMessage.createdAt,
+          isAdmin: false
+        });
+      }
+    } else {
+      // Emit admin reply to refresh visitor session (if visitor is connected)
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`chat_${chatSession}`).emit('admin_reply', {
+          sessionId: chatSession,
+          message,
+          createdAt: chatMessage.createdAt
+        });
+      }
     }
 
     res.status(201).json({ success: true, data: chatMessage, sessionId: chatSession });
