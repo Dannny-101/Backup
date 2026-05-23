@@ -1730,6 +1730,12 @@
                 // Save to localStorage immediately
                 saveChatSession();
                 
+                // JOIN SOCKET ROOM NOW (socket already connected at this point)
+                if (chatSocket && chatSocket.connected) {
+                    console.log('🟢 Joining socket room after session create:', chatSessionId);
+                    chatSocket.emit('join_chat', chatSessionId);
+                }
+                
                 // Show chat interface
                 showChatInterface();
                 
