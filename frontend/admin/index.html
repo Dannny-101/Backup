@@ -393,6 +393,264 @@
       box-shadow: 0 25px 60px rgba(0,0,0,0.6);
     }
     .modal-sm { max-width: 440px; }
+    .modal-lead { 
+      max-width: 600px; 
+      width: 90%; 
+      max-height: 90vh;
+      animation: modalFadeIn 200ms ease-out;
+    }
+    .modal-lead.closing {
+      animation: modalFadeOut 150ms ease-in forwards;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes modalFadeOut {
+      from { opacity: 1; transform: scale(1) translateY(0); }
+      to { opacity: 0; transform: scale(0.95) translateY(10px); }
+    }
+    @media (max-width: 768px) {
+      .modal-lead { width: 95%; max-height: 95vh; }
+    }
+    @media (max-width: 480px) {
+      .modal-lead { 
+        width: 100%; 
+        max-width: 100%; 
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
+      }
+      .modal-overlay { padding: 0; align-items: flex-end; }
+    }
+    .lead-modal-header {
+      border-bottom: none;
+      padding-bottom: 0.5rem;
+    }
+    .lead-header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .lead-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text);
+    }
+    .lead-status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.875rem;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .lead-status-badge.new { background: #dbeafe; color: #1e40af; }
+    .lead-status-badge.contacted { background: #fef3c7; color: #92400e; }
+    .lead-status-badge.viewing_scheduled { background: #e0e7ff; color: #3730a3; }
+    .lead-status-badge.converted { background: #d1fae5; color: #065f46; }
+    .lead-status-badge.closed { background: #f3f4f6; color: #4b5563; }
+    
+    /* Lead Cards */
+    .lead-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .lead-card-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .lead-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .lead-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .lead-field-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+    .lead-field-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .lead-field-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .lead-field-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .lead-field-value a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .lead-field-value a:hover { text-decoration: underline; }
+    .lead-field-value.not-provided {
+      color: #9ca3af;
+      font-style: italic;
+    }
+    .lead-copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .lead-copy-btn:hover {
+      background: var(--surface);
+      color: var(--gold);
+    }
+    
+    /* Message Card - Most Prominent */
+    .lead-message-card {
+      background: #f0f7ff;
+      border: 1px solid #dbeafe;
+      border-left: 4px solid #3b82f6;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .lead-message-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #3b82f6;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .lead-message-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #1e3a5f;
+      white-space: pre-wrap;
+    }
+    @media (min-width: 768px) {
+      .lead-message-text { font-size: 17px; }
+    }
+    
+    /* Metadata Grid */
+    .lead-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 480px) {
+      .lead-meta-grid { grid-template-columns: 1fr; }
+    }
+    .lead-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .lead-meta-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .lead-meta-value {
+      font-size: 0.85rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .lead-meta-value.not-provided {
+      color: #9ca3af;
+      font-style: italic;
+    }
+    
+    /* Property Link Card */
+    .lead-property-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .lead-property-link:hover {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.05);
+    }
+    .lead-property-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--gold-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+    .lead-property-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .lead-property-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lead-property-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .lead-property-arrow {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* Lead Actions Section */
+    .lead-actions {
+      border-top: 1px solid var(--border);
+      padding-top: 1.25rem;
+      margin-top: 0.5rem;
+    }
     .modal-header {
       padding: 1.25rem 1.5rem;
       border-bottom: 1px solid var(--border);
@@ -757,12 +1015,15 @@
 
 <!-- Lead Modal -->
 <div class="modal-overlay" id="leadModal">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <span class="modal-title">Lead Details</span>
+  <div class="modal modal-lead">
+    <div class="modal-header lead-modal-header">
+      <div class="lead-header-info">
+        <h2 class="lead-name" id="leadModalName">Lead Name</h2>
+        <span class="lead-status-badge" id="leadModalStatus">new</span>
+      </div>
       <button class="modal-close" onclick="closeModal('leadModal')">&times;</button>
     </div>
-    <div class="modal-body" id="leadModalBody"></div>
+    <div class="modal-body lead-modal-body" id="leadModalBody"></div>
   </div>
 </div>
 
@@ -1398,30 +1659,129 @@ function filterLeads() { renderLeadsBody(); }
 function viewLead(id) {
   const l = S.leads.find(x => x._id === id);
   if (!l) return;
+  
+  // Update header
+  document.getElementById('leadModalName').textContent = l.name;
+  const statusBadge = document.getElementById('leadModalStatus');
+  statusBadge.textContent = l.status;
+  statusBadge.className = `lead-status-badge ${l.status}`;
+  
+  // Helper to format value or show "Not provided"
+  const val = (v) => v ? `<span class="lead-field-value">${v}</span>` : `<span class="lead-field-value not-provided">Not provided</span>`;
+  const valMeta = (v) => v ? `<span class="lead-meta-value">${v}</span>` : `<span class="lead-meta-value not-provided">Not provided</span>`;
+  
+  // Format date: "23 May 2026"
+  const fmtDateLong = (d) => {
+    if (!d) return null;
+    const date = new Date(d);
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  };
+  
+  // Copy to clipboard function
+  const copyBtn = (text) => `<button class="lead-copy-btn" onclick="navigator.clipboard.writeText('${text}');toast('Copied!')" title="Copy"><i class="fas fa-copy"></i></button>`;
+  
   document.getElementById('leadModalBody').innerHTML = `
-    <div style="margin-bottom:1.25rem;">
-      <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.5rem;">${l.name}</div>
-      <div style="color:var(--text-muted);font-size:0.85rem;display:flex;flex-direction:column;gap:4px;">
-        <span><i class="fas fa-envelope" style="width:16px;"></i> ${l.email}</span>
-        ${l.phone?`<span><i class="fas fa-phone" style="width:16px;"></i> ${l.phone}</span>`:''}
-        ${l.university?`<span><i class="fas fa-graduation-cap" style="width:16px;"></i> ${l.university}</span>`:''}
-        <span><i class="fas fa-tag" style="width:16px;"></i> Source: ${l.source?.replace(/_/g,' ')}</span>
+    <!-- Contact Card -->
+    <div class="lead-card">
+      <div class="lead-card-title"><i class="fas fa-user"></i> Contact Information</div>
+      <div class="lead-card-content">
+        <div class="lead-field">
+          <div class="lead-field-icon"><i class="fas fa-user"></i></div>
+          <div class="lead-field-content">
+            <div class="lead-field-label">Name</div>
+            ${val(l.name)} ${copyBtn(l.name)}
+          </div>
+        </div>
+        <div class="lead-field">
+          <div class="lead-field-icon"><i class="fas fa-envelope"></i></div>
+          <div class="lead-field-content">
+            <div class="lead-field-label">Email</div>
+            ${l.email ? `<span class="lead-field-value"><a href="mailto:${l.email}">${l.email}</a></span> ${copyBtn(l.email)}` : val(null)}
+          </div>
+        </div>
+        <div class="lead-field">
+          <div class="lead-field-icon"><i class="fas fa-phone"></i></div>
+          <div class="lead-field-content">
+            <div class="lead-field-label">Phone</div>
+            ${l.phone ? `<span class="lead-field-value">${l.phone}</span> ${copyBtn(l.phone)}` : val(null)}
+          </div>
+        </div>
+        <div class="lead-field">
+          <div class="lead-field-icon"><i class="fas fa-graduation-cap"></i></div>
+          <div class="lead-field-content">
+            <div class="lead-field-label">University</div>
+            ${val(l.university)}
+          </div>
+        </div>
       </div>
     </div>
-    ${l.message?`<div style="background:var(--surface2);padding:0.875rem;border-radius:var(--radius);margin-bottom:1.25rem;font-size:0.85rem;">${l.message}</div>`:''}
-    <div class="form-group">
-      <label class="form-label">Status</label>
-      <select class="form-select" id="lStatusSel">
-        ${['new','contacted','viewing_scheduled','converted','closed'].map(s=>`<option value="${s}"${l.status===s?' selected':''}>${cap(s)}</option>`).join('')}
-      </select>
+    
+    <!-- Property Card (if applicable) -->
+    ${l.listingId ? `
+    <div class="lead-card">
+      <div class="lead-card-title"><i class="fas fa-home"></i> Property Interest</div>
+      <a href="/listing.html?id=${l.listingId}" target="_blank" class="lead-property-link">
+        <div class="lead-property-icon"><i class="fas fa-building"></i></div>
+        <div class="lead-property-info">
+          <div class="lead-property-name">${l.listingTitle || 'View Property'}</div>
+          <div class="lead-property-meta">Click to view listing details</div>
+        </div>
+        <div class="lead-property-arrow"><i class="fas fa-chevron-right"></i></div>
+      </a>
     </div>
-    <div class="form-group">
-      <label class="form-label">Notes</label>
-      <textarea class="form-textarea" id="lNotesTa">${l.notes||''}</textarea>
+    ` : ''}
+    
+    <!-- Message Card - Most Prominent -->
+    ${l.message ? `
+    <div class="lead-message-card">
+      <div class="lead-message-label"><i class="fas fa-comment-dots"></i> Visitor's Message</div>
+      <div class="lead-message-text">${l.message}</div>
     </div>
-    <button class="btn btn-gold" style="width:100%;" onclick="updateLead('${l._id}')">
-      <i class="fas fa-save"></i> Update Lead
-    </button>
+    ` : ''}
+    
+    <!-- Metadata Card -->
+    <div class="lead-card">
+      <div class="lead-card-title"><i class="fas fa-info-circle"></i> Metadata</div>
+      <div class="lead-meta-grid">
+        <div class="lead-meta-item">
+          <div class="lead-meta-label">Source</div>
+          ${valMeta(l.source ? l.source.replace(/_/g, ' ') : null)}
+        </div>
+        <div class="lead-meta-item">
+          <div class="lead-meta-label">IP Address</div>
+          ${valMeta(l.ipAddress)}
+        </div>
+        <div class="lead-meta-item">
+          <div class="lead-meta-label">User Agent</div>
+          ${valMeta(l.userAgent)}
+        </div>
+        <div class="lead-meta-item">
+          <div class="lead-meta-label">Created</div>
+          <span class="lead-meta-value">${fmtDateLong(l.createdAt) || 'Not provided'}</span>
+        </div>
+        <div class="lead-meta-item">
+          <div class="lead-meta-label">Last Updated</div>
+          <span class="lead-meta-value">${fmtDateLong(l.updatedAt) || 'Not provided'}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions Section -->
+    <div class="lead-actions">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="lStatusSel">
+          ${['new','contacted','viewing_scheduled','converted','closed'].map(s=>`<option value="${s}"${l.status===s?' selected':''}>${cap(s)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="lNotesTa" rows="3">${l.notes||''}</textarea>
+      </div>
+      <button class="btn btn-gold" style="width:100%;" onclick="updateLead('${l._id}')">
+        <i class="fas fa-save"></i> Update Lead
+      </button>
+    </div>
   `;
   openModal('leadModal');
 }
