@@ -3,9 +3,45 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
+
+// Socket.io setup
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+// Make io accessible to routes
+app.set('io', io);
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    console.log('Client connected:', socket.id);
+    
+    // Admin joins the all_admins room for notifications
+    socket.on('join_admin', (adminId) => {
+        socket.join('all_admins');
+        socket.adminId = adminId;
+        console.log(`Admin ${adminId} joined all_admins room`);
+    });
+    
+    // Visitor joins their chat session room
+    socket.on('join_chat', (sessionId) => {
+        socket.join(`chat_${sessionId}`);
+        console.log(`Session ${sessionId} joined chat room`);
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
+});
 
 // Middleware
 app.use(cors());
@@ -27,6 +63,12 @@ app.use('/api/leads', require('./routes/leads'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/whatsapp', require('./routes/whatsapp'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/audit', require('./routes/audit').router);
+app.use('/api/tasks', require('./routes/tasks'));
 
 // Serve frontend
 app.get('/', (req, res) => {
@@ -38,4 +80,4 @@ app.get('/admin', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
