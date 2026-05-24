@@ -529,6 +529,79 @@
         }
         .view-toggle-btn i { font-size: 0.85rem; }
 
+        /* University Filter Row */
+        .uni-filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+        .uni-filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            border: 1.5px solid transparent;
+            background: var(--color-surface);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .uni-filter-btn i { font-size: 0.75rem; }
+        .uni-filter-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .uni-filter-btn.active { color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        
+        /* University color coding */
+        .uni-filter-btn[data-uni="Taylor's University"] { border-color: #dc2626; color: #dc2626; }
+        .uni-filter-btn[data-uni="Taylor's University"].active, .uni-filter-btn[data-uni="Taylor's University"]:hover { background: #dc2626; color: white; }
+        
+        .uni-filter-btn[data-uni="Monash University Malaysia"] { border-color: #1e3a5f; color: #1e3a5f; }
+        .uni-filter-btn[data-uni="Monash University Malaysia"].active, .uni-filter-btn[data-uni="Monash University Malaysia"]:hover { background: #1e3a5f; color: white; }
+        
+        .uni-filter-btn[data-uni="Sunway University"] { border-color: #d97706; color: #d97706; }
+        .uni-filter-btn[data-uni="Sunway University"].active, .uni-filter-btn[data-uni="Sunway University"]:hover { background: #d97706; color: white; }
+        
+        .uni-filter-btn[data-uni="INTI International College"] { border-color: #991b1b; color: #991b1b; }
+        .uni-filter-btn[data-uni="INTI International College"].active, .uni-filter-btn[data-uni="INTI International College"]:hover { background: #991b1b; color: white; }
+        
+        .uni-filter-btn[data-uni="Help University"] { border-color: #ef4444; color: #ef4444; }
+        .uni-filter-btn[data-uni="Help University"].active, .uni-filter-btn[data-uni="Help University"]:hover { background: #ef4444; color: white; }
+        
+        .uni-filter-btn[data-uni="SEGi University"] { border-color: #3b82f6; color: #3b82f6; }
+        .uni-filter-btn[data-uni="SEGi University"].active, .uni-filter-btn[data-uni="SEGi University"]:hover { background: #3b82f6; color: white; }
+
+        /* University Tags on Property Cards */
+        .uni-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .uni-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .uni-tag.taylors { background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3); }
+        .uni-tag.monash { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; border: 1px solid rgba(30, 58, 95, 0.3); }
+        .uni-tag.sunway { background: rgba(217, 119, 6, 0.12); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); }
+        .uni-tag.inti { background: rgba(153, 27, 27, 0.12); color: #991b1b; border: 1px solid rgba(153, 27, 27, 0.3); }
+        .uni-tag.help { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .uni-tag.segi { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .uni-tag i { font-size: 0.6rem; }
+
         /* Property Cards grid override */
         .listings-grid.properties-view {
             grid-template-columns: repeat(2, 1fr) !important;
@@ -1582,6 +1655,34 @@
                 <span>All Rooms</span>
             </button>
         </div>
+        
+        <!-- University Filter Row -->
+        <div class="uni-filter-row" id="uniFilterRow">
+            <button class="uni-filter-btn" data-uni="Taylor's University" onclick="filterByUniversity('Taylor\'s University')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Taylor's</span>
+            </button>
+            <button class="uni-filter-btn" data-uni="Monash University Malaysia" onclick="filterByUniversity('Monash University Malaysia')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Monash</span>
+            </button>
+            <button class="uni-filter-btn" data-uni="Sunway University" onclick="filterByUniversity('Sunway University')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Sunway</span>
+            </button>
+            <button class="uni-filter-btn" data-uni="INTI International College" onclick="filterByUniversity('INTI International College')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>INTI</span>
+            </button>
+            <button class="uni-filter-btn" data-uni="Help University" onclick="filterByUniversity('Help University')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Help</span>
+            </button>
+            <button class="uni-filter-btn" data-uni="SEGi University" onclick="filterByUniversity('SEGi University')">
+                <i class="fas fa-graduation-cap"></i>
+                <span>SEGi</span>
+            </button>
+        </div>
     </div>
 
     <div class="listings-section">
@@ -2021,12 +2122,22 @@
             if (university) {
                 document.getElementById('universityFilter').value = university;
                 updateAreaDropdown(); // Update area dropdown options but don't apply filters yet
+                
+                // Also trigger university filter buttons
+                setTimeout(() => {
+                    filterByUniversity(university);
+                    // Scroll to university filters
+                    const uniFilterRow = document.getElementById('uniFilterRow');
+                    if (uniFilterRow) {
+                        uniFilterRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 200); // Wait for data to load
             }
             if (area) document.getElementById('areaFilter').value = area;
             if (type) document.getElementById('typeFilter').value = type;
             
-            // Apply filters if any params were set
-            if (university || area || type) {
+            // Apply regular filters if area or type params were set (but not university - handled above)
+            if ((area || type) && !university) {
                 setTimeout(applyFilters, 100); // Wait for listings to load
             }
         }
@@ -2161,6 +2272,22 @@
 
                 const roomTypeEntries = Object.entries(p.roomTypes || {});
 
+                // Generate university tags
+                const uniMap = {
+                    "Taylor's University": { class: 'taylors', icon: 'fa-graduation-cap' },
+                    "Monash University Malaysia": { class: 'monash', icon: 'fa-graduation-cap' },
+                    "Sunway University": { class: 'sunway', icon: 'fa-graduation-cap' },
+                    "INTI International College": { class: 'inti', icon: 'fa-graduation-cap' },
+                    "Help University": { class: 'help', icon: 'fa-graduation-cap' },
+                    "SEGi University": { class: 'segi', icon: 'fa-graduation-cap' }
+                };
+                
+                const nearbyUnis = p.nearbyUniversities || [p.location?.university].filter(Boolean);
+                const uniTagsHtml = nearbyUnis.length > 0 ? nearbyUnis.map(uni => {
+                    const uniInfo = uniMap[uni] || { class: 'taylors', icon: 'fa-map-marker-alt' };
+                    return `<span class="uni-tag ${uniInfo.class}"><i class="fas ${uniInfo.icon}"></i> ${uni}</span>`;
+                }).join('') : '';
+
                 return `
                     <a href="/property.html?id=${p._id}" class="property-card" data-aos="fade-up" data-aos-delay="${(i % 2) * 80}" style="text-decoration:none;">
                         <div class="property-image">
@@ -2168,8 +2295,8 @@
                             <div class="property-price">${priceRange}<span>/month</span></div>
                         </div>
                         <div class="property-content">
+                            <div class="uni-tags">${uniTagsHtml}</div>
                             <div class="property-meta">
-                                <span class="property-badge">${p.location?.university || 'Klang Valley'}</span>
                                 <span class="property-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                             </div>
                             <h3 class="property-title">${p.name}</h3>
@@ -2395,6 +2522,43 @@
                 options += `<option value="${area}">${area}</option>`;
             });
             areaSelect.innerHTML = options;
+            renderListings(allListings);
+        }
+
+        function filterByUniversity(universityName) {
+            // Update active state on buttons
+            document.querySelectorAll('.uni-filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.uni === universityName);
+            });
+            
+            // Filter properties by university
+            const filtered = allListings.filter(listing => {
+                const nearbyUnis = listing.nearbyUniversities || [listing.location?.university].filter(Boolean);
+                return nearbyUnis.includes(universityName);
+            });
+            
+            // Switch to properties view
+            setView('properties');
+            
+            // Render filtered results
+            renderProperties(filtered);
+            
+            // Update active filters display
+            const activeFilters = document.getElementById('activeFilters');
+            const existingFilter = Array.from(activeFilters.children).find(el => el.dataset.type === 'university');
+            if (existingFilter) existingFilter.remove();
+            
+            const filterTag = document.createElement('span');
+            filterTag.className = 'filter-tag';
+            filterTag.dataset.type = 'university';
+            filterTag.innerHTML = `${universityName} <i class="fas fa-times" onclick="clearUniversityFilter()"></i>`;
+            activeFilters.appendChild(filterTag);
+        }
+
+        function clearUniversityFilter() {
+            document.querySelectorAll('.uni-filter-btn').forEach(btn => btn.classList.remove('active'));
+            const filterTag = document.querySelector('[data-type="university"]');
+            if (filterTag) filterTag.remove();
             renderListings(allListings);
         }
 
