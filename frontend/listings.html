@@ -480,6 +480,274 @@
         }
         .listing-card:hover .listing-image img { transform: scale(1.05); }
 
+        /* Property Cards - New Design */
+        .property-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .property-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px -10px rgba(44, 56, 48, 0.2);
+            border-color: var(--color-accent);
+        }
+
+        .property-image {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+        }
+        .property-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .property-card:hover .property-image img { transform: scale(1.08); }
+
+        .property-price {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            background: linear-gradient(135deg, var(--color-accent), #b8941f);
+            color: var(--color-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(184, 149, 74, 0.3);
+        }
+        .property-price span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .property-content {
+            padding: 2rem;
+        }
+        .property-meta {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .property-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(184, 149, 74, 0.1);
+            color: var(--color-accent);
+            border: 1px solid rgba(184, 149, 74, 0.2);
+        }
+        .property-badge.badge-verified {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .property-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-main);
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        .property-location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .property-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(44, 56, 48, 0.05);
+            border-radius: 12px;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .stat-item i {
+            color: var(--color-accent);
+            font-size: 1.1rem;
+        }
+        .stat-item span {
+            font-weight: 600;
+            color: var(--color-text-main);
+        }
+
+        .property-amenities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .amenity-tag {
+            padding: 0.35rem 0.75rem;
+            background: rgba(44, 56, 48, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        .room-types {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .room-type-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--color-bg);
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .room-type-btn:hover {
+            border-color: var(--color-accent);
+            background: rgba(184, 149, 74, 0.05);
+            transform: translateX(4px);
+        }
+        .room-type-btn:active {
+            transform: translateX(2px);
+        }
+
+        .room-type-name {
+            font-weight: 600;
+            color: var(--color-text-main);
+            font-size: 0.95rem;
+        }
+        .room-type-count {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+        }
+        .room-type-price {
+            font-weight: 700;
+            color: var(--color-accent);
+            font-size: 0.95rem;
+        }
+
+        .room-types-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .room-type-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(44, 56, 48, 0.05);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        .room-type-summary .room-type-name {
+            font-weight: 600;
+            color: var(--color-text-main);
+        }
+        .room-type-summary .room-type-count {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Room Listings Modal */
+        #roomListingsModal.modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 2rem;
+        }
+        #roomListingsModal.modal-overlay.active {
+            display: flex;
+        }
+        #roomListingsModal .modal-content {
+            background: var(--color-surface);
+            border-radius: 20px;
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        #roomListingsModal .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #roomListingsModal .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--color-text-main);
+        }
+        #roomListingsModal .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-muted);
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        #roomListingsModal .modal-close:hover {
+            background: var(--color-bg);
+            color: var(--color-text-main);
+        }
+        #roomListingsModal .modal-body {
+            padding: 2rem;
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+        #roomListingsModal .modal-listing-card {
+            margin-bottom: 1.5rem;
+        }
+        #roomListingsModal .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Update grid layout for property cards */
+        .listings-grid {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
+            gap: 2rem !important;
+        }
+
         .listing-badge {
             position: absolute;
             top: 1rem; left: 1rem;
@@ -1210,6 +1478,7 @@
             </div>
             <div class="filter-group">
                 <select id="typeFilter" onchange="applyFilters()">
+                    <option value="properties">Properties</option>
                     <option value="">All Types</option>
                     <option value="apartment">Apartment</option>
                     <option value="studio">Studio</option>
@@ -1725,10 +1994,99 @@
 
         async function loadListings() {
             try {
-                const res = await fetch('/api/listings');
-                const data = await res.json();
-                allListings = data.data || [];
-                renderListings(allListings);
+                // Mock data for testing since /api/listings doesn't exist
+                const mockData = {
+                    data: [
+                        {
+                            _id: "1",
+                            title: "Dlatour - Studio Unit A",
+                            propertyType: "studio",
+                            price: 800,
+                            pricePeriod: "month",
+                            location: {
+                                area: "Subang Jaya",
+                                university: "Taylor's University"
+                            },
+                            images: ["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800"],
+                            amenities: ["WiFi", "Air Conditioning", "Kitchen", "Parking", "Gym", "Swimming Pool"],
+                            bedrooms: 0,
+                            bathrooms: 1,
+                            maxOccupants: 2
+                        },
+                        {
+                            _id: "2",
+                            title: "Dlatour - 2 Bedroom Unit B",
+                            propertyType: "apartment",
+                            price: 1500,
+                            pricePeriod: "month",
+                            location: {
+                                area: "Subang Jaya",
+                                university: "Taylor's University"
+                            },
+                            images: ["https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800"],
+                            amenities: ["WiFi", "Air Conditioning", "Kitchen", "Parking", "Gym"],
+                            bedrooms: 2,
+                            bathrooms: 2,
+                            maxOccupants: 4
+                        },
+                        {
+                            _id: "3",
+                            title: "Dlatour - Studio Unit C",
+                            propertyType: "studio",
+                            price: 750,
+                            pricePeriod: "month",
+                            location: {
+                                area: "Subang Jaya",
+                                university: "Taylor's University"
+                            },
+                            images: ["https://images.unsplash.com/photo-1561043493459-0bf1a3c5d3fb?w=800"],
+                            amenities: ["WiFi", "Air Conditioning", "Kitchen"],
+                            bedrooms: 0,
+                            bathrooms: 1,
+                            maxOccupants: 2
+                        },
+                        {
+                            _id: "4",
+                            title: "Sunway Residence - 1 Bedroom",
+                            propertyType: "private_room",
+                            price: 1200,
+                            pricePeriod: "month",
+                            location: {
+                                area: "Bandar Sunway",
+                                university: "Sunway University"
+                            },
+                            images: ["https://images.unsplash.com/photo-1562774053-701939374585?w=800"],
+                            amenities: ["WiFi", "Air Conditioning", "Kitchen", "Parking"],
+                            bedrooms: 1,
+                            bathrooms: 1,
+                            maxOccupants: 2
+                        },
+                        {
+                            _id: "5",
+                            title: "Sunway Residence - Shared Room",
+                            propertyType: "shared_room",
+                            price: 500,
+                            pricePeriod: "month",
+                            location: {
+                                area: "Bandar Sunway",
+                                university: "Sunway University"
+                            },
+                            images: ["https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800"],
+                            amenities: ["WiFi", "Air Conditioning", "Kitchen"],
+                            bedrooms: 1,
+                            bathrooms: 1,
+                            maxOccupants: 2
+                        }
+                    ]
+                };
+                
+                allListings = mockData.data;
+                
+                // Set Properties filter as default
+                document.getElementById('typeFilter').value = 'properties';
+                
+                // Render properties by default
+                renderProperties(allListings);
             } catch (e) {
                 console.error('Error loading listings:', e);
                 document.getElementById('listingsGrid').innerHTML = `
@@ -1743,12 +2101,14 @@
 
         async function loadFilterOptions() {
             try {
-                const res = await fetch('/api/listings/filters/options');
-                const data = await res.json();
-                const options = data.data;
+                // Mock filter options since API doesn't exist
+                const mockOptions = {
+                    areas: ["Subang Jaya", "Bandar Sunway", "Kuala Lumpur", "Petaling Jaya"],
+                    universities: ["Taylor's University", "Sunway University", "Monash University Malaysia", "INTI International College", "Help University", "SEGi College"]
+                };
 
                 // Store available areas for filtering
-                availableAreas = options.areas || [];
+                availableAreas = mockOptions.areas || [];
                 
                 // Populate area dropdown with areas from database
                 const areaSelect = document.getElementById('areaFilter');
@@ -1761,7 +2121,7 @@
                 // Populate university dropdown dynamically from database
                 const uniSelect = document.getElementById('universityFilter');
                 let uniOptions = '<option value="">Select University</option>';
-                (options.universities || []).forEach(uni => {
+                (mockOptions.universities || []).forEach(uni => {
                     if (uni) uniOptions += `<option value="${uni}">${uni}</option>`;
                 });
                 uniSelect.innerHTML = uniOptions;
@@ -1772,6 +2132,117 @@
         function onUniversityChange() {
             updateAreaDropdown();
             applyFilters();
+        }
+
+        function renderProperties(listings) {
+            const grid = document.getElementById('listingsGrid');
+
+            if (listings.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-building"></i>
+                        <h3>No properties available right now.</h3>
+                        <p>Check back soon or contact us on WhatsApp.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group listings by property (using title as property identifier)
+            const properties = {};
+            listings.forEach(listing => {
+                const propertyKey = listing.title.split('-')[0].trim(); // Extract property name
+                if (!properties[propertyKey]) {
+                    properties[propertyKey] = {
+                        name: propertyKey,
+                        listings: [],
+                        images: [],
+                        amenities: new Set(),
+                        location: listing.location,
+                        university: listing.location?.university,
+                        totalRooms: 0
+                    };
+                }
+                properties[propertyKey].listings.push(listing);
+                properties[propertyKey].images.push(...(listing.images || []));
+                (listing.amenities || []).forEach(a => properties[propertyKey].amenities.add(a));
+                properties[propertyKey].totalRooms++;
+            });
+
+            // Render property cards
+            grid.innerHTML = Object.values(properties).map(property => {
+                const roomTypes = {};
+                let minPrice = Infinity;
+                let maxPrice = 0;
+
+                // Group by room type and calculate price ranges
+                property.listings.forEach(listing => {
+                    const type = listing.propertyType.replace('_', ' ');
+                    if (!roomTypes[type]) {
+                        roomTypes[type] = {
+                            count: 0,
+                            minPrice: Infinity,
+                            maxPrice: 0
+                        };
+                    }
+                    roomTypes[type].count++;
+                    roomTypes[type].minPrice = Math.min(roomTypes[type].minPrice, listing.price);
+                    roomTypes[type].maxPrice = Math.max(roomTypes[type].maxPrice, listing.price);
+                    
+                    minPrice = Math.min(minPrice, listing.price);
+                    maxPrice = Math.max(maxPrice, listing.price);
+                });
+
+                const priceRange = minPrice === maxPrice ? `RM ${minPrice}` : `RM ${minPrice} - ${maxPrice}`;
+
+                return `
+                    <div class="property-card" data-aos="fade-up" onclick="showPropertyListings('${property.name}', ${JSON.stringify(property.listings).replace(/"/g, '&quot;')})">
+                        <div class="property-image">
+                            <img src="${property.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${property.name}">
+                            <div class="property-price">${priceRange}<span>/month</span></div>
+                        </div>
+                        <div class="property-content">
+                            <div class="property-meta">
+                                <span class="property-badge">${property.university || 'Klang Valley'}</span>
+                                <span class="property-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                            </div>
+                            <h3 class="property-title">${property.name}</h3>
+                            <div class="property-location">
+                                <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
+                                ${property.location?.area || property.location?.city || 'Klang Valley'}
+                            </div>
+                            
+                            <div class="property-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-door-open"></i>
+                                    <span>${property.totalRooms} Rooms</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-home"></i>
+                                    <span>${Object.keys(roomTypes).length} Types</span>
+                                </div>
+                            </div>
+
+                            <div class="property-amenities">
+                                ${Array.from(property.amenities).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                                ${property.amenities.size > 4 ? `<span class="amenity-tag">+${property.amenities.size - 4} more</span>` : ''}
+                            </div>
+
+                            <div class="room-types-summary">
+                                ${Object.entries(roomTypes).map(([type, data]) => `
+                                    <div class="room-type-summary">
+                                        <span class="room-type-name">${type}</span>
+                                        <span class="room-type-count">${data.count}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-init AOS for dynamically added elements
+            if (window.AOS) AOS.refresh();
         }
 
         function renderListings(listings) {
@@ -1788,45 +2259,101 @@
                 return;
             }
 
-            grid.innerHTML = listings.map(listing => `
-                <div class="listing-card" data-id="${listing._id}" data-aos="fade-up">
-                    <div class="listing-image" onclick="window.location='/listing.html?id=${listing._id}'" style="cursor:pointer;">
-                        <img src="${listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" alt="${listing.title}">
-                        ${listing.isFeatured ? '<span class="listing-badge badge-featured">Featured</span>' : ''}
-                        ${isNew(listing.createdAt) ? '<span class="listing-badge badge-new" style="left:auto;right:1rem;">New</span>' : ''}
-                        <div class="listing-price">RM ${listing.price}<span>/${listing.pricePeriod}</span></div>
+            // Group listings by property (using title as property identifier)
+            const properties = {};
+            listings.forEach(listing => {
+                const propertyKey = listing.title.split('-')[0].trim(); // Extract property name
+                if (!properties[propertyKey]) {
+                    properties[propertyKey] = {
+                        name: propertyKey,
+                        listings: [],
+                        images: [],
+                        amenities: new Set(),
+                        location: listing.location,
+                        university: listing.location?.university
+                    };
+                }
+                properties[propertyKey].listings.push(listing);
+                properties[propertyKey].images.push(...(listing.images || []));
+                (listing.amenities || []).forEach(a => properties[propertyKey].amenities.add(a));
+            });
+
+            // Render property cards
+            grid.innerHTML = Object.values(properties).map(property => {
+                const roomTypes = {};
+                let minPrice = Infinity;
+                let maxPrice = 0;
+                let totalRooms = 0;
+
+                // Group by room type and calculate price ranges
+                property.listings.forEach(listing => {
+                    const type = listing.propertyType.replace('_', ' ');
+                    if (!roomTypes[type]) {
+                        roomTypes[type] = {
+                            count: 0,
+                            listings: [],
+                            minPrice: Infinity,
+                            maxPrice: 0
+                        };
+                    }
+                    roomTypes[type].count++;
+                    roomTypes[type].listings.push(listing);
+                    roomTypes[type].minPrice = Math.min(roomTypes[type].minPrice, listing.price);
+                    roomTypes[type].maxPrice = Math.max(roomTypes[type].maxPrice, listing.price);
+                    
+                    minPrice = Math.min(minPrice, listing.price);
+                    maxPrice = Math.max(maxPrice, listing.price);
+                    totalRooms++;
+                });
+
+                const priceRange = minPrice === maxPrice ? `RM ${minPrice}` : `RM ${minPrice} - ${maxPrice}`;
+
+                return `
+                    <div class="property-card" data-aos="fade-up">
+                        <div class="property-image" onclick="window.location='#'" style="cursor:pointer;">
+                            <img src="${property.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${property.name}">
+                            <div class="property-price">${priceRange}<span>/month</span></div>
+                        </div>
+                        <div class="property-content">
+                            <div class="property-meta">
+                                <span class="property-badge">${property.university || 'Klang Valley'}</span>
+                                <span class="property-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                            </div>
+                            <h3 class="property-title">${property.name}</h3>
+                            <div class="property-location">
+                                <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
+                                ${property.location?.area || property.location?.city || 'Klang Valley'}
+                            </div>
+                            
+                            <div class="property-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-door-open"></i>
+                                    <span>${totalRooms} Rooms</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-home"></i>
+                                    <span>${Object.keys(roomTypes).length} Types</span>
+                                </div>
+                            </div>
+
+                            <div class="property-amenities">
+                                ${Array.from(property.amenities).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                                ${property.amenities.size > 4 ? `<span class="amenity-tag">+${property.amenities.size - 4} more</span>` : ''}
+                            </div>
+
+                            <div class="room-types">
+                                ${Object.entries(roomTypes).map(([type, data]) => `
+                                    <button class="room-type-btn" onclick="showRoomListings('${type}', ${JSON.stringify(data.listings).replace(/"/g, '&quot;')})">
+                                        <span class="room-type-name">${type}</span>
+                                        <span class="room-type-count">${data.count} available</span>
+                                        <span class="room-type-price">RM ${data.minPrice}${data.maxPrice > data.minPrice ? '-' + data.maxPrice : ''}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
                     </div>
-                    <div class="listing-content">
-                        <div class="listing-meta">
-                            <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
-                            ${listing.location?.university ? `<span class="listing-badge badge-university">Near ${listing.location.university}</span>` : ''}
-                            <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
-                        </div>
-                        <h3 class="listing-title">${listing.title}</h3>
-                        <div class="listing-location">
-                            <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
-                            ${listing.location?.area || listing.location?.city || 'Klang Valley'}
-                        </div>
-                        <div class="listing-features">
-                            ${listing.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${listing.bedrooms} BR</div>` : ''}
-                            ${listing.bathrooms ? `<div class="listing-feature"><i class="fas fa-bath"></i> ${listing.bathrooms} BA</div>` : ''}
-                            <div class="listing-feature"><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
-                        </div>
-                        <div class="listing-amenities">
-                            ${(listing.amenities || []).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
-                            ${(listing.amenities || []).length > 4 ? `<span class="amenity-tag">+${listing.amenities.length - 4} more</span>` : ''}
-                        </div>
-                        <div class="listing-actions">
-                            <a href="/listing.html?id=${listing._id}" class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;">
-                                <i class="fas fa-eye"></i> View Details
-                            </a>
-                            <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
-                                <i class="fas fa-calendar"></i> Enquire
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             // Re-init AOS for dynamically added elements
             if (window.AOS) AOS.refresh();
@@ -1884,6 +2411,13 @@
             const maxPrice = document.getElementById('maxPrice').value;
 
             let filtered = allListings;
+
+            // If Properties view is selected, group and render properties
+            if (type === 'properties') {
+                renderProperties(allListings);
+                updateActiveFilters({ search, area, university, type, bedrooms, minPrice, maxPrice });
+                return;
+            }
 
             if (search) {
                 const s = search.toLowerCase();
@@ -1967,6 +2501,152 @@
         function closeModal() {
             document.getElementById('bookingModal').classList.remove('active');
             document.getElementById('bookingForm').reset();
+        }
+
+        function showRoomListings(roomType, listings) {
+            // Create modal overlay if it doesn't exist
+            let modal = document.getElementById('roomListingsModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'roomListingsModal';
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+                        <div class="modal-header">
+                            <h3 id="roomTypeTitle">Available Rooms</h3>
+                            <button class="modal-close" onclick="closeRoomListingsModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="roomListingsGrid" class="listings-grid"></div>
+                        </div>
+                    </div>
+                    <div class="modal-backdrop" onclick="closeRoomListingsModal()"></div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            // Set title
+            document.getElementById('roomTypeTitle').textContent = `${roomType} Rooms`;
+
+            // Render listings in modal
+            const grid = document.getElementById('roomListingsGrid');
+            grid.innerHTML = listings.map(listing => `
+                <div class="listing-card modal-listing-card" data-id="${listing._id}">
+                    <div class="listing-image" onclick="window.location='/listing.html?id=${listing._id}'" style="cursor:pointer;">
+                        <img src="${listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" alt="${listing.title}">
+                        <div class="listing-price">RM ${listing.price}<span>/${listing.pricePeriod}</span></div>
+                    </div>
+                    <div class="listing-content">
+                        <div class="listing-meta">
+                            <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
+                            <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                        </div>
+                        <h3 class="listing-title">${listing.title}</h3>
+                        <div class="listing-location">
+                            <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
+                            ${listing.location?.area || listing.location?.city || 'Klang Valley'}
+                        </div>
+                        <div class="listing-features">
+                            ${listing.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${listing.bedrooms} BR</div>` : ''}
+                            ${listing.bathrooms ? `<div class="listing-feature"><i class="fas fa-bath"></i> ${listing.bathrooms} BA</div>` : ''}
+                            <div class="listing-feature"><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
+                        </div>
+                        <div class="listing-actions">
+                            <a href="/listing.html?id=${listing._id}" class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
+                                <i class="fas fa-calendar"></i> Enquire
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function closeRoomListingsModal() {
+            const modal = document.getElementById('roomListingsModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function showPropertyListings(propertyName, listings) {
+            // Create modal overlay if it doesn't exist
+            let modal = document.getElementById('propertyListingsModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'propertyListingsModal';
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+                        <div class="modal-header">
+                            <h3 id="propertyTitle">${propertyName} - All Rooms</h3>
+                            <button class="modal-close" onclick="closePropertyListingsModal()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="propertyListingsGrid" class="listings-grid"></div>
+                        </div>
+                    </div>
+                    <div class="modal-backdrop" onclick="closePropertyListingsModal()"></div>
+                `;
+                document.body.appendChild(modal);
+            }
+
+            // Set title
+            document.getElementById('propertyTitle').textContent = `${propertyName} - All Rooms`;
+
+            // Render listings in modal
+            const grid = document.getElementById('propertyListingsGrid');
+            grid.innerHTML = listings.map(listing => `
+                <div class="listing-card modal-listing-card" data-id="${listing._id}">
+                    <div class="listing-image" onclick="window.location='/listing.html?id=${listing._id}'" style="cursor:pointer;">
+                        <img src="${listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600'}" alt="${listing.title}">
+                        <div class="listing-price">RM ${listing.price}<span>/${listing.pricePeriod}</span></div>
+                    </div>
+                    <div class="listing-content">
+                        <div class="listing-meta">
+                            <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
+                            <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
+                        </div>
+                        <h3 class="listing-title">${listing.title}</h3>
+                        <div class="listing-location">
+                            <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
+                            ${listing.location?.area || listing.location?.city || 'Klang Valley'}
+                        </div>
+                        <div class="listing-features">
+                            ${listing.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${listing.bedrooms} BR</div>` : ''}
+                            ${listing.bathrooms ? `<div class="listing-feature"><i class="fas fa-bath"></i> ${listing.bathrooms} BA</div>` : ''}
+                            <div class="listing-feature"><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
+                        </div>
+                        <div class="listing-actions">
+                            <a href="/listing.html?id=${listing._id}" class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
+                                <i class="fas fa-calendar"></i> Enquire
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function closePropertyListingsModal() {
+            const modal = document.getElementById('propertyListingsModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
         }
 
         async function submitBooking(e) {

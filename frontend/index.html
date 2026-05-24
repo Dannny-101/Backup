@@ -475,11 +475,12 @@
             background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
             z-index: 1;
         }
-        .uni-card-taylors { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .uni-card-monash { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); }
-        .uni-card-inti { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-        .uni-card-help { background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%); }
-        .uni-card-segi { background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); }
+        .uni-card-taylors { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-monash { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-inti { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-help { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-segi { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-sunway { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
         .uni-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         .uni-card-content { position: relative; z-index: 2; }
         .uni-name { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.25rem; }
@@ -1108,39 +1109,52 @@
                 <p class="section-desc" style="margin:0 auto;">Verified rooms within walking distance of these universities. Currently focused on the Klang Valley with more locations coming soon.</p>
             </div>
             <div class="unis-grid">
-                <a href="/listings.html?university=Taylor's University" class="uni-card uni-card-taylors" data-aos="fade-up" data-aos-delay="0">
+                <a href="/listings.html?university=Taylor's University" class="uni-card uni-card-taylors" data-aos="fade-up" data-aos-delay="0" 
+                   style="background-image: url('https://images.unsplash.com/photo-1562774053-701939374585?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
                     <span class="uni-badge">Subang Jaya</span>
                     <div class="uni-card-content">
                         <div class="uni-name">Taylor's University</div>
                         <div class="uni-city">Premium lakeside campus living</div>
                     </div>
                 </a>
-                <a href="/listings.html?university=Monash University Malaysia" class="uni-card uni-card-monash" data-aos="fade-up" data-aos-delay="80">
+                <a href="/listings.html?university=Monash University Malaysia" class="uni-card uni-card-monash" data-aos="fade-up" data-aos-delay="80"
+                   style="background-image: url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
                     <span class="uni-badge">Subang Jaya</span>
                     <div class="uni-card-content">
                         <div class="uni-name">Monash University Malaysia</div>
                         <div class="uni-city">Walkable student housing</div>
                     </div>
                 </a>
-                <a href="/listings.html?university=INTI International College" class="uni-card uni-card-inti" data-aos="fade-up" data-aos-delay="160">
+                <a href="/listings.html?university=INTI International College" class="uni-card uni-card-inti" data-aos="fade-up" data-aos-delay="160"
+                   style="background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
                     <span class="uni-badge">Subang Jaya</span>
                     <div class="uni-card-content">
                         <div class="uni-name">INTI International College</div>
                         <div class="uni-city">Campus-proximate rooms</div>
                     </div>
                 </a>
-                <a href="/listings.html?university=Help University" class="uni-card uni-card-help" data-aos="fade-up" data-aos-delay="240">
+                <a href="/listings.html?university=Help University" class="uni-card uni-card-help" data-aos="fade-up" data-aos-delay="240"
+                   style="background-image: url('https://images.unsplash.com/photo-1561043493459-0bf1a3c5d3fb?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
                     <span class="uni-badge">Kuala Lumpur</span>
                     <div class="uni-card-content">
                         <div class="uni-name">Help University</div>
                         <div class="uni-city">City centre convenience</div>
                     </div>
                 </a>
-                <a href="/listings.html?university=SEGi University" class="uni-card uni-card-segi" data-aos="fade-up" data-aos-delay="320">
+                <a href="/listings.html?university=SEGi College" class="uni-card uni-card-segi" data-aos="fade-up" data-aos-delay="320"
+                   style="background-image: url('https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
                     <span class="uni-badge">Petaling Jaya</span>
                     <div class="uni-card-content">
-                        <div class="uni-name">SEGi University</div>
+                        <div class="uni-name">SEGi College</div>
                         <div class="uni-city">Accessible from Kota Damansara</div>
+                    </div>
+                </a>
+                <a href="/listings.html?university=Sunway University" class="uni-card uni-card-sunway" data-aos="fade-up" data-aos-delay="400"
+                   style="background-image: url('https://images.unsplash.com/photo-1562774053-701939374585?w=800&h=600&fit=crop'); background-size: cover; background-position: center;">
+                    <span class="uni-badge">Bandar Sunway</span>
+                    <div class="uni-card-content">
+                        <div class="uni-name">Sunway University</div>
+                        <div class="uni-city">Premier integrated campus</div>
                     </div>
                 </a>
             </div>
