@@ -578,31 +578,33 @@
         .uni-filter-btn[data-uni="SEGi University"] { border-color: #3b82f6; color: #3b82f6; }
         .uni-filter-btn[data-uni="SEGi University"].active, .uni-filter-btn[data-uni="SEGi University"]:hover { background: #3b82f6; color: white; }
 
-        /* University Tags on Property Cards */
+        /* University Tags on Property Cards - compact pill style like filters */
         .uni-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem;
+            gap: 0.35rem;
             margin-bottom: 0.5rem;
         }
         .uni-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
+            gap: 0.3rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.65rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
+            text-transform: none;
+            letter-spacing: 0.01em;
+            border: 1px solid;
+            white-space: nowrap;
         }
-        .uni-tag.taylors { background: rgba(220, 38, 38, 0.12); color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.3); }
-        .uni-tag.monash { background: rgba(30, 58, 95, 0.12); color: #1e3a5f; border: 1px solid rgba(30, 58, 95, 0.3); }
-        .uni-tag.sunway { background: rgba(217, 119, 6, 0.12); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.3); }
-        .uni-tag.inti { background: rgba(153, 27, 27, 0.12); color: #991b1b; border: 1px solid rgba(153, 27, 27, 0.3); }
-        .uni-tag.help { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .uni-tag.segi { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .uni-tag i { font-size: 0.6rem; }
+        .uni-tag.taylors { background: rgba(220, 38, 38, 0.08); color: #dc2626; border-color: rgba(220, 38, 38, 0.4); }
+        .uni-tag.monash { background: rgba(30, 58, 95, 0.08); color: #1e3a5f; border-color: rgba(30, 58, 95, 0.4); }
+        .uni-tag.sunway { background: rgba(217, 119, 6, 0.08); color: #d97706; border-color: rgba(217, 119, 6, 0.4); }
+        .uni-tag.inti { background: rgba(153, 27, 27, 0.08); color: #991b1b; border-color: rgba(153, 27, 27, 0.4); }
+        .uni-tag.help { background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.4); }
+        .uni-tag.segi { background: rgba(59, 130, 246, 0.08); color: #3b82f6; border-color: rgba(59, 130, 246, 0.4); }
+        .uni-tag i { font-size: 0.55rem; }
 
         /* Property Cards grid override */
         .listings-grid.properties-view {
@@ -2276,18 +2278,18 @@
 
                 // Generate university tags
                 const uniMap = {
-                    "Taylor's University": { class: 'taylors', icon: 'fa-graduation-cap' },
-                    "Monash University Malaysia": { class: 'monash', icon: 'fa-graduation-cap' },
-                    "Sunway University": { class: 'sunway', icon: 'fa-graduation-cap' },
-                    "INTI International College": { class: 'inti', icon: 'fa-graduation-cap' },
-                    "Help University": { class: 'help', icon: 'fa-graduation-cap' },
-                    "SEGi University": { class: 'segi', icon: 'fa-graduation-cap' }
+                    "Taylor's University": { class: 'taylors', shortName: "Taylor's" },
+                    "Monash University Malaysia": { class: 'monash', shortName: 'Monash' },
+                    "Sunway University": { class: 'sunway', shortName: 'Sunway' },
+                    "INTI International College": { class: 'inti', shortName: 'INTI' },
+                    "Help University": { class: 'help', shortName: 'Help' },
+                    "SEGi University": { class: 'segi', shortName: 'SEGi' }
                 };
                 
                 const nearbyUnis = p.nearbyUniversities || [p.location?.university].filter(Boolean);
                 const uniTagsHtml = nearbyUnis.length > 0 ? nearbyUnis.map(uni => {
-                    const uniInfo = uniMap[uni] || { class: 'taylors', icon: 'fa-map-marker-alt' };
-                    return `<span class="uni-tag ${uniInfo.class}"><i class="fas ${uniInfo.icon}"></i> ${uni}</span>`;
+                    const uniInfo = uniMap[uni] || { class: 'taylors', shortName: uni };
+                    return `<span class="uni-tag ${uniInfo.class}">${uniInfo.shortName}</span>`;
                 }).join('') : '';
 
                 return `
