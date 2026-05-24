@@ -2535,9 +2535,9 @@
                 btn.classList.toggle('active', btn.dataset.uni === universityName);
             });
             
-            // Filter properties by university
-            const filtered = allListings.filter(listing => {
-                const nearbyUnis = listing.nearbyUniversities || [listing.location?.university].filter(Boolean);
+            // Filter properties by university (use allProperties, not allListings!)
+            const filtered = allProperties.filter(p => {
+                const nearbyUnis = p.nearbyUniversities || [p.location?.university].filter(Boolean);
                 return nearbyUnis.includes(universityName);
             });
             
@@ -2563,7 +2563,7 @@
             document.querySelectorAll('.uni-filter-btn').forEach(btn => btn.classList.remove('active'));
             const filterTag = document.querySelector('[data-type="university"]');
             if (filterTag) filterTag.remove();
-            renderListings(allListings);
+            renderProperties(allProperties);
         }
 
         function openBooking(id, title) {
