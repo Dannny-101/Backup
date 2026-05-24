@@ -941,6 +941,7 @@
                             <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
                                 <i class="fas fa-calendar"></i> Enquire
                             </button>
+                            ${listing.wechatId ? `<button class="btn btn-sm" style="background:#07c160;color:white;" title="WeChat: ${listing.wechatId}" onclick="copyWechat('${listing.wechatId}',event)"><i class="fab fa-weixin"></i> WeChat</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -948,6 +949,19 @@
 
             // Re-init AOS for dynamically added elements
             if (window.AOS) AOS.refresh();
+        }
+
+        function copyWechat(id, e) {
+            e.preventDefault();
+            e.stopPropagation();
+            navigator.clipboard.writeText(id).then(() => {
+                const btn = e.currentTarget;
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            }).catch(() => {
+                prompt('Copy this WeChat ID:', id);
+            });
         }
 
         function isNew(date) {

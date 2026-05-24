@@ -1074,6 +1074,10 @@
           <label class="form-label">WhatsApp Number</label>
           <input class="form-input" id="lWhatsapp" placeholder="+601x...">
         </div>
+        <div class="form-group">
+          <label class="form-label">WeChat ID <span style="font-size:0.75rem;color:var(--text-muted);">(for Chinese students)</span></label>
+          <input class="form-input" id="lWechat" placeholder="e.g. wechat_username">
+        </div>
         <div class="form-group" style="grid-column:1/-1">
           <label class="form-label">Amenities (comma separated)</label>
           <input class="form-input" id="lAmenities" placeholder="WiFi, Parking, Gym, Laundry...">
@@ -1649,7 +1653,7 @@ async function openListingModal(l = null) {
   set('lCity', l?.location?.city); set('lArea', l?.location?.area); set('lUniversity', l?.location?.university);
   set('lAddress', l?.location?.address); set('lBedrooms', l?.bedrooms);
   set('lBathrooms', l?.bathrooms); set('lOccupants', l?.maxOccupants);
-  set('lWhatsapp', l?.whatsappNumber);
+  set('lWhatsapp', l?.whatsappNumber); set('lWechat', l?.wechatId);
   set('lAmenities', (l?.amenities || []).join(', '));
   set('lImages', (l?.images || []).join(', '));
   set('lFrom', l?.availableFrom?.split('T')[0]); set('lUntil', l?.availableUntil?.split('T')[0]);
@@ -1674,6 +1678,7 @@ async function saveListing() {
     bathrooms: parseFloat(document.getElementById('lBathrooms').value)||0,
     maxOccupants: parseInt(document.getElementById('lOccupants').value)||1,
     whatsappNumber: document.getElementById('lWhatsapp').value,
+    wechatId: document.getElementById('lWechat').value,
     amenities: document.getElementById('lAmenities').value.split(',').map(s=>s.trim()).filter(Boolean),
     images: document.getElementById('lImages').value.split(',').map(s=>s.trim()).filter(Boolean),
     availableFrom: document.getElementById('lFrom').value,

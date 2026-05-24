@@ -30,6 +30,7 @@ const listingSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
     whatsappNumber: String,
+    wechatId: String,
     agentName: String,
     views: { type: Number, default: 0 },
     inquiries: { type: Number, default: 0 },

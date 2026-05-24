@@ -267,6 +267,7 @@
         const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Flexible';
         const whatsappNum = l.whatsappNumber ? l.whatsappNumber.replace(/\D/g,'') : '';
         const whatsappMsg = encodeURIComponent(`Hi! I'm interested in "${l.title}" listed on Ten&See. Can you tell me more?`);
+        const wechatId = l.wechatId || '';
 
         wrap.innerHTML = `
             <div class="breadcrumb">
@@ -349,6 +350,11 @@
                             <i class="fab fa-whatsapp"></i> WhatsApp Agent
                         </a>
                         ` : ''}
+                        ${wechatId ? `
+                        <button class="btn btn-sm" style="background:#07c160;color:white;padding:0.65rem 1.2rem;" onclick="copyWechat('${wechatId}')" title="WeChat ID: ${wechatId}">
+                            <i class="fab fa-weixin"></i> WeChat
+                        </button>
+                        ` : ''}
                         <a href="/listings.html" class="btn btn-outline-dark">
                             <i class="fas fa-arrow-left"></i> Back to Listings
                         </a>
@@ -366,6 +372,17 @@
                 </div>
             </div>
         `;
+    }
+
+    function copyWechat(id) {
+        navigator.clipboard.writeText(id).then(() => {
+            const btn = event.currentTarget;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        }).catch(() => {
+            prompt('Copy this WeChat ID:', id);
+        });
     }
 
     function openModal() {
