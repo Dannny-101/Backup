@@ -941,7 +941,7 @@
                             <button class="btn btn-primary btn-sm" onclick="openBooking('${listing._id}', '${listing.title.replace(/'/g, "\'")}')">
                                 <i class="fas fa-calendar"></i> Enquire
                             </button>
-                            ${listing.wechatId ? `<button class="btn btn-sm" style="background:#07c160;color:white;" title="WeChat: ${listing.wechatId}" onclick="copyWechat('${listing.wechatId}',event)"><i class="fab fa-weixin"></i> WeChat</button>` : ''}
+                            ${listing.wechatId ? `<button class="btn btn-sm" style="background:#07c160;color:white;" title="WeChat: ${listing.wechatId}" onclick="openWechat('${listing.wechatId}',event)"><i class="fab fa-weixin"></i> WeChat</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -951,17 +951,35 @@
             if (window.AOS) AOS.refresh();
         }
 
-        function copyWechat(id, e) {
+        function openWechat(id, e) {
             e.preventDefault();
             e.stopPropagation();
-            navigator.clipboard.writeText(id).then(() => {
-                const btn = e.currentTarget;
+            const btn = e.currentTarget;
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (isMobile) {
+                // Try to open WeChat app directly
+                const appUrl = `weixin://dl/chat?username=${encodeURIComponent(id)}`;
+                const fallbackUrl = `https://web.wechat.com`;
+                const start = Date.now();
+                window.location = appUrl;
+                setTimeout(() => {
+                    // If app didn't open (still on page), copy ID and show fallback
+                    if (Date.now() - start < 2000) {
+                        navigator.clipboard.writeText(id).catch(() => {});
+                        const orig = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-check"></i> ID Copied!';
+                        setTimeout(() => { btn.innerHTML = orig; }, 2500);
+                        alert(`WeChat app not detected.\n\nWeChat ID copied to clipboard:\n${id}\n\nOpen WeChat and search for this ID.`);
+                    }
+                }, 1500);
+            } else {
+                // Desktop: copy ID and open web.wechat.com
+                navigator.clipboard.writeText(id).catch(() => {});
                 const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                setTimeout(() => { btn.innerHTML = orig; }, 2000);
-            }).catch(() => {
-                prompt('Copy this WeChat ID:', id);
-            });
+                btn.innerHTML = '<i class="fas fa-check"></i> ID Copied!';
+                setTimeout(() => { btn.innerHTML = orig; }, 2500);
+                window.open(`https://web.wechat.com`, '_blank');
+            }
         }
 
         function isNew(date) {

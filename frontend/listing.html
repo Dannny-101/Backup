@@ -351,7 +351,7 @@
                         </a>
                         ` : ''}
                         ${wechatId ? `
-                        <button class="btn btn-sm" style="background:#07c160;color:white;padding:0.65rem 1.2rem;" onclick="copyWechat('${wechatId}')" title="WeChat ID: ${wechatId}">
+                        <button class="btn btn-sm" style="background:#07c160;color:white;padding:0.65rem 1.2rem;" onclick="openWechat('${wechatId}')" title="WeChat ID: ${wechatId}">
                             <i class="fab fa-weixin"></i> WeChat
                         </button>
                         ` : ''}
@@ -374,15 +374,29 @@
         `;
     }
 
-    function copyWechat(id) {
-        navigator.clipboard.writeText(id).then(() => {
-            const btn = event.currentTarget;
+    function openWechat(id) {
+        const btn = event.currentTarget;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+            const appUrl = `weixin://dl/chat?username=${encodeURIComponent(id)}`;
+            const start = Date.now();
+            window.location = appUrl;
+            setTimeout(() => {
+                if (Date.now() - start < 2000) {
+                    navigator.clipboard.writeText(id).catch(() => {});
+                    const orig = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> ID Copied!';
+                    setTimeout(() => { btn.innerHTML = orig; }, 2500);
+                    alert(`WeChat app not detected.\n\nWeChat ID copied to clipboard:\n${id}\n\nOpen WeChat and search for this ID.`);
+                }
+            }, 1500);
+        } else {
+            navigator.clipboard.writeText(id).catch(() => {});
             const orig = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            setTimeout(() => { btn.innerHTML = orig; }, 2000);
-        }).catch(() => {
-            prompt('Copy this WeChat ID:', id);
-        });
+            btn.innerHTML = '<i class="fas fa-check"></i> ID Copied!';
+            setTimeout(() => { btn.innerHTML = orig; }, 2500);
+            window.open('https://web.wechat.com', '_blank');
+        }
     }
 
     function openModal() {
