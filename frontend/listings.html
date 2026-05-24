@@ -512,9 +512,396 @@
             .price-range { flex-direction: column; align-items: stretch; }
             .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
         }
+
+        /* ── FULLSCREEN INTRO ANIMATION ── */
+        .intro-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 9999;
+            background: var(--color-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transform-origin: center center;
+        }
+
+        /* Dynamic Slideshow Background */
+        .intro-slideshow {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -2;
+            opacity: 0;
+            animation: bgFadeIn 2s ease-out 0.3s forwards;
+        }
+
+        .intro-slideshow::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, 
+                rgba(27, 46, 75, 0.8) 0%, 
+                rgba(27, 46, 75, 0.6) 50%,
+                rgba(27, 46, 75, 0.8) 100%
+            );
+            z-index: 1;
+        }
+
+        @keyframes bgFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .intro-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        .intro-slide.active {
+            opacity: 1;
+        }
+
+        .intro-overlay.hidden {
+            animation: introExit 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            pointer-events: none;
+        }
+
+        @keyframes introExit {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.1);
+                visibility: hidden;
+            }
+        }
+
+        .intro-content {
+            text-align: center;
+            max-width: 700px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Glowing Card Container */
+        .intro-card {
+            position: relative;
+            padding: 3rem 4rem;
+            background: rgba(27, 46, 75, 0.6);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            opacity: 0;
+            transform: scale(0.9);
+            animation: cardReveal 0.7s ease-out 0.2s forwards;
+        }
+
+        @keyframes cardReveal {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Subtle static glow around card */
+        .intro-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 26px;
+            background: linear-gradient(135deg, 
+                rgba(201, 168, 76, 0.3) 0%, 
+                rgba(201, 168, 76, 0.1) 50%,
+                rgba(201, 168, 76, 0.3) 100%
+            );
+            z-index: -1;
+            filter: blur(8px);
+            opacity: 0;
+            animation: glowFadeIn 0.8s ease-out 1s forwards;
+        }
+
+        @keyframes glowFadeIn {
+            to { opacity: 1; }
+        }
+
+        .intro-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            animation: logoReveal 0.6s ease-out 0.4s forwards;
+        }
+
+        @keyframes logoReveal {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .intro-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 24px;
+            box-shadow: 0 30px 100px rgba(201, 168, 76, 0.4);
+        }
+
+        .intro-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 0.5s ease-out 0.8s forwards;
+        }
+
+        .intro-brand span {
+            font-weight: 300;
+            color: var(--color-accent);
+        }
+
+        .intro-tagline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.5s ease-out 1s forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .intro-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            align-items: stretch;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .intro-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.3s;
+        }
+
+        .intro-feature:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(201, 168, 76, 0.4);
+            transform: translateX(5px);
+        }
+
+        /* Cascading animation delays - synced with 5s exit */
+        .intro-feature:nth-child(1) { animation: slideInRight 0.4s ease-out 2.8s forwards; }
+        .intro-feature:nth-child(2) { animation: slideInRight 0.4s ease-out 3.4s forwards; }
+        .intro-feature:nth-child(3) { animation: slideInRight 0.4s ease-out 4.0s forwards; }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .intro-feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-accent);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .intro-feature-text {
+            text-align: left;
+        }
+
+        .intro-feature-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.15rem;
+        }
+
+        .intro-feature-desc {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .intro-skip {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeIn 0.3s ease-out 1s forwards;
+            transition: all 0.2s;
+        }
+
+        .intro-skip:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        /* Disable scroll during intro */
+        body.intro-active {
+            overflow: hidden;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .intro-slideshow {
+                display: none;
+            }
+            .intro-overlay {
+                background: var(--color-primary);
+            }
+            .intro-content {
+                padding: 1rem;
+                max-width: 95%;
+            }
+            .intro-card {
+                padding: 2rem 1.5rem;
+            }
+            .intro-logo {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 1rem;
+            }
+            .intro-brand {
+                font-size: 1.8rem;
+            }
+            .intro-tagline {
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+            }
+            .intro-features {
+                gap: 0.75rem;
+                max-width: 100%;
+            }
+            .intro-feature {
+                padding: 0.75rem 1rem;
+                gap: 0.75rem;
+            }
+            .intro-feature-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+                border-radius: 8px;
+            }
+            .intro-feature-title {
+                font-size: 0.85rem;
+            }
+            .intro-feature-desc {
+                font-size: 0.75rem;
+            }
+            .intro-skip {
+                right: 1rem;
+                bottom: 1rem;
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Fullscreen Intro Animation Overlay -->
+    <div class="intro-overlay" id="introOverlay">
+        <!-- Dynamic Slideshow Background -->
+        <div class="intro-slideshow" id="introSlideshow">
+            <div class="intro-slide active" style="background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1920&q=80');"></div>
+            <div class="intro-slide" style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1920&q=80');"></div>
+            <div class="intro-slide" style="background-image: url('https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1920&q=80');"></div>
+        </div>
+        <div class="intro-content">
+            <!-- Glowing Card Container with Animated Border (Loading Bar) -->
+            <div class="intro-card">
+                <div class="intro-logo">
+                    <img src="/assets/logo.png" alt="Ten&See">
+                </div>
+                <div class="intro-brand">Ten<span>&</span>See</div>
+                <div class="intro-tagline">Find Your Perfect Student Home</div>
+                <div class="intro-features">
+                    <div class="intro-feature">
+                        <div class="intro-feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="intro-feature-text">
+                            <div class="intro-feature-title">Verified Listings</div>
+                            <div class="intro-feature-desc">Every property personally vetted</div>
+                        </div>
+                    </div>
+                    <div class="intro-feature">
+                        <div class="intro-feature-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="intro-feature-text">
+                            <div class="intro-feature-title">No Middlemen</div>
+                            <div class="intro-feature-desc">Connect directly with owners</div>
+                        </div>
+                    </div>
+                    <div class="intro-feature">
+                        <div class="intro-feature-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <div class="intro-feature-text">
+                            <div class="intro-feature-title">Premium Spaces</div>
+                            <div class="intro-feature-desc">Curated rooms near universities</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="intro-skip" id="introSkip" onclick="skipIntro()">Skip</button>
+    </div>
+
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="/" class="logo" target="_self" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"></a>
@@ -777,11 +1164,129 @@
             "Cyberjaya", "Damansara Heights", "Kuala Lumpur City Centre", "Serdang", "Lakeside Campus", 
             "Taman Connaught", "Kerinchi", "Shah Alam", "Kajang", "Puchong"];
 
-        // Load listings on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        // ── INTRO ANIMATION LOGIC ──
+        const INTRO_DURATION = 5000; // 5 seconds total intro time
+        const MAX_INTRO_VIEWS = 3;   // Show intro max 3 times per session
+        let introTimer;
+
+        function getSessionViewCount() {
+            return parseInt(sessionStorage.getItem('introViewCount') || '0');
+        }
+
+        function incrementSessionViewCount() {
+            const count = getSessionViewCount() + 1;
+            sessionStorage.setItem('introViewCount', count.toString());
+            return count;
+        }
+
+        function shouldShowIntro() {
+            return getSessionViewCount() < MAX_INTRO_VIEWS;
+        }
+
+        function skipIntroCompletely() {
+            const overlay = document.getElementById('introOverlay');
+            const body = document.body;
+
+            // Stop slideshow if running
+            stopIntroSlideshow();
+
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+            body.classList.remove('intro-active');
+
+            // Load data immediately without animation
             loadListings();
             loadFilterOptions();
             applyUrlParams();
+        }
+
+        let introSlideshowInterval;
+
+        function startIntroSlideshow() {
+            const slideshow = document.getElementById('introSlideshow');
+            if (!slideshow) return;
+            const slides = slideshow.querySelectorAll('.intro-slide');
+            if (slides.length <= 1) return;
+
+            let currentSlide = 0;
+            const slideInterval = 2000; // Change every 2 seconds during intro
+
+            introSlideshowInterval = setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, slideInterval);
+        }
+
+        function stopIntroSlideshow() {
+            if (introSlideshowInterval) {
+                clearInterval(introSlideshowInterval);
+                introSlideshowInterval = null;
+            }
+        }
+
+        function initIntro() {
+            const overlay = document.getElementById('introOverlay');
+            const body = document.body;
+
+            // Check if we've exceeded max views for this session
+            if (!shouldShowIntro()) {
+                skipIntroCompletely();
+                return;
+            }
+
+            // Increment view count for this session
+            incrementSessionViewCount();
+
+            // Start the background slideshow
+            startIntroSlideshow();
+
+            // Disable scrolling during intro
+            body.classList.add('intro-active');
+
+            // Start loading data in background
+            loadListings();
+            loadFilterOptions();
+
+            // Auto-hide intro after duration
+            introTimer = setTimeout(() => {
+                hideIntro();
+            }, INTRO_DURATION);
+        }
+
+        function hideIntro() {
+            const overlay = document.getElementById('introOverlay');
+            const body = document.body;
+
+            if (!overlay) return;
+
+            // Stop the slideshow
+            stopIntroSlideshow();
+
+            // Add exit animation class
+            overlay.classList.add('hidden');
+
+            // Re-enable scrolling
+            body.classList.remove('intro-active');
+
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                // Apply URL params after intro (if any)
+                applyUrlParams();
+            }, 800);
+        }
+
+        function skipIntro() {
+            clearTimeout(introTimer);
+            stopIntroSlideshow();
+            hideIntro();
+        }
+
+        // Load listings on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initIntro();
         });
 
         // Apply URL parameters from quick search
