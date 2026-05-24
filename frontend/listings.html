@@ -483,7 +483,7 @@
         /* View Toggle Row */
         .view-toggle-row {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             gap: 0.75rem;
             margin-top: 1rem;
         }
@@ -2091,7 +2091,7 @@
             const grid = document.getElementById('listingsGrid');
             grid.classList.add('properties-view');
             try {
-                const res = await fetch('/api/listings?isActive=true');
+                const res = await fetch('/api/listings?isActive=true&includeAllCities=true');
                 const data = await res.json();
                 allListings = data.data || [];
             } catch (e) {
@@ -2221,103 +2221,48 @@
                 return;
             }
 
-            // Group listings by property (using title as property identifier)
-            const properties = {};
-            listings.forEach(listing => {
-                const propertyKey = listing.title.split('-')[0].trim(); // Extract property name
-                if (!properties[propertyKey]) {
-                    properties[propertyKey] = {
-                        name: propertyKey,
-                        listings: [],
-                        images: [],
-                        amenities: new Set(),
-                        location: listing.location,
-                        university: listing.location?.university
-                    };
-                }
-                properties[propertyKey].listings.push(listing);
-                properties[propertyKey].images.push(...(listing.images || []));
-                (listing.amenities || []).forEach(a => properties[propertyKey].amenities.add(a));
-            });
+            // Sort alphabetically by title
+            const sorted = [...listings].sort((a, b) => a.title.localeCompare(b.title));
 
-            // Render property cards
-            grid.innerHTML = Object.values(properties).map(property => {
-                const roomTypes = {};
-                let minPrice = Infinity;
-                let maxPrice = 0;
-                let totalRooms = 0;
-
-                // Group by room type and calculate price ranges
-                property.listings.forEach(listing => {
-                    const type = listing.propertyType.replace('_', ' ');
-                    if (!roomTypes[type]) {
-                        roomTypes[type] = {
-                            count: 0,
-                            listings: [],
-                            minPrice: Infinity,
-                            maxPrice: 0
-                        };
-                    }
-                    roomTypes[type].count++;
-                    roomTypes[type].listings.push(listing);
-                    roomTypes[type].minPrice = Math.min(roomTypes[type].minPrice, listing.price);
-                    roomTypes[type].maxPrice = Math.max(roomTypes[type].maxPrice, listing.price);
-                    
-                    minPrice = Math.min(minPrice, listing.price);
-                    maxPrice = Math.max(maxPrice, listing.price);
-                    totalRooms++;
-                });
-
-                const priceRange = minPrice === maxPrice ? `RM ${minPrice}` : `RM ${minPrice} - ${maxPrice}`;
-
+            grid.innerHTML = sorted.map((listing, i) => {
+                const typeLabel = listing.propertyType
+                    ? listing.propertyType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                    : 'Room';
+                const imgSrc = listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800';
                 return `
-                    <div class="property-card" data-aos="fade-up">
-                        <div class="property-image" onclick="window.location='#'" style="cursor:pointer;">
-                            <img src="${property.images[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${property.name}">
-                            <div class="property-price">${priceRange}<span>/month</span></div>
+                <a href="/listing.html?id=${listing._id}" class="listing-card" data-aos="fade-up" data-aos-delay="${(i % 3) * 60}" style="text-decoration:none;display:block;cursor:pointer;">
+                    <div class="listing-image">
+                        <img src="${imgSrc}" alt="${listing.title}">
+                        <div class="listing-price">RM ${listing.price}<span>/${listing.pricePeriod || 'month'}</span></div>
+                        ${isNew(listing.createdAt) ? '<span class="listing-badge badge-new">New</span>' : ''}
+                    </div>
+                    <div class="listing-content">
+                        <div class="listing-meta">
+                            <span class="listing-type">${typeLabel}</span>
+                            <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                         </div>
-                        <div class="property-content">
-                            <div class="property-meta">
-                                <span class="property-badge">${property.university || 'Klang Valley'}</span>
-                                <span class="property-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
-                            </div>
-                            <h3 class="property-title">${property.name}</h3>
-                            <div class="property-location">
-                                <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
-                                ${property.location?.area || property.location?.city || 'Klang Valley'}
-                            </div>
-                            
-                            <div class="property-stats">
-                                <div class="stat-item">
-                                    <i class="fas fa-door-open"></i>
-                                    <span>${totalRooms} Rooms</span>
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-home"></i>
-                                    <span>${Object.keys(roomTypes).length} Types</span>
-                                </div>
-                            </div>
-
-                            <div class="property-amenities">
-                                ${Array.from(property.amenities).slice(0, 4).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
-                                ${property.amenities.size > 4 ? `<span class="amenity-tag">+${property.amenities.size - 4} more</span>` : ''}
-                            </div>
-
-                            <div class="room-types">
-                                ${Object.entries(roomTypes).map(([type, data]) => `
-                                    <button class="room-type-btn" onclick="showRoomListings('${type}', ${JSON.stringify(data.listings).replace(/"/g, '&quot;')})">
-                                        <span class="room-type-name">${type}</span>
-                                        <span class="room-type-count">${data.count} available</span>
-                                        <span class="room-type-price">RM ${data.minPrice}${data.maxPrice > data.minPrice ? '-' + data.maxPrice : ''}</span>
-                                    </button>
-                                `).join('')}
-                            </div>
+                        <h3 class="listing-title">${listing.title}</h3>
+                        <div class="listing-location">
+                            <i class="fas fa-map-marker-alt" style="color:var(--color-accent)"></i>
+                            ${listing.location?.area || listing.location?.city || 'Klang Valley'}
+                        </div>
+                        <div class="listing-features">
+                            ${listing.bedrooms ? `<div class="listing-feature"><i class="fas fa-bed"></i> ${listing.bedrooms} BR</div>` : ''}
+                            ${listing.bathrooms ? `<div class="listing-feature"><i class="fas fa-bath"></i> ${listing.bathrooms} BA</div>` : ''}
+                            <div class="listing-feature"><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
+                        </div>
+                        <div class="listing-actions">
+                            <span class="btn btn-outline-dark btn-sm" style="flex:1;justify-content:center;pointer-events:none;">
+                                <i class="fas fa-eye"></i> View Details
+                            </span>
+                            <button class="btn btn-primary btn-sm" onclick="event.preventDefault();event.stopPropagation();openBooking('${listing._id}', '${listing.title.replace(/'/g, "\\'")}')"> 
+                                <i class="fas fa-calendar"></i> Enquire
+                            </button>
                         </div>
                     </div>
-                `;
+                </a>`;
             }).join('');
 
-            // Re-init AOS for dynamically added elements
             if (window.AOS) AOS.refresh();
         }
 
