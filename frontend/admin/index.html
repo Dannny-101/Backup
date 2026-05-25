@@ -1109,6 +1109,268 @@
   .main { margin-left: 0 !important; padding-bottom: 70px; }
   .content { padding: 1rem; }
 }
+
+/* ── POLISHED UI: GLASSMORPHISM & ANIMATIONS ── */
+
+/* 1. Glassmorphism Cards */
+.card {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.chat-session-item.active {
+  background: rgba(201,168,76,0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 16px;
+}
+
+.task-column {
+  background: rgba(255,255,255,0.02);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 16px;
+}
+
+.modal {
+  background: rgba(30,32,38,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+}
+.modal-overlay {
+  opacity: 0;
+  animation: modalFadeIn 200ms forwards;
+}
+.modal-overlay.active .modal {
+  animation: modalScaleIn 200ms forwards;
+}
+@keyframes modalFadeIn {
+  to { opacity: 1; }
+}
+@keyframes modalScaleIn {
+  from { transform: scale(0.98); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 2. Soft Neumorphic Buttons */
+.btn {
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn:active {
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2), inset -2px -2px 5px rgba(255,255,255,0.05);
+  transform: translateY(0);
+}
+.btn:hover {
+  box-shadow: 0 0 20px rgba(201,168,76,0.15);
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+.btn:active::after {
+  width: 200%;
+  height: 200%;
+}
+
+/* 3. Gold Glow States */
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.1));
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  border-radius: 16px;
+}
+.form-input:focus, .form-select:focus {
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  border-color: var(--gold);
+}
+.btn-gold {
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+
+/* 4. Sidebar Nav Animation */
+.nav-item {
+  position: relative;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  background: var(--gold);
+  border-radius: 0 3px 3px 0;
+  transform: translateY(-50%);
+  transition: height 0.3s ease;
+}
+.nav-item.active::before {
+  height: 70%;
+}
+
+/* 5. Table Row Styling */
+table tr {
+  transition: background 0.2s ease;
+}
+table tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+table tr:hover td:first-child {
+  border-left: 2px solid var(--gold);
+}
+
+/* 6. Stats Cards */
+.stats-grid {
+  gap: 2rem;
+}
+.stat-card {
+  padding: 2rem;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+.stat-value {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+/* 7. Emoji Avatar Styles */
+.admin-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+.admin-avatar:hover {
+  transform: scale(1.1);
+}
+
+.task-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  background: var(--gold);
+}
+
+.staff-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.staff-msg-avatar:hover {
+  transform: scale(1.1);
+}
+
+/* 8. Avatar Picker Styles */
+.emoji-option {
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+.emoji-option:hover {
+  transform: scale(1.1);
+}
+.emoji-option.selected {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 10px rgba(201,168,76,0.3);
+}
+
+.color-option {
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+.color-option:hover {
+  transform: scale(1.1);
+}
+.color-option.selected {
+  border: 3px solid white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* 9. Task Card Improvements */
+.task-card {
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.task-assignees {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.task-assignee-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.task-assignee-avatar:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+
+/* 10. Input & Form Styling */
+.form-input, .form-select, .form-textarea {
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
   </style>
 <base target="_blank">
 </head>
@@ -1491,6 +1753,38 @@
       <button class="btn btn-gold" style="width:100%;" onclick="saveTeamMember()">
         <i class="fas fa-user-plus"></i> Add Member
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Avatar Picker Modal -->
+<div class="modal-overlay" id="avatarModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Choose Your Avatar</span>
+      <button class="modal-close" onclick="closeModal('avatarModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:1.5rem;">
+        <div id="avatarPreview" style="width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 0.5rem;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🦁</div>
+        <button class="btn btn-sm" onclick="randomizeAvatar()" style="background:var(--surface2);"><i class="fas fa-dice"></i> Randomize</button>
+      </div>
+      
+      <div style="margin-bottom:1rem;">
+        <label style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;display:block;">Choose Emoji</label>
+        <div id="emojiGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.5rem;">
+          ${['🦁','🐯','🦊','🐺','🐻','🐼','🐨','🐸','🐙','🦉','🦅','🦜','🐉','🦕','🦖','🐳','🐬','🦈','🐊','🐅','🦓','🦒','🦌','🦌','🐘','🦏','🦛','🐪','🦙','🦘','🦡','🦦','🐿️','🦔','🐇','🦫','🦭','🐧','🦆','🦢'].map(e => `<div class="emoji-option" data-emoji="${e}" onclick="selectEmoji('${e}')" style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;border-radius:8px;transition:all 0.2s;background:var(--surface2);" onmouseover="this.style.background='var(--gold-dim)'" onmouseout="this.style.background='var(--surface2)'">${e}</div>`).join('')}
+        </div>
+      </div>
+      
+      <div style="margin-bottom:1rem;">
+        <label style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.5rem;display:block;">Background Color</label>
+        <div id="colorGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:0.5rem;">
+          ${['#c9a84c','#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c','#34495e'].map(c => `<div class="color-option" data-color="${c}" onclick="selectAvatarColor('${c}')" style="aspect-ratio:1;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.2s;background:${c};"></div>`).join('')}
+        </div>
+      </div>
+      
+      <button class="btn btn-gold" style="width:100%;" onclick="saveAvatar()"><i class="fas fa-check"></i> Save Avatar</button>
     </div>
   </div>
 </div>
@@ -4164,71 +4458,6 @@ async function deactivateAdmin(id) {
   else toast('Error', 'error');
 }
 
-// ── AVATAR PICKER ──
-let selectedEmoji = '🦁';
-let selectedBg = '#c9a84c';
-const EMOJIS = ['🦁','🐯','🦊','🐺','🐻','🐼','🐨','🐸','🐙','🦉','🦅','🦜','🐉','🦕','🦖','🐳','🐬','🦈','🐊','🐅','🦓','🦒','🦌','🐫','🐪','🦙','🦘','🦡','🦦','🐿️','🦔','🐇','🦫','🦭','🐧','🦆','🦢','🦩','🦚','🦜'];
-const COLORS = ['#c9a84c','#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c','#34495e'];
-
-function initAvatarModal() {
-  const saved = JSON.parse(localStorage.getItem('myAvatar') || '{"emoji":"🦁","bg":"#c9a84c"}');
-  selectedEmoji = saved.emoji;
-  selectedBg = saved.bg;
-  updateAvatarPreview();
-  highlightSelections();
-}
-
-function selectEmoji(e) {
-  selectedEmoji = e;
-  updateAvatarPreview();
-  highlightSelections();
-}
-
-function selectAvatarColor(c) {
-  selectedBg = c;
-  updateAvatarPreview();
-  highlightSelections();
-}
-
-function updateAvatarPreview() {
-  const preview = document.getElementById('avatarPreview');
-  if (preview) {
-    preview.textContent = selectedEmoji;
-    preview.style.background = selectedBg;
-  }
-}
-
-function highlightSelections() {
-  document.querySelectorAll('.emoji-option').forEach(el => {
-    el.style.border = el.dataset.emoji === selectedEmoji ? '2px solid var(--gold)' : '2px solid transparent';
-  });
-  document.querySelectorAll('.color-option').forEach(el => {
-    el.style.border = el.dataset.color === selectedBg ? '3px solid white' : '3px solid transparent';
-  });
-}
-
-function randomizeAvatar() {
-  selectedEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-  selectedBg = COLORS[Math.floor(Math.random() * COLORS.length)];
-  updateAvatarPreview();
-  highlightSelections();
-}
-
-async function saveAvatar() {
-  const r = await api('/api/admin/avatar', { 
-    method: 'PUT', 
-    body: JSON.stringify({ emoji: selectedEmoji, bg: selectedBg }) 
-  });
-  if (r.success) {
-    localStorage.setItem('myAvatar', JSON.stringify({ emoji: selectedEmoji, bg: selectedBg }));
-    closeModal('avatarModal');
-    toast('Avatar saved!');
-    renderApp();
-  } else {
-    toast(r.error || 'Error saving avatar', 'error');
-  }
-}
-
 // ── TEAM CHAT ──
 let staffChatTab = 'direct'; // 'direct' or 'groups'
 let selectedStaffId = null;
@@ -4454,6 +4683,81 @@ function handleStaffMessage(data) {
     staffChatMessages = messages;
     renderStaffMessages();
   }
+}
+
+// ── AVATAR PICKER ──
+let selectedEmoji = '🦁';
+let selectedBg = '#c9a84c';
+const EMOJIS = ['🦁','🐯','🦊','🐺','🐻','🐼','🐨','🐸','🐙','🦉','🦅','🦜','🐉','🦕','🦖','🐳','🐬','🦈','🐊','🐅','🦓','🦒','🦌','🦌','🐘','🦏','🦛','🐪','🦙','🦘','🦡','🦦','🐿️','🦔','🐇','🦫','🦭','🐧','🦆','🦢'];
+const COLORS = ['#c9a84c','#e74c3c','#3498db','#2ecc71','#9b59b6','#f39c12','#1abc9c','#34495e'];
+
+function initAvatarModal() {
+  const saved = JSON.parse(localStorage.getItem('myAvatar') || '{"emoji":"🦁","bg":"#c9a84c"}');
+  selectedEmoji = saved.emoji;
+  selectedBg = saved.bg;
+  updateAvatarPreview();
+  highlightSelections();
+}
+
+function selectEmoji(e) {
+  selectedEmoji = e;
+  updateAvatarPreview();
+  highlightSelections();
+}
+
+function selectAvatarColor(c) {
+  selectedBg = c;
+  updateAvatarPreview();
+  highlightSelections();
+}
+
+function updateAvatarPreview() {
+  const preview = document.getElementById('avatarPreview');
+  if (preview) {
+    preview.textContent = selectedEmoji;
+    preview.style.background = selectedBg;
+  }
+}
+
+function highlightSelections() {
+  document.querySelectorAll('.emoji-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.emoji === selectedEmoji);
+  });
+  document.querySelectorAll('.color-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.color === selectedBg);
+  });
+}
+
+function randomizeAvatar() {
+  selectedEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+  selectedBg = COLORS[Math.floor(Math.random() * COLORS.length)];
+  updateAvatarPreview();
+  highlightSelections();
+}
+
+async function saveAvatar() {
+  const r = await api('/api/admin/avatar', { 
+    method: 'PUT', 
+    body: JSON.stringify({ emoji: selectedEmoji, bg: selectedBg }) 
+  });
+  if (r.success) {
+    localStorage.setItem('myAvatar', JSON.stringify({ emoji: selectedEmoji, bg: selectedBg }));
+    closeModal('avatarModal');
+    toast('Avatar saved!');
+    renderApp();
+  } else {
+    toast(r.error || 'Error saving avatar', 'error');
+  }
+}
+
+// Helper to get avatar display HTML
+function getAvatarHTML(avatar, size = 'md') {
+  if (!avatar) return '';
+  const sizes = { sm: '24px', md: '32px', lg: '40px', xl: '80px' };
+  const fontSizes = { sm: '0.8rem', md: '1rem', lg: '1.2rem', xl: '2.5rem' };
+  const s = sizes[size] || sizes.md;
+  const fs = fontSizes[size] || fontSizes.md;
+  return `<div style="width:${s};height:${s};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${fs};background:${avatar.bg || '#c9a84c'};flex-shrink:0;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">${avatar.emoji || '👤'}</div>`;
 }
 
 function escapeHtml(text) {
