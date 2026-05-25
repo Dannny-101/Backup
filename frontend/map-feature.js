@@ -4,11 +4,11 @@
  * Used on property.html and listing.html
  */
 
-// Token set via window.MAPBOX_TOKEN (injected by server or inline script before this file loads)
-const MAPBOX_TOKEN = window.MAPBOX_TOKEN || '';
-
 (function () {
     'use strict';
+
+    // Read lazily so inline token script always runs first
+    function getToken() { return window.MAPBOX_TOKEN || ''; }
 
     let map = null;
     let currentMarkers = [];
@@ -39,7 +39,7 @@ const MAPBOX_TOKEN = window.MAPBOX_TOKEN || '';
         }
 
         loadMapbox(() => {
-            mapboxgl.accessToken = MAPBOX_TOKEN;
+            mapboxgl.accessToken = getToken();
             map = new mapboxgl.Map({
                 container: 'map-canvas',
                 style: 'mapbox://styles/mapbox/satellite-streets-v12',
@@ -242,7 +242,7 @@ const MAPBOX_TOKEN = window.MAPBOX_TOKEN || '';
         const profile = mode === 'driving' ? 'driving' : 'walking';
 
         try {
-            const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin};${dest}?geometries=geojson&steps=true&overview=full&access_token=${MAPBOX_TOKEN}`;
+            const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin};${dest}?geometries=geojson&steps=true&overview=full&access_token=${getToken()}`;
             const res = await fetch(url);
             const data = await res.json();
 
