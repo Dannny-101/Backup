@@ -111,15 +111,24 @@ router.get('/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// GET all admins (superadmin only)
-router.get('/', authMiddleware, async (req, res) => {
+// GET all admins (superadmin only - for admin management)
+router.get('/', authMiddleware, requireSuperAdmin, async (req, res) => {
   try {
-    if (req.admin.role !== 'superadmin') {
-      return res.status(403).json({ success: false, error: 'Superadmin access required' });
-    }
     const admins = await Admin.find({ isActive: true })
       .select('-password')
       .populate('createdBy', 'name username')
+      .sort({ createdAt: -1 });
+    res.json({ success: true, count: admins.length, data: admins });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET all admins for chat (all authenticated admins)
+router.get('/list', authMiddleware, async (req, res) => {
+  try {
+    const admins = await Admin.find({ isActive: true })
+      .select('-password')
       .sort({ createdAt: -1 });
     res.json({ success: true, count: admins.length, data: admins });
   } catch (error) {
