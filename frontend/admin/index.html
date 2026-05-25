@@ -1856,6 +1856,45 @@ table tr:hover td:first-child {
   </div>
 </div>
 
+<!-- Add Admin Modal (Superadmin Only) -->
+<div class="modal-overlay" id="addAdminModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Add New Admin</span>
+      <button class="modal-close" onclick="closeModal('addAdminModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input type="text" id="newAdminName" class="form-input" placeholder="Full name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="newAdminEmail" class="form-input" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username <span style="color:var(--error)">*</span></label>
+        <input type="text" id="newAdminUsername" class="form-input" placeholder="username" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password <span style="color:var(--error)">*</span></label>
+        <input type="password" id="newAdminPassword" class="form-input" placeholder="password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select id="newAdminRole" class="form-select">
+          <option value="admin">Admin</option>
+          <option value="superadmin">Superadmin</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal('addAdminModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveNewAdmin()">Create Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Booking Modal -->
 <div class="modal-overlay" id="bookingModal">
   <div class="modal modal-sm">
@@ -1996,6 +2035,8 @@ function renderApp() {
 <div class="nav-item" id="nav-teamchat" onclick="showSection('teamchat')"><i class="fas fa-user-friends"></i> Team Chat <span class="nav-badge" id="teamChatBadge" style="display:none">0</span></div>
 <div class="nav-item" id="nav-tasks" onclick="showSection('tasks')"><i class="fas fa-tasks"></i> Task Board</div>
 <div class="nav-item" id="nav-team" onclick="showSection('team')"><i class="fas fa-users-cog"></i> Team</div>
+${S.adminRole === 'superadmin' ? `<div class="nav-section-label">System</div>
+<div class="nav-item" id="nav-adminmgmt" onclick="showSection('adminmgmt')"><i class="fas fa-user-shield"></i> Admin Management</div>` : ''}
         </nav>
         <div class="sidebar-footer">
           <div class="admin-profile">
@@ -2038,6 +2079,7 @@ function renderApp() {
           <div class="section" id="sec-audit"></div>
           <div class="section" id="sec-tasks"></div>
           <div class="section" id="sec-team"></div>
+          <div class="section" id="sec-adminmgmt"></div>
         </div>
       </div>
     </div>
@@ -2068,7 +2110,8 @@ const TITLES = {
   audit: ['Audit Log', 'Admin activity history'],
   tasks: ['Task Board', 'Team task management'],
   properties: ['Properties', 'Manage properties and rooms'],
-  team: ['Team', 'Manage admin users']
+  team: ['Team', 'Manage admin users'],
+  adminmgmt: ['Admin Management', 'Manage admin accounts']
 };
 
 function showSection(sec) {
@@ -2087,7 +2130,8 @@ function showSection(sec) {
     bookings: loadBookings, chat: () => { loadChat(); S.chatInterval = setInterval(() => { loadChatSessions(); if (S.currentSession) loadMessages(S.currentSession); }, 5000); },
     teamchat: loadTeamChat,
     analytics: loadAnalytics, reports: loadReports, audit: loadAudit, tasks: loadTasks,
-    team: loadTeam
+    team: loadTeam,
+    adminmgmt: loadAdminManagement
   };
   loaders[sec]?.();
 
@@ -4459,6 +4503,90 @@ async function deactivateAdmin(id) {
   const r = await api(`/api/admin/${id}`, { method: 'DELETE' });
   if (r.success) { toast('Admin deactivated'); loadTeam(); }
   else toast('Error', 'error');
+}
+
+// ── ADMIN MANAGEMENT (SUPERADMIN ONLY) ──
+async function loadAdminManagement() {
+  const sec = document.getElementById('sec-adminmgmt');
+  sec.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <h2 style="font-size:1.1rem;font-weight:600;">Admin Management</h2>
+      <button class="btn btn-gold" onclick="openModal('addAdminModal')"><i class="fas fa-user-plus"></i> Add Admin</button>
+    </div>
+    <div class="card">
+      <div class="card-body no-pad">
+        <table class="data-table">
+          <thead><tr><th>User</th><th>Username</th><th>Email</th><th>Role</th><th>Created By</th><th>Created At</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="adminMgmtBody"><tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  try {
+    const data = await api('/api/admin/');
+    const admins = data.data || [];
+    const tbody = document.getElementById('adminMgmtBody');
+    if (!admins.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-users"></i><p>No admins found</p></div></td></tr>`; return; }
+    tbody.innerHTML = admins.map(a => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <div class="team-avatar">${(a.name || a.username).charAt(0).toUpperCase()}</div>
+            <div><div class="cell-primary">${a.name || '-'}</div></div>
+          </div>
+        </td>
+        <td style="font-size:0.85rem;">${a.username}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted);">${a.email || '-'}</td>
+        <td>${statusBadge(a.role)}</td>
+        <td style="font-size:0.78rem;color:var(--text-muted);">${a.createdBy?.name || a.createdBy?.username || 'System'}</td>
+        <td style="font-size:0.78rem;color:var(--text-muted);">${a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '-'}</td>
+        <td>${a.isActive ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
+        <td>
+          <div style="display:flex;gap:0.5rem;">
+            ${a._id !== S.adminId ? `
+              <select onchange="changeAdminRole('${a._id}', this.value)" style="font-size:0.75rem;padding:0.25rem;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--text);">
+                <option value="admin" ${a.role === 'admin' ? 'selected' : ''}>Admin</option>
+                <option value="superadmin" ${a.role === 'superadmin' ? 'selected' : ''}>Superadmin</option>
+              </select>
+              <button class="btn btn-danger-ghost btn-sm btn-icon" onclick="deleteAdmin('${a._id}')" title="Delete"><i class="fas fa-trash"></i></button>
+            ` : '<em style="font-size:0.75rem;color:var(--text-muted);">You</em>'}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch { sec.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>Failed to load admins</p></div>`; }
+}
+
+async function saveNewAdmin() {
+  const body = {
+    username: document.getElementById('newAdminUsername').value,
+    password: document.getElementById('newAdminPassword').value,
+    name: document.getElementById('newAdminName').value,
+    email: document.getElementById('newAdminEmail').value,
+    role: document.getElementById('newAdminRole').value
+  };
+  if (!body.username || !body.password) { toast('Username and password required', 'error'); return; }
+  try {
+    const r = await api('/api/admin/create', { method: 'POST', body: JSON.stringify(body) });
+    if (r.success) { closeModal('addAdminModal'); toast('Admin created successfully'); loadAdminManagement(); }
+    else toast(r.error || 'Error creating admin', 'error');
+  } catch { toast('Error creating admin', 'error'); }
+}
+
+async function deleteAdmin(id) {
+  if (!confirm('Permanently delete this admin? This action cannot be undone.')) return;
+  const r = await api(`/api/admin/${id}`, { method: 'DELETE' });
+  if (r.success) { toast('Admin deleted'); loadAdminManagement(); }
+  else toast('Error deleting admin', 'error');
+}
+
+async function changeAdminRole(id, newRole) {
+  if (!confirm(`Change role to ${newRole}?`)) return;
+  try {
+    const r = await api(`/api/admin/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role: newRole }) });
+    if (r.success) { toast('Role updated'); loadAdminManagement(); }
+    else toast(r.error || 'Error updating role', 'error');
+  } catch { toast('Error updating role', 'error'); }
 }
 
 // ── TEAM CHAT ──

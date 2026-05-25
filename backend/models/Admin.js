@@ -9,9 +9,10 @@ const adminSchema = new mongoose.Schema({
   avatar: { type: String, default: '' },
   role: { 
     type: String, 
-    enum: ['superadmin', 'admin', 'manager'], 
+    enum: ['superadmin', 'admin'], 
     default: 'admin' 
   },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
   isActive: { type: Boolean, default: true },
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now }
