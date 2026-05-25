@@ -9,32 +9,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="/theme.js"></script>
-    <link rel="stylesheet" href="/theme.css?v=3">
+    <link rel="stylesheet" href="/theme.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        /* Global smooth transitions for theme changes - match homepage */
-        body, div, span, p, h1, h2, h3, h4, h5, h6, a, button, section, article, aside, header, footer, nav, main {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        :root {
+            --color-accent: #c9a84c;
+            --color-primary: #1a2118;
+            --color-bg: #f8f7f4;
+            --color-surface: #ffffff;
+            --color-border: #e8e4dc;
+            --color-text-main: #1a2118;
+            --color-text-muted: #6b7280;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.13);
         }
-        
         body { font-family: 'DM Sans', sans-serif; background: var(--color-bg); color: var(--color-text-main); min-height: 100vh; }
 
-        /* NAV - Fixed dark like homepage */
-        .nav { position: sticky; top: 0; z-index: 100; background: #2C3830; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: #c9a84c; text-decoration: none; }
-        .nav-back { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
-        .nav-back:hover { color: #c9a84c; }
-        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: #c9a84c; text-decoration: none; display: inline-flex; align-items: center; }
-        .logo img { width: 64px; height: 64px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
-        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 600; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
-        .logo-text span { color: #c9a84c; font-weight: 700; }
-        /* Theme toggle - use theme.css styles, just override for dark nav */
-        .nav .theme-toggle { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; }
-        .nav .theme-toggle:hover { border-color: #c9a84c; color: #c9a84c; }
-        /* Moon icon only - white on dark nav, dark on light mode pages */
-        [data-theme="light"] .nav .theme-toggle { color: rgba(255,255,255,0.8); }
-        [data-theme="light"] .nav .theme-toggle:hover { color: #c9a84c; }
+        /* NAV */
+        .nav { position: sticky; top: 0; z-index: 100; background: rgba(248,247,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--color-accent); text-decoration: none; }
+        .nav-back { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        .nav-back:hover { color: var(--color-accent); }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--color-accent); text-decoration: none; display: inline-flex; align-items: center; }
+        .logo img { width: 72px; height: 72px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
+        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; color: var(--color-text-main); margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
+        .logo-text span { color: var(--color-accent); font-weight: 700; }
+        .theme-toggle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .theme-toggle:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
         /* HERO */
         .property-hero { position: relative; height: 420px; overflow: hidden; background: var(--color-primary); }
@@ -50,27 +52,28 @@
 
         /* INFO STRIP */
         .property-info-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
-        .info-strip-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm); transition: background 0.3s ease, border-color 0.3s ease; }
+        .info-strip-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm); }
         .info-strip-icon { font-size: 1.5rem; color: var(--color-accent); margin-bottom: 0.5rem; }
-        .info-strip-value { font-size: 1.4rem; font-weight: 700; color: var(--color-text-main); transition: color 0.3s ease; }
-        .info-strip-label { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem; transition: color 0.3s ease; }
+        .info-strip-value { font-size: 1.4rem; font-weight: 700; color: var(--color-text-main); }
+        .info-strip-label { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem; }
 
         /* AMENITIES */
-        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 1.25rem; transition: color 0.3s ease; }
+        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 1.25rem; }
         .amenities-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 3rem; }
-        .amenity-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: var(--color-text-main); transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        .amenity-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: var(--color-text-main); }
         .amenity-pill i { color: var(--color-accent); font-size: 0.8rem; }
 
-        /* ROOM TYPES BAR - simple display without buttons */
-        .room-types-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; padding: 0.75rem 0; }
-        .room-type-tag { padding: 0.4rem 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; color: var(--color-text-main); font-size: 0.85rem; font-weight: 500; text-transform: capitalize; }
+        /* ROOM TYPE FILTERS */
+        .room-type-filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2.5rem; }
+        .room-type-filter-btn { padding: 0.6rem 1.5rem; border: 2px solid var(--color-border); border-radius: 20px; background: var(--color-surface); color: var(--color-text-muted); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: capitalize; }
+        .room-type-filter-btn:hover, .room-type-filter-btn.active { border-color: var(--color-accent); background: rgba(201,168,76,0.08); color: var(--color-accent); }
 
         /* LISTINGS GRID */
         .room-listings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
         @media (max-width: 768px) { .room-listings-grid { grid-template-columns: 1fr; } }
 
         /* LISTING CARD */
-        .listing-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.3s ease; text-decoration: none; display: block; }
+        .listing-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; overflow: hidden; transition: all 0.25s ease; text-decoration: none; display: block; }
         .listing-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--color-accent); }
         .listing-image { position: relative; height: 220px; overflow: hidden; }
         .listing-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
@@ -78,12 +81,12 @@
         .listing-type-badge { position: absolute; top: 1rem; left: 1rem; background: var(--color-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .listing-price-tag { position: absolute; bottom: 1rem; left: 1rem; background: linear-gradient(135deg, var(--color-accent), #b8941f); color: var(--color-primary); padding: 0.5rem 1rem; border-radius: 10px; font-size: 1rem; font-weight: 700; }
         .listing-content { padding: 1.5rem; }
-        .listing-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem; transition: color 0.3s ease; }
+        .listing-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem; }
         .listing-meta { display: flex; gap: 1rem; margin-bottom: 0.75rem; }
-        .listing-meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--color-text-muted); transition: color 0.3s ease; }
+        .listing-meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--color-text-muted); }
         .listing-meta-item i { color: var(--color-accent); }
         .listing-amenities { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
-        .amenity-tag { padding: 0.25rem 0.6rem; background: rgba(44,56,48,0.05); border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.72rem; color: var(--color-text-muted); transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
+        .amenity-tag { padding: 0.25rem 0.6rem; background: rgba(44,56,48,0.05); border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.72rem; color: var(--color-text-muted); }
         .btn-enquire { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem; background: var(--color-primary); color: white; border: none; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
         .btn-enquire:hover { background: var(--color-accent); color: var(--color-primary); }
 
@@ -109,7 +112,7 @@
         <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"><span class="logo-text">Ten<span>&</span>See</span></a>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
-                <i class="fas fa-moon" aria-hidden="true"></i>
+                <i class="fas fa-moon"></i>
             </button>
             <a class="nav-back" href="/listings.html"><i class="fas fa-arrow-left"></i> All Properties</a>
         </div>
@@ -136,7 +139,7 @@
         </div>
 
         <h2 class="section-title">Available Rooms</h2>
-        <div class="room-types-bar" id="roomTypesBar"></div>
+        <div class="room-type-filters" id="roomTypeFilters"></div>
         <div class="room-listings-grid" id="roomListingsGrid">
             <div class="loading-spinner"><div class="spinner"></div></div>
         </div>
@@ -169,6 +172,7 @@
         const params = new URLSearchParams(window.location.search);
         const propertyId = params.get('id');
         let allRoomListings = [];
+        let activeType = 'all';
 
         const AMENITY_ICONS = {
             'WiFi': 'fa-wifi', 'Air Conditioning': 'fa-snowflake', 'Parking': 'fa-car',
@@ -242,8 +246,8 @@
                     ).join('');
                 }
 
-                // Room types display
-                buildRoomTypesBar(types);
+                // Room type filters
+                buildRoomTypeFilters(types);
 
                 // Render all listings
                 renderRoomListings(allRoomListings);
@@ -254,10 +258,21 @@
             }
         }
 
-        function buildRoomTypesBar(types) {
-            const el = document.getElementById('roomTypesBar');
+        function buildRoomTypeFilters(types) {
+            const el = document.getElementById('roomTypeFilters');
             if (!types.length) { el.style.display = 'none'; return; }
-            el.innerHTML = types.map(t => `<span class="room-type-tag">${t.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`).join('');
+            el.innerHTML = `
+                <button class="room-type-filter-btn active" onclick="setRoomTypeFilter('all', this)">All Rooms</button>
+                ${types.map(t => `<button class="room-type-filter-btn" onclick="setRoomTypeFilter('${t}', this)">${t.replace('_',' ')}</button>`).join('')}
+            `;
+        }
+
+        function setRoomTypeFilter(type, btn) {
+            activeType = type;
+            document.querySelectorAll('.room-type-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtered = type === 'all' ? allRoomListings : allRoomListings.filter(l => l.propertyType === type);
+            renderRoomListings(filtered);
         }
 
         function renderRoomListings(listings) {
@@ -274,7 +289,7 @@
                 <a href="/listing.html?id=${l._id}" class="listing-card" data-aos="fade-up" data-aos-delay="${(i % 2) * 80}">
                     <div class="listing-image">
                         <img src="${l.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${l.title}">
-                        <span class="listing-type-badge">${l.propertyType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
+                        <span class="listing-type-badge">${l.propertyType.replace('_',' ')}</span>
                         <div class="listing-price-tag">RM ${l.price}<span style="font-size:0.75rem;font-weight:500;">/${l.pricePeriod}</span></div>
                     </div>
                     <div class="listing-content">
@@ -306,29 +321,6 @@
             document.getElementById('bookingForm').reset();
         }
         document.getElementById('bookingModal').addEventListener('click', e => { if (e.target === document.getElementById('bookingModal')) closeBooking(); });
-
-        // Theme toggle functionality - match homepage implementation
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        
-        document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
-            const updateAria = () => {
-                const current = document.documentElement.getAttribute('data-theme');
-                btn.setAttribute('aria-label', current === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-            };
-            updateAria();
-            btn.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateAria();
-            });
-        });
 
         async function submitBooking(e) {
             e.preventDefault();
