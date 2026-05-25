@@ -1578,6 +1578,7 @@
 const S = {
   token: localStorage.getItem('adminToken'),
   adminId: localStorage.getItem('adminId'),
+  adminRole: localStorage.getItem('adminRole') || 'admin',
   section: 'dashboard',
   listings: [], leads: [], bookings: [], notifications: [],
   chatSessions: [], currentSession: null,
@@ -1652,7 +1653,9 @@ async function login() {
       S.adminName = u.charAt(0).toUpperCase() + u.slice(1);
       localStorage.setItem('adminName', S.adminName);
       S.adminId = data.admin?.id;
-localStorage.setItem('adminId', S.adminId);
+      localStorage.setItem('adminId', S.adminId);
+      S.adminRole = data.admin?.role || 'admin';
+      localStorage.setItem('adminRole', S.adminRole);
       renderApp();
     } else {
       document.getElementById('loginError').style.display = 'block';
@@ -3866,24 +3869,33 @@ function renderTaskBoard() {
         ${tasks.filter(t => t.status === col).map(t => {
           const dueStatus = getDueStatus(t.dueDate);
           const dueClass = getDueClass(dueStatus);
-          const assignee = t.assignedTo;
-          const assigneeInitials = assignee?.name ? assignee.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : (assignee?.username?.substring(0, 2).toUpperCase() || '?');
+          // Handle multi-assignees - can be array or single object
+          const assignees = Array.isArray(t.assignedTo) ? t.assignedTo : (t.assignedTo ? [t.assignedTo] : []);
+          const renderAssignees = () => {
+            if (assignees.length === 0) return '';
+            return `<div class="task-assignees" style="display:flex;gap:0.35rem;margin-top:0.5rem;flex-wrap:wrap;">${assignees.map(a => {
+              const initials = a?.name ? a.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2) : (a?.username?.substring(0, 2).toUpperCase() || '?');
+              return `<div class="task-assignee-avatar" title="${a.name || a.username}">${initials}</div>`;
+            }).join('')}</div>`;
+          };
           
           return `
           <div class="task-card priority-${t.priority} ${dueClass}" 
                draggable="true"
                data-task-id="${t._id}"
                ondragstart="handleTaskDragStart(event, '${t._id}')"
-               ondragend="handleTaskDragEnd(event)"
-               onclick="editTask('${t._id}')">
-            <div class="task-card-header">
-              <h5>${t.title}</h5>
-              <div class="task-priority-dot ${t.priority}"></div>
+               ondragend="handleTaskDragEnd(event)">
+            <div class="task-card-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
+              <h5 style="flex:1;cursor:pointer;" onclick="editTask('${t._id}')">${t.title}</h5>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="task-priority-dot ${t.priority}"></div>
+                <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();editTask('${t._id}')" title="Edit" style="padding:0.25rem 0.5rem;font-size:0.75rem;"><i class="fas fa-pencil-alt"></i></button>
+              </div>
             </div>
-            <p>${t.description?.substring(0, 80) || ''}${t.description?.length > 80 ? '...' : ''}</p>
+            <p style="cursor:pointer;" onclick="editTask('${t._id}')">${t.description?.substring(0, 80) || ''}${t.description?.length > 80 ? '...' : ''}</p>
             
             ${t.dueDate ? `
-            <div class="task-due-date ${dueStatus}">
+            <div class="task-due-date ${dueStatus}" style="cursor:pointer;" onclick="editTask('${t._id}')">
               <i class="fas fa-calendar-alt"></i>
               <span>${formatDueDate(t.dueDate)}</span>
               ${dueStatus === 'overdue' ? '<span style="margin-left:0.25rem;">(Overdue)</span>' : ''}
@@ -3891,14 +3903,9 @@ function renderTaskBoard() {
             </div>
             ` : ''}
             
-            ${assignee ? `
-            <div class="task-assignee">
-              <div class="task-assignee-avatar">${assigneeInitials}</div>
-              <span class="task-assignee-name">${assignee.name || assignee.username}</span>
-            </div>
-            ` : ''}
+            ${renderAssignees()}
             
-            <div class="task-meta">
+            <div class="task-meta" style="cursor:pointer;" onclick="editTask('${t._id}')">
               <span class="creator">By ${t.createdBy?.name || t.createdBy?.username}</span>
               <span style="text-transform:capitalize;">${t.priority}</span>
             </div>
@@ -3981,7 +3988,7 @@ async function openTaskModal() {
   document.getElementById('taskCategory').value = 'general';
   document.getElementById('taskDueDate').value = '';
   
-  // Populate assignee dropdown
+  // Populate assignee dropdown with multi-select
   const assigneeSelect = document.getElementById('taskAssignedTo');
   assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
   S.teamMembers.forEach(m => {
@@ -3990,6 +3997,17 @@ async function openTaskModal() {
   assigneeSelect.value = '';
   
   openModal('taskModal');
+}
+
+// Helper to get selected assignees as array
+function getSelectedAssignees() {
+  const select = document.getElementById('taskAssignedTo');
+  const selected = Array.from(select.selectedOptions).filter(o => o.value);
+  return selected.map(o => ({
+    userId: o.value,
+    name: o.dataset.name || '',
+    username: o.dataset.username
+  }));
 }
 
 async function editTask(id) {
@@ -4007,13 +4025,25 @@ async function editTask(id) {
   document.getElementById('taskCategory').value = task.category;
   document.getElementById('taskDueDate').value = task.dueDate ? task.dueDate.split('T')[0] : '';
   
-  // Populate assignee dropdown
+  // Populate assignee dropdown with multi-select
   const assigneeSelect = document.getElementById('taskAssignedTo');
   assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
   S.teamMembers.forEach(m => {
     assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
   });
-  assigneeSelect.value = task.assignedTo?.userId || '';
+  
+  // Handle multi-assignees - can be array or single object for backward compatibility
+  const assignedTo = task.assignedTo;
+  if (Array.isArray(assignedTo) && assignedTo.length > 0) {
+    const selectedIds = assignedTo.map(a => a.userId);
+    Array.from(assigneeSelect.options).forEach(opt => {
+      opt.selected = selectedIds.includes(opt.value);
+    });
+  } else if (assignedTo?.userId) {
+    assigneeSelect.value = assignedTo.userId;
+  } else {
+    assigneeSelect.value = '';
+  }
   
   openModal('taskModal');
 }
@@ -4022,13 +4052,7 @@ async function saveTask() {
   const taskId = document.getElementById('taskId').value;
   const isEdit = !!taskId;
   
-  const assigneeSelect = document.getElementById('taskAssignedTo');
-  const assigneeOption = assigneeSelect.options[assigneeSelect.selectedIndex];
-  const assignedTo = assigneeSelect.value ? {
-    userId: assigneeSelect.value,
-    name: assigneeOption.dataset.name || '',
-    username: assigneeOption.dataset.username
-  } : null;
+  const assignedTo = getSelectedAssignees();
   
   const body = {
     title: document.getElementById('taskTitle').value,
@@ -4080,7 +4104,7 @@ async function loadTeam() {
   sec.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
       <h2 style="font-size:1.1rem;font-weight:600;">Team Management</h2>
-      <button class="btn btn-gold" onclick="openModal('teamModal')"><i class="fas fa-user-plus"></i> Add Member</button>
+      ${S.adminRole === 'superadmin' ? `<button class="btn btn-gold" onclick="openModal('teamModal')"><i class="fas fa-user-plus"></i> Add Member</button>` : ''}
     </div>
     <div class="card">
       <div class="card-body no-pad">
