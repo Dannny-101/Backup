@@ -1309,6 +1309,12 @@
                             <div class="contact-value">Selangor, Malaysia</div>
                         </div>
                     </div>
+                    <!-- WhatsApp QR Code - Desktop Only -->
+                    <div id="whatsappQRDesktop" style="display:none;margin-top:1rem;padding:1rem;background:#f0fdf4;border:2px solid #25d366;border-radius:12px;text-align:center;" data-aos="fade-up">
+                        <div style="font-weight:600;color:#166534;margin-bottom:0.5rem;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> Scan to Chat on WhatsApp</div>
+                        <img id="whatsappQRCode" src="" alt="WhatsApp QR Code" style="width:180px;height:180px;border-radius:8px;">
+                        <div style="font-size:0.8rem;color:#15803d;margin-top:0.5rem;">Point your phone camera here</div>
+                    </div>
                 </div>
                 <div class="contact-form-card" data-aos="fade-left">
                     <h3>Send us a message</h3>
@@ -2211,7 +2217,30 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadFilterOptions();
             loadFeatured();
+            initWhatsAppQR();
         });
+
+        // WhatsApp QR Code - Desktop only
+        function initWhatsAppQR() {
+            const qrContainer = document.getElementById('whatsappQRDesktop');
+            const qrImg = document.getElementById('whatsappQRCode');
+            if (!qrContainer || !qrImg) return;
+            
+            // Only show on desktop (>1024px)
+            function checkScreenSize() {
+                if (window.innerWidth > 1024) {
+                    qrContainer.style.display = 'block';
+                    // Generate QR code using QRServer API
+                    const whatsappUrl = 'https://wa.me/60184022169?text=Hi%20Ten%26See%2C%20I%27m%20interested%20in%20finding%20a%20room.%20Can%20you%20help%20me%3F';
+                    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(whatsappUrl)}`;
+                } else {
+                    qrContainer.style.display = 'none';
+                }
+            }
+            
+            checkScreenSize();
+            window.addEventListener('resize', checkScreenSize);
+        }
 
         // Load universities and areas from database
         async function loadFilterOptions() {

@@ -8,6 +8,8 @@ const { Server } = require('socket.io');
 require('dotenv').config();
 
 const ChatMessage = require('./models/ChatMessage');
+const Lead = require('./models/Lead');
+const Notification = require('./models/Notification');
 
 const app = express();
 const server = http.createServer(app);
@@ -319,6 +321,75 @@ app.get('/admin', (req, res) => {
 app.get('/property', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/property.html'));
 });
+
+// Smart Notification Cron - Check for unattended leads every 15 minutes
+const UNATTENDED_LEAD_THRESHOLD = 16 * 60 * 60 * 1000; // 16 hours in milliseconds
+const CHECK_INTERVAL = 15 * 60 * 1000; // 15 minutes
+const notifiedLeadIds = new Set(); // Track already notified leads
+
+async function checkUnattendedLeads() {
+  try {
+    const cutoffTime = new Date(Date.now() - UNATTENDED_LEAD_THRESHOLD);
+    
+    // Find leads older than 16 hours with status 'new' and no admin assigned
+    const unattendedLeads = await Lead.find({
+      status: 'new',
+      assignedTo: null,
+      createdAt: { $lte: cutoffTime },
+      _id: { $nin: Array.from(notifiedLeadIds) } // Exclude already notified
+    });
+    
+    for (const lead of unattendedLeads) {
+      // Create notification
+      await Notification.create({
+        type: 'unattended_lead',
+        title: 'Unattended Lead Alert',
+        message: `Lead from ${lead.name} unattended for 16+ hours`,
+        data: { 
+          leadId: lead._id, 
+          source: lead.source,
+          createdAt: lead.createdAt 
+        },
+        isRead: false
+      });
+      
+      // Emit real-time alert to admins
+      if (emitToAdmins) {
+        emitToAdmins('unattended_lead_alert', {
+          leadId: lead._id,
+          name: lead.name,
+          source: lead.source,
+          createdAt: lead.createdAt,
+          message: `Lead from ${lead.name} unattended for 16+ hours`
+        });
+      }
+      
+      // Mark as notified
+      notifiedLeadIds.add(lead._id.toString());
+      
+      console.log(`[Smart Notify] Unattended lead: ${lead.name} (${lead._id})`);
+    }
+    
+    // Clean up old entries from notifiedLeadIds (leads that may have been handled)
+    if (notifiedLeadIds.size > 1000) {
+      const recentLeads = await Lead.find({
+        _id: { $in: Array.from(notifiedLeadIds).map(id => new mongoose.Types.ObjectId(id)) }
+      }).select('_id status');
+      
+      for (const lead of recentLeads) {
+        if (lead.status !== 'new') {
+          notifiedLeadIds.delete(lead._id.toString());
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[Smart Notify] Error checking unattended leads:', error);
+  }
+}
+
+// Start the cron job
+setInterval(checkUnattendedLeads, CHECK_INTERVAL);
+console.log('[Smart Notify] Unattended lead checker started (every 15 min)');
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

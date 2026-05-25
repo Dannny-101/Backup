@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const whatsappService = require('../services/whatsapp');
 const Lead = require('../models/Lead');
+const Notification = require('../models/Notification');
+const emailService = require('../services/email');
 
 /**
  * POST /api/whatsapp/webhook
@@ -28,22 +30,63 @@ router.post('/webhook', async (req, res) => {
 
     // Store as lead if phone provided
     if (phoneNumber) {
-      const lead = await Lead.create({
-        name: senderName,
-        phone: phoneNumber,
-        message: message,
-        source: 'whatsapp',
-        status: 'new'
-      });
+      // Check for existing lead with same phone to avoid duplicates
+      let lead = await Lead.findOne({ phone: phoneNumber });
+      
+      if (!lead) {
+        // Create new lead from WhatsApp
+        lead = await Lead.create({
+          name: senderName || 'WhatsApp User',
+          phone: phoneNumber,
+          message: message,
+          source: 'whatsapp',
+          status: 'new',
+          assignedTo: null
+        });
 
-      // Notify admin via dashboard (emit socket event)
+        // Create dashboard notification
+        await Notification.create({
+          type: 'new_lead',
+          title: 'New WhatsApp Lead',
+          message: `${senderName || 'WhatsApp User'} messaged via WhatsApp: "${message?.substring(0, 50)}${message?.length > 50 ? '...' : ''}"`,
+          data: { leadId: lead._id, source: 'whatsapp' },
+          isRead: false
+        });
+
+        // Send email alert to admin
+        try {
+          await emailService.sendNewLeadAlert(
+            process.env.ADMIN_EMAIL || 'admin@tenandsee.homes',
+            {
+              name: lead.name,
+              email: lead.email || 'N/A (WhatsApp)',
+              phone: lead.phone,
+              source: lead.source,
+              message: lead.message
+            }
+          );
+        } catch (emailErr) {
+          console.error('Failed to send WhatsApp lead email alert:', emailErr.message);
+        }
+      } else {
+        // Update existing lead with new message
+        lead.message = message;
+        lead.status = 'new'; // Reset status to trigger attention
+        lead.updatedAt = new Date();
+        await lead.save();
+      }
+
+      // Emit real-time event to admin dashboard
       const io = req.app.get('io');
-      if (io) {
-        io.emit('new_whatsapp_message', {
+      const emitToAdmins = req.app.get('emitToAdmins');
+      
+      if (io && emitToAdmins) {
+        emitToAdmins('new_whatsapp_lead', {
           leadId: lead._id,
-          senderName,
-          phoneNumber,
-          message,
+          senderName: lead.name,
+          phoneNumber: lead.phone,
+          message: lead.message,
+          source: 'whatsapp',
           timestamp: new Date()
         });
       }
