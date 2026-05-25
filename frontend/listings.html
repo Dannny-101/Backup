@@ -2614,7 +2614,7 @@
                     </div>
                     <div class="listing-content">
                         <div class="listing-meta">
-                            <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
+                            <span class="listing-type">${listing.propertyType ? listing.propertyType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Room'}</span>
                             <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                         </div>
                         <h3 class="listing-title">${listing.title}</h3>
@@ -2687,7 +2687,7 @@
                     </div>
                     <div class="listing-content">
                         <div class="listing-meta">
-                            <span class="listing-type">${listing.propertyType.replace('_', ' ')}</span>
+                            <span class="listing-type">${listing.propertyType ? listing.propertyType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Room'}</span>
                             <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                         </div>
                         <h3 class="listing-title">${listing.title}</h3>
