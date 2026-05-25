@@ -454,7 +454,18 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB Connected'))
+.then(async () => {
+    console.log('MongoDB Connected');
+    // Fix any admin docs where avatar is not an object (e.g. empty string from old data)
+    try {
+        const Admin = require('./models/Admin');
+        await Admin.updateMany(
+            { $or: [{ avatar: { $type: 'string' } }, { avatar: null }, { 'avatar.emoji': { $exists: false } }] },
+            { $set: { avatar: { emoji: '🦁', bg: '#c9a84c' } } }
+        );
+        console.log('✅ Admin avatar migration complete');
+    } catch(e) { console.error('Avatar migration error:', e.message); }
+})
 .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Routes
