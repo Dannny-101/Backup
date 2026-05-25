@@ -6,7 +6,10 @@ const adminSchema = new mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, default: '' },
   email: { type: String, default: '' },
-  avatar: { type: String, default: '' },
+  avatar: {
+    emoji: { type: String, default: '🦁' },
+    bg: { type: String, default: '#c9a84c' }
+  },
   role: { 
     type: String, 
     enum: ['superadmin', 'admin'], 

@@ -850,6 +850,19 @@
     .toast.error i { color: var(--danger); }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
 
+    /* ── CHAT NOTIFICATION BANNER ── */
+    .chat-banner { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 10000; display: flex; align-items: center; gap: 0.75rem; background: var(--surface); border: 1px solid var(--gold); border-radius: 14px; padding: 0.85rem 1.1rem; min-width: 300px; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(201,168,76,0.2); animation: bannerSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1); cursor: pointer; }
+    .chat-banner:hover { border-color: var(--gold); filter: brightness(1.05); }
+    @keyframes bannerSlideUp { from { transform: translateY(120%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes bannerSlideDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(120%); opacity: 0; } }
+    .chat-banner-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; border: 2px solid var(--gold); }
+    .chat-banner-body { flex: 1; min-width: 0; }
+    .chat-banner-name { font-weight: 700; font-size: 0.85rem; color: var(--gold); margin-bottom: 0.2rem; }
+    .chat-banner-msg { font-size: 0.82rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-banner-time { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .chat-banner-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1rem; padding: 0 0 0 0.5rem; flex-shrink: 0; }
+    .chat-banner-icon { font-size: 0.75rem; color: var(--gold); margin-bottom: 0.15rem; }
+
     /* ── STATUS PILLS ── */
     .status-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .status-pill {
@@ -4539,6 +4552,73 @@ let selectedGroupId = null;
 let staffGroups = [];
 let onlineStaff = [];
 let staffChatMessages = [];
+let chatUnreadCounts = {}; // { adminId: count }
+let chatLastMessages = {}; // { adminId: { text, timestamp, fromName } }
+let activeChatBanner = null;
+
+// Internal chime via AudioContext — no external files needed
+function playChime() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const times = [0, 0.18, 0.34];
+    const freqs = [880, 1108, 1320];
+    times.forEach((t, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freqs[i], ctx.currentTime + t);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.35);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime + t + 0.38);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch(e) {}
+}
+
+// Rich chat notification banner (bottom-right, slides up)
+function showChatBanner(data) {
+  // Remove existing banner
+  if (activeChatBanner) { activeChatBanner.remove(); activeChatBanner = null; }
+
+  const avatar = data.fromAvatar;
+  const avatarHtml = avatar?.emoji
+    ? `<div class="chat-banner-avatar" style="background:${avatar.bg||'#c9a84c'}">${avatar.emoji}</div>`
+    : `<div class="chat-banner-avatar" style="background:var(--gold)">${(data.fromName||'?').charAt(0).toUpperCase()}</div>`;
+
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const preview = (data.message||'').length > 60 ? data.message.substring(0,60)+'…' : data.message;
+
+  const banner = document.createElement('div');
+  banner.className = 'chat-banner';
+  banner.innerHTML = `
+    ${avatarHtml}
+    <div class="chat-banner-body">
+      <div class="chat-banner-icon"><i class="fas fa-comment-dots"></i> Team Chat</div>
+      <div class="chat-banner-name">${data.fromName || 'Admin'}</div>
+      <div class="chat-banner-msg">${preview}</div>
+      <div class="chat-banner-time">${timeStr}</div>
+    </div>
+    <button class="chat-banner-close" onclick="event.stopPropagation();this.closest('.chat-banner').remove();">&times;</button>
+  `;
+  banner.addEventListener('click', () => {
+    banner.remove();
+    showSection('teamchat');
+    if (data.fromId) setTimeout(() => selectStaff(data.fromId, data.fromName, data.fromRole||'Admin'), 200);
+  });
+  document.body.appendChild(banner);
+  activeChatBanner = banner;
+
+  // Auto-dismiss after 6 seconds
+  setTimeout(() => {
+    if (banner.parentNode) {
+      banner.style.animation = 'bannerSlideDown 0.3s ease forwards';
+      setTimeout(() => banner.remove(), 300);
+    }
+    if (activeChatBanner === banner) activeChatBanner = null;
+  }, 6000);
+}
 
 async function loadTeamChat() {
   const sec = document.getElementById('sec-teamchat');
@@ -4578,16 +4658,33 @@ async function renderStaffChatList() {
       onlineStaff = data.data || [];
     } catch { onlineStaff = []; }
     
-    list.innerHTML = onlineStaff.map(s => `
-      <div class="teamchat-item ${selectedStaffId === s._id ? 'active' : ''}" onclick="selectStaff('${s._id}', '${s.name || s.username}', '${s.role || 'admin'}')">
-        <div class="teamchat-avatar" style="${s.avatar?.emoji ? `background:${s.avatar.bg||'#c9a84c'};font-size:1.1rem;` : ''}">${s.avatar?.emoji || (s.name || s.username).charAt(0).toUpperCase()}</div>
-        <div class="teamchat-info">
-          <div class="teamchat-name">${s.name || s.username} ${s._id === S.adminId ? '(You)' : ''}</div>
-          <div class="teamchat-meta">${s.role || 'Admin'}</div>
+    // Sort by latest message timestamp (most recent first)
+    const sorted = [...onlineStaff].sort((a, b) => {
+      const ta = chatLastMessages[a._id]?.timestamp || 0;
+      const tb = chatLastMessages[b._id]?.timestamp || 0;
+      return new Date(tb) - new Date(ta);
+    });
+
+    list.innerHTML = sorted.map(s => {
+      const last = chatLastMessages[s._id];
+      const unread = chatUnreadCounts[s._id] || 0;
+      const lastText = last ? `<div class="teamchat-meta" style="font-size:0.72rem;">${last.text.length > 28 ? last.text.substring(0,28)+'…' : last.text}</div>` : `<div class="teamchat-meta">${s.role || 'Admin'}</div>`;
+      return `
+        <div class="teamchat-item ${selectedStaffId === s._id ? 'active' : ''}" onclick="selectStaff('${s._id}', '${s.name || s.username}', '${s.role || 'admin'}');chatUnreadCounts['${s._id}']=0;renderStaffChatList();">
+          <div class="teamchat-avatar" style="${s.avatar?.emoji ? `background:${s.avatar.bg||'#c9a84c'};font-size:1.1rem;` : ''}">${s.avatar?.emoji || (s.name || s.username).charAt(0).toUpperCase()}</div>
+          <div class="teamchat-info" style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div class="teamchat-name" style="${unread > 0 ? 'font-weight:700;' : ''}">${s.name || s.username} ${s._id === S.adminId ? '<span style="font-size:0.7rem;opacity:0.6">(You)</span>' : ''}</div>
+              ${last ? `<div style="font-size:0.7rem;color:var(--text-muted);">${new Date(last.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+            </div>
+            ${lastText}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            ${unread > 0 ? `<span style="background:var(--gold);color:#000;border-radius:50%;width:18px;height:18px;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${unread}</span>` : `<div class="teamchat-status ${s.isActive ? '' : 'offline'}"></div>`}
+          </div>
         </div>
-        <div class="teamchat-status ${s.isActive ? '' : 'offline'}"></div>
-      </div>
-    `).join('') || '<div style="padding:1rem;text-align:center;color:var(--text-muted);">No staff online</div>';
+      `;
+    }).join('') || '<div style="padding:1rem;text-align:center;color:var(--text-muted);">No staff found</div>';
   } else {
     // Groups
     list.innerHTML = staffGroups.map(g => `
@@ -4652,10 +4749,14 @@ function renderStaffChatWindow(title, subtitle) {
 }
 
 function loadStaffMessages(targetId, type) {
-  // Load from localStorage for now (can be enhanced with API)
   const key = `staffchat_${type}_${targetId}`;
   const stored = localStorage.getItem(key);
   staffChatMessages = stored ? JSON.parse(stored) : [];
+  // Seed last message tracker from history
+  if (staffChatMessages.length > 0) {
+    const last = staffChatMessages[staffChatMessages.length - 1];
+    chatLastMessages[targetId] = { text: last.text, timestamp: last.timestamp, fromName: last.fromName };
+  }
   renderStaffMessages();
 }
 
@@ -4779,15 +4880,33 @@ function handleStaffMessage(data) {
   });
   localStorage.setItem(key, JSON.stringify(messages));
   
-  // Always update badge for new messages
-  if ((selectedStaffId !== data.fromId && !data.groupId) || (data.groupId && selectedGroupId !== data.groupId)) {
+  // Update last message and unread tracking
+  const senderId = data.groupId || data.fromId;
+  chatLastMessages[senderId] = { text: data.message, timestamp: new Date().toISOString(), fromName: data.fromName };
+
+  const isActiveChat = (data.fromId && selectedStaffId === data.fromId) || (data.groupId && selectedGroupId === data.groupId);
+  const isOnChatPage = S.section === 'teamchat';
+
+  if (!isActiveChat) {
+    // Increment unread
+    chatUnreadCounts[senderId] = (chatUnreadCounts[senderId] || 0) + 1;
+
+    // Update nav badge
     const badge = document.getElementById('teamChatBadge');
     if (badge) {
-      badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+      const total = Object.values(chatUnreadCounts).reduce((a, b) => a + b, 0);
+      badge.textContent = total;
       badge.style.display = 'inline-block';
     }
-    // Also show toast notification
-    toast(`New message from ${data.fromName}`, 'info');
+
+    // Play chime
+    playChime();
+
+    // Show rich banner preview
+    showChatBanner(data);
+
+    // Refresh sidebar if on chat page to resort
+    if (isOnChatPage) renderStaffChatList();
   }
   
   // Refresh if currently viewing this chat
