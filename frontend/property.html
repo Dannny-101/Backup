@@ -12,16 +12,16 @@
     <link rel="stylesheet" href="/theme.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--color-bg); color: var(--color-text-main); min-height: 100vh; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--color-bg); color: var(--color-text-main); min-height: 100vh; transition: background 0.3s ease, color 0.3s ease; }
 
         /* NAV */
-        .nav { position: sticky; top: 0; z-index: 100; background: rgba(248,247,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+        .nav { position: sticky; top: 0; z-index: 100; background: var(--color-surface); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; transition: background 0.3s ease, border-color 0.3s ease; }
         .nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: var(--color-accent); text-decoration: none; }
-        .nav-back { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+        .nav-back { display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: color 0.2s, background 0.3s ease; }
         .nav-back:hover { color: var(--color-accent); }
         .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: var(--color-accent); text-decoration: none; display: inline-flex; align-items: center; }
         .logo img { width: 72px; height: 72px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
-        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; color: var(--color-accent); margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
+        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; color: var(--color-text-main); margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; transition: color 0.3s ease; }
         .logo-text span { color: var(--color-accent); font-weight: 700; }
         .theme-toggle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; position: relative; overflow: hidden; }
         .theme-toggle:hover { border-color: var(--color-accent); color: var(--color-accent); }
@@ -44,15 +44,15 @@
 
         /* INFO STRIP */
         .property-info-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
-        .info-strip-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm); }
+        .info-strip-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm); transition: background 0.3s ease, border-color 0.3s ease; }
         .info-strip-icon { font-size: 1.5rem; color: var(--color-accent); margin-bottom: 0.5rem; }
-        .info-strip-value { font-size: 1.4rem; font-weight: 700; color: var(--color-text-main); }
-        .info-strip-label { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem; }
+        .info-strip-value { font-size: 1.4rem; font-weight: 700; color: var(--color-text-main); transition: color 0.3s ease; }
+        .info-strip-label { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem; transition: color 0.3s ease; }
 
         /* AMENITIES */
-        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 1.25rem; }
+        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 1.25rem; transition: color 0.3s ease; }
         .amenities-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 3rem; }
-        .amenity-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: var(--color-text-main); }
+        .amenity-pill { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: var(--color-text-main); transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
         .amenity-pill i { color: var(--color-accent); font-size: 0.8rem; }
 
         /* ROOM TYPE FILTERS */
@@ -65,7 +65,7 @@
         @media (max-width: 768px) { .room-listings-grid { grid-template-columns: 1fr; } }
 
         /* LISTING CARD */
-        .listing-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; overflow: hidden; transition: all 0.25s ease; text-decoration: none; display: block; }
+        .listing-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 20px; overflow: hidden; transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.3s ease; text-decoration: none; display: block; }
         .listing-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--color-accent); }
         .listing-image { position: relative; height: 220px; overflow: hidden; }
         .listing-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
@@ -73,12 +73,12 @@
         .listing-type-badge { position: absolute; top: 1rem; left: 1rem; background: var(--color-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
         .listing-price-tag { position: absolute; bottom: 1rem; left: 1rem; background: linear-gradient(135deg, var(--color-accent), #b8941f); color: var(--color-primary); padding: 0.5rem 1rem; border-radius: 10px; font-size: 1rem; font-weight: 700; }
         .listing-content { padding: 1.5rem; }
-        .listing-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem; }
+        .listing-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.5rem; transition: color 0.3s ease; }
         .listing-meta { display: flex; gap: 1rem; margin-bottom: 0.75rem; }
-        .listing-meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--color-text-muted); }
+        .listing-meta-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--color-text-muted); transition: color 0.3s ease; }
         .listing-meta-item i { color: var(--color-accent); }
         .listing-amenities { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
-        .amenity-tag { padding: 0.25rem 0.6rem; background: rgba(44,56,48,0.05); border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.72rem; color: var(--color-text-muted); }
+        .amenity-tag { padding: 0.25rem 0.6rem; background: rgba(44,56,48,0.05); border: 1px solid var(--color-border); border-radius: 6px; font-size: 0.72rem; color: var(--color-text-muted); transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease; }
         .btn-enquire { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem; background: var(--color-primary); color: white; border: none; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; }
         .btn-enquire:hover { background: var(--color-accent); color: var(--color-primary); }
 
