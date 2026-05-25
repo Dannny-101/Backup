@@ -5,26 +5,6 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const { createAuditLog } = require('./audit');
 
-// ── TEMPORARY EMERGENCY PASSWORD RESET ──
-// REMOVE THIS AFTER YOU LOG IN SUCCESSFULLY
-// GET: /api/admin/emergency-reset?secret=tensee2025&username=YOUR_USERNAME&newpass=NewPassword123
-router.get('/emergency-reset', async (req, res) => {
-  try {
-    const { secret, username, newpass } = req.query;
-    if (secret !== 'tensee2025') return res.status(403).json({ error: 'Wrong secret' });
-    if (!username || !newpass) return res.status(400).json({ error: 'username and newpass required' });
-    const admin = await Admin.findOne({ username });
-    if (!admin) {
-      const all = await Admin.find({}, 'username role');
-      return res.status(404).json({ error: 'Not found', available: all });
-    }
-    admin.password = newpass;
-    await admin.save();
-    res.json({ success: true, message: 'Password reset!', username: admin.username, role: admin.role });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 // POST login
 router.post('/login', async (req, res) => {
   try {
