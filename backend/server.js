@@ -265,7 +265,7 @@ io.on('connection', (socket) => {
     
     // Direct message between staff
     socket.on('staff_message', (data) => {
-        const { toId, message, fromId, fromName, fromRole } = data;
+        const { toId, message, fromId, fromName, fromRole, fromAvatar } = data;
         if (!toId || !message || !fromId) return;
         
         const payload = {
@@ -273,6 +273,7 @@ io.on('connection', (socket) => {
             fromId,
             fromName: fromName || 'Admin',
             fromRole: fromRole || 'Admin',
+            fromAvatar,
             message,
             timestamp: new Date().toISOString()
         };
@@ -297,7 +298,7 @@ io.on('connection', (socket) => {
     
     // Group message
     socket.on('group_message', (data) => {
-        const { groupId, message, fromId, fromName, fromRole } = data;
+        const { groupId, message, fromId, fromName, fromRole, fromAvatar } = data;
         if (!groupId || !message || !fromId) return;
         
         const payload = {
@@ -305,6 +306,7 @@ io.on('connection', (socket) => {
             fromId,
             fromName: fromName || 'Admin',
             fromRole: fromRole || 'Admin',
+            fromAvatar,
             message,
             timestamp: new Date().toISOString()
         };

@@ -4712,12 +4712,25 @@ function sendStaffMessage() {
   const type = selectedStaffId ? 'direct' : 'group';
   localStorage.setItem(`staffchat_${type}_${targetId}`, JSON.stringify(staffChatMessages));
   
-  // Emit via socket
+  // Emit via socket with avatar
   if (socket) {
+    console.log('Sending message via socket:', { selectedStaffId, selectedGroupId });
     if (selectedStaffId) {
-      socket.emit('staff_message', { toId: selectedStaffId, message: text, fromId: S.adminId, fromName: myName });
+      socket.emit('staff_message', { 
+        toId: selectedStaffId, 
+        message: text, 
+        fromId: S.adminId, 
+        fromName: myName,
+        fromAvatar: myAvatar
+      });
     } else if (selectedGroupId) {
-      socket.emit('group_message', { groupId: selectedGroupId, message: text, fromId: S.adminId, fromName: myName });
+      socket.emit('group_message', { 
+        groupId: selectedGroupId, 
+        message: text, 
+        fromId: S.adminId, 
+        fromName: myName,
+        fromAvatar: myAvatar
+      });
     }
   }
   
@@ -4738,7 +4751,13 @@ function createGroupModal() {
 
 // Handle incoming staff messages
 function handleStaffMessage(data) {
-  if (data.toId && data.toId !== S.adminId) return; // Not for me
+  console.log('Received staff message:', data);
+  
+  // Check if message is for current user (for direct messages)
+  if (data.toId && data.toId !== S.adminId) {
+    console.log('Message not for me, ignoring');
+    return;
+  }
   
   const key = data.groupId ? `staffchat_group_${data.groupId}` : `staffchat_direct_${data.fromId}`;
   const stored = localStorage.getItem(key) || '[]';
@@ -4747,18 +4766,21 @@ function handleStaffMessage(data) {
     fromId: data.fromId,
     fromName: data.fromName,
     fromRole: data.fromRole || 'Admin',
+    fromAvatar: data.fromAvatar,
     text: data.message,
     timestamp: new Date().toISOString()
   });
   localStorage.setItem(key, JSON.stringify(messages));
   
-  // Update badge if not viewing
+  // Always update badge for new messages
   if ((selectedStaffId !== data.fromId && !data.groupId) || (data.groupId && selectedGroupId !== data.groupId)) {
     const badge = document.getElementById('teamChatBadge');
     if (badge) {
       badge.textContent = (parseInt(badge.textContent) || 0) + 1;
       badge.style.display = 'inline-block';
     }
+    // Also show toast notification
+    toast(`New message from ${data.fromName}`, 'info');
   }
   
   // Refresh if currently viewing this chat
