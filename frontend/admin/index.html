@@ -2978,28 +2978,323 @@ async function updateBooking(id) {
   else toast('Error updating booking', 'error');
 }
 
+// ── QUEUE / LIVE CHAT MANAGEMENT ────────────────────────────────────────────
+
+function playChime() {
+  const sound = document.getElementById('notifSound');
+  if (sound) { sound.currentTime = 0; sound.play().catch(() => {}); }
+}
+
+// Agent chat status (persisted in session)
+S.chatStatus = S.chatStatus || 'offline';
+S.queueMetrics = S.queueMetrics || null;
+S.myChats = S.myChats || [];
+
+// ── Status toggle (shown in the chat section header) ──────────────────────
+function renderAgentStatusBar() {
+  const statuses = [
+    { key: 'online',  label: 'Online',   color: '#22c55e' },
+    { key: 'away',    label: 'Away',     color: '#f59e0b' },
+    { key: 'offline', label: 'Offline',  color: '#6b7280' }
+  ];
+  return `
+    <div class="agent-status-bar" id="agentStatusBar" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);margin-right:0.25rem;">My Status:</span>
+      ${statuses.map(s => `
+        <button onclick="setMyChatStatus('${s.key}')" id="statusBtn-${s.key}"
+          style="padding:0.3rem 0.8rem;border-radius:20px;border:2px solid ${s.color};background:${S.chatStatus===s.key?s.color:'transparent'};
+                 color:${S.chatStatus===s.key?'#fff':s.color};font-size:0.75rem;font-weight:600;cursor:pointer;transition:all 0.2s;">
+          <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${s.color};margin-right:4px;vertical-align:middle;"></span>${s.label}
+        </button>
+      `).join('')}
+      <span style="margin-left:auto;font-size:0.75rem;color:var(--text-muted);" id="myActiveChatCount">
+        Active chats: <strong>0</strong>
+      </span>
+    </div>`;
+}
+
+async function setMyChatStatus(status) {
+  S.chatStatus = status;
+  try {
+    await api('/api/queue/status', { method: 'POST', body: JSON.stringify({ status }) });
+    if (socket && socket.connected) {
+      socket.emit('set_chat_status', { adminId: S.adminId, status });
+    }
+    // Re-render status buttons
+    const statuses = [
+      { key: 'online',  color: '#22c55e' },
+      { key: 'away',    color: '#f59e0b' },
+      { key: 'offline', color: '#6b7280' }
+    ];
+    statuses.forEach(s => {
+      const btn = document.getElementById(`statusBtn-${s.key}`);
+      if (btn) {
+        btn.style.background = status === s.key ? s.color : 'transparent';
+        btn.style.color = status === s.key ? '#fff' : s.color;
+      }
+    });
+    const labels = { online: '🟢 Online', away: '🟡 Away', offline: '⚫ Offline' };
+    toast(`Status: ${labels[status] || status}`, 'info');
+  } catch (e) {
+    toast('Failed to update status', 'error');
+  }
+}
+
+// ── Queue alert popup (non-blocking, slides in) ──────────────────────────
+function showQueueAlert(data) {
+  const existing = document.getElementById('queueAlertBanner');
+  if (existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'queueAlertBanner';
+  div.style.cssText = `
+    position:fixed;top:1.25rem;right:1.25rem;z-index:99999;
+    background:var(--surface);border:2px solid #22c55e;border-radius:12px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:1rem 1.25rem;min-width:280px;max-width:340px;
+    animation:bannerSlideUp 0.3s ease;
+  `;
+  const waited = data.waitedMs ? `${Math.round(data.waitedMs/1000)}s wait` : '';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
+      <div>
+        <div style="font-weight:700;font-size:0.95rem;color:var(--text-main);">💬 New Chat Assigned</div>
+        <div style="font-size:0.85rem;color:var(--text-muted);margin:0.25rem 0;">
+          <strong>${data.visitorName || 'Visitor'}</strong>
+          ${data.topic ? `· ${data.topic}` : ''}
+          ${waited ? `<span style="color:#22c55e;"> · ${waited}</span>` : ''}
+        </div>
+      </div>
+      <button onclick="document.getElementById('queueAlertBanner').remove()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-muted);line-height:1;">×</button>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+      <button onclick="acceptAssignedChat('${data.sessionId}');document.getElementById('queueAlertBanner').remove();"
+        style="flex:1;background:#22c55e;color:#fff;border:none;padding:0.45rem 0;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;">
+        Accept Chat
+      </button>
+      <button onclick="rejectAssignedChat('${data.sessionId}');document.getElementById('queueAlertBanner').remove();"
+        style="flex:1;background:var(--surface);color:var(--text-muted);border:1px solid var(--border);padding:0.45rem 0;border-radius:8px;cursor:pointer;font-size:0.85rem;">
+        Pass
+      </button>
+    </div>
+  `;
+  document.body.appendChild(div);
+  setTimeout(() => { if (div.parentNode) div.remove(); }, 30000);
+}
+
+async function acceptAssignedChat(sessionId) {
+  if (!sessionId) return;
+  try {
+    await api(`/api/queue/accept/${sessionId}`, { method: 'POST' });
+    if (socket && socket.connected) {
+      socket.emit('accept_chat', { sessionId, adminId: S.adminId });
+    }
+    showSection('chat');
+    setTimeout(() => openSession(sessionId, 'Visitor', false), 400);
+  } catch (e) {
+    toast('Error accepting chat', 'error');
+  }
+}
+
+function rejectAssignedChat(sessionId) {
+  if (!sessionId || !socket) return;
+  socket.emit('reject_chat', { sessionId, adminId: S.adminId });
+  toast('Chat passed to next available agent', 'info');
+}
+
+// ── My Chats panel ────────────────────────────────────────────────────────
+async function refreshMyChats() {
+  try {
+    const data = await api('/api/queue/mine');
+    S.myChats = data.data || [];
+    renderMyChatsPanel();
+    const el = document.getElementById('myActiveChatCount');
+    if (el) el.innerHTML = `Active chats: <strong>${S.myChats.length}</strong>`;
+  } catch (e) { /* silent */ }
+}
+
+function renderMyChatsPanel() {
+  const container = document.getElementById('myChatsPanel');
+  if (!container) return;
+  if (!S.myChats.length) {
+    container.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:0.85rem;"><i class="fas fa-inbox" style="font-size:1.5rem;opacity:0.4;display:block;margin-bottom:0.5rem;"></i>No assigned chats</div>`;
+    return;
+  }
+  container.innerHTML = S.myChats.map(s => {
+    const unread = s.unreadCount || 0;
+    const since = s.lastMessageAt ? fmtTime(s.lastMessageAt) : '';
+    return `
+      <div class="chat-session-item ${S.currentSession===s.sessionId?'active':''}"
+           data-session="${s.sessionId}"
+           onclick="openSession('${s.sessionId}','${(s.name||'Visitor').replace(/'/g,"\\'")}', false)"
+           style="position:relative;">
+        <div class="session-avatar">${(s.name||'V').charAt(0).toUpperCase()}</div>
+        <div class="session-info">
+          <div class="session-name">${s.name||'Visitor'}</div>
+          <div class="session-preview">${s.lastMessage||'...'}</div>
+        </div>
+        <div class="session-meta">
+          <div class="session-time">${since}</div>
+          ${unread>0?`<div class="unread-count">${unread}</div>`:''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Queue panel (queued visitors waiting) ────────────────────────────────
+async function refreshQueuePanel() {
+  try {
+    const data = await api('/api/queue/list');
+    const queue = data.data || [];
+    const container = document.getElementById('queuePanel');
+    if (!container) return;
+    if (!queue.length) {
+      container.innerHTML = `<div style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:0.85rem;"><i class="fas fa-check-circle" style="font-size:1.5rem;color:#22c55e;opacity:0.7;display:block;margin-bottom:0.5rem;"></i>Queue is empty</div>`;
+      return;
+    }
+    container.innerHTML = queue.map((s, i) => {
+      const waited = s.queueEnteredAt
+        ? Math.round((Date.now()-new Date(s.queueEnteredAt).getTime())/1000)
+        : 0;
+      const waitStr = waited > 60 ? `${Math.floor(waited/60)}m ${waited%60}s` : `${waited}s`;
+      return `
+        <div style="padding:0.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.75rem;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1C2420;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:0.85rem;">${s.name||'Visitor'}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">${s.topic||'General'} · Waited ${waitStr}</div>
+          </div>
+          <button onclick="manualAcceptQueue('${s.sessionId}')"
+            style="background:#22c55e;color:#fff;border:none;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;">
+            Take
+          </button>
+        </div>`;
+    }).join('');
+  } catch (e) { /* silent */ }
+}
+
+async function manualAcceptQueue(sessionId) {
+  try {
+    await api(`/api/queue/accept/${sessionId}`, { method: 'POST' });
+    if (socket) socket.emit('accept_chat', { sessionId, adminId: S.adminId });
+    toast('Chat accepted', 'info');
+    await refreshMyChats();
+    await refreshQueuePanel();
+    setTimeout(() => openSession(sessionId, 'Visitor', false), 300);
+  } catch (e) { toast('Error accepting chat', 'error'); }
+}
+
+// ── Supervisor metrics bar ────────────────────────────────────────────────
+function renderQueueMetricsBar(data) {
+  const el = document.getElementById('queueMetricsBar');
+  if (!el || !data) return;
+  const statusDot = { online: '#22c55e', away: '#f59e0b', offline: '#6b7280', invisible: '#a855f7' };
+  const agents = (data.agentStatus || []).map(a => `
+    <span id="agentDot-${a.id}" title="${a.name}: ${a.chatStatus}" style="display:inline-flex;align-items:center;gap:4px;margin-right:0.75rem;font-size:0.78rem;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${statusDot[a.chatStatus]||'#6b7280'};display:inline-block;"></span>
+      ${a.name} <span style="color:var(--text-muted);">${a.activeChats}/${a.maxChats}</span>
+    </span>`).join('');
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:0.4rem 1rem;background:var(--bg);border-bottom:1px solid var(--border);font-size:0.78rem;">
+      <span style="color:var(--text-muted);">Queue:</span>
+      <strong style="color:${data.queueLength>0?'var(--gold)':'#22c55e'}">${data.queueLength}</strong>
+      <span style="color:var(--text-muted);">Active:</span>
+      <strong>${data.activeChats}</strong>
+      <span style="margin-left:auto;">${agents}</span>
+    </div>`;
+}
+
+function updateAgentStatusDot(adminId, status) {
+  const dot = document.getElementById(`agentDot-${adminId}`);
+  if (!dot) return;
+  const statusDot = { online: '#22c55e', away: '#f59e0b', offline: '#6b7280', invisible: '#a855f7' };
+  const span = dot.querySelector('span');
+  if (span) span.style.background = statusDot[status] || '#6b7280';
+}
+
+function updateQueueBadge() {
+  refreshQueuePanel();
+}
+
+// ── Push notification registration ───────────────────────────────────────
+async function initPushNotifications() {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    const reg = await navigator.serviceWorker.register('/admin/sw-admin.js');
+    const keyRes = await fetch('/api/push/vapid-public-key').then(r => r.json()).catch(() => null);
+    if (!keyRes?.key) return;
+
+    const existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      await saveSubscription(existing);
+      return;
+    }
+    const sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(keyRes.key)
+    });
+    await saveSubscription(sub);
+    console.log('[Push] Subscribed ✓');
+  } catch (e) {
+    console.warn('[Push] Could not subscribe:', e.message);
+  }
+}
+
+async function saveSubscription(sub) {
+  try {
+    await api('/api/push/subscribe', { method: 'POST', body: JSON.stringify({ subscription: sub }) });
+  } catch (e) { /* silent */ }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+// ── CSS for queue elements (injected once) ────────────────────────────────
+(function injectQueueStyles() {
+  if (document.getElementById('queueStyles')) return;
+  const style = document.createElement('style');
+  style.id = 'queueStyles';
+  style.textContent = `
+    .sla-breach { border-left: 3px solid #ef4444 !important; animation: sla-pulse 1s ease infinite; }
+    @keyframes sla-pulse { 0%,100%{background:var(--surface)} 50%{background:#fee2e2} }
+    #queueAlertBanner { pointer-events:all; }
+    .queue-tab-btn { padding:0.4rem 1rem;border:none;background:transparent;color:var(--text-muted);font-size:0.82rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent; }
+    .queue-tab-btn.active { color:var(--gold);border-bottom-color:var(--gold); }
+  `;
+  document.head.appendChild(style);
+})();
+
 // ── CHAT ──
 let chatFilter = 'active'; // 'active', 'closed', 'all'
+
+// Track which left-panel tab is active: 'mine' | 'queue' | 'all'
+let chatLeftTab = 'mine';
 
 async function loadChat() {
   const sec = document.getElementById('sec-chat');
   sec.innerHTML = `
-    <div class="card" style="height:600px;">
+    ${renderAgentStatusBar()}
+    <div id="queueMetricsBar"></div>
+    <div class="card" style="height:580px;margin-top:0.75rem;">
       <div class="chat-layout">
-        <div class="chat-sessions" id="chatSessions">
-          <div style="padding:0.75rem;border-bottom:1px solid var(--border);background:var(--surface);">
-            <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
-              <button onclick="setChatFilter('active')" id="filterActive" class="btn btn-sm ${chatFilter==='active'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">Active</button>
-              <button onclick="setChatFilter('closed')" id="filterClosed" class="btn btn-sm ${chatFilter==='closed'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">Closed</button>
-              <button onclick="setChatFilter('all')" id="filterAll" class="btn btn-sm ${chatFilter==='all'?'btn-gold':''}" style="flex:1;font-size:0.75rem;">All</button>
-            </div>
+        <div class="chat-sessions" id="chatSessions" style="display:flex;flex-direction:column;">
+          <div style="display:flex;border-bottom:1px solid var(--border);background:var(--surface);">
+            <button class="queue-tab-btn ${chatLeftTab==='mine'?'active':''}" onclick="switchChatTab('mine')">My Chats</button>
+            <button class="queue-tab-btn ${chatLeftTab==='queue'?'active':''}" onclick="switchChatTab('queue')">Queue</button>
+            <button class="queue-tab-btn ${chatLeftTab==='all'?'active':''}" onclick="switchChatTab('all')">All</button>
           </div>
-          <div id="chatSessionsList"><div class="loading"><div class="spinner"></div></div></div>
+          <div id="chatLeftPanel" style="flex:1;overflow-y:auto;">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
         </div>
         <div class="chat-main">
           <div class="card-header" id="chatHeader">
             <span class="card-title"><i class="fas fa-comments"></i> <span id="chatHeaderName">Select a conversation</span></span>
           </div>
+          <div id="adminTakeoverBanner" style="display:none;"></div>
           <div class="chat-messages" id="chatMessages">
             <div class="chat-empty">
               <i class="fas fa-comments"></i>
@@ -3015,7 +3310,34 @@ async function loadChat() {
       </div>
     </div>
   `;
-  await loadChatSessions();
+  // Inject queue panel containers that the helpers reference
+  const leftPanel = document.getElementById('chatLeftPanel');
+  leftPanel.innerHTML = `
+    <div id="myChatsPanel" style="${chatLeftTab==='mine'?'':'display:none'}"></div>
+    <div id="queuePanel" style="${chatLeftTab==='queue'?'':'display:none'}"></div>
+    <div id="chatSessionsList" style="${chatLeftTab==='all'?'':'display:none'}"><div class="loading"><div class="spinner"></div></div></div>
+  `;
+
+  // Load all three in parallel
+  await Promise.all([refreshMyChats(), refreshQueuePanel(), loadChatSessions()]);
+  // Seed metrics bar
+  try {
+    const m = await api('/api/queue/metrics');
+    if (m.success) renderQueueMetricsBar(m.data);
+  } catch(e) {}
+}
+
+function switchChatTab(tab) {
+  chatLeftTab = tab;
+  ['mine','queue','all'].forEach(t => {
+    const panel = document.getElementById(t === 'mine' ? 'myChatsPanel' : t === 'queue' ? 'queuePanel' : 'chatSessionsList');
+    if (panel) panel.style.display = t === tab ? '' : 'none';
+    const btn = document.querySelector(`.queue-tab-btn[onclick*="'${t}'"]`);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  if (tab === 'queue') refreshQueuePanel();
+  if (tab === 'mine') refreshMyChats();
+  if (tab === 'all') loadChatSessions();
 }
 
 function setChatFilter(filter) {
@@ -3446,6 +3768,15 @@ async function sendReply() {
       name: S.user?.name || 'Agent'
     }) });
     console.log('Admin reply saved and broadcast via REST');
+    // Notify queue engine of agent reply (SLA tracking) — fire and forget
+    if (socket && socket.connected) {
+      socket.emit('admin_reply', {
+        sessionId: S.currentSession,
+        message: msg,
+        adminName: S.user?.name || 'Agent',
+        adminId: S.adminId
+      });
+    }
   } catch (e) {
     console.error('Failed to save reply:', e);
     toast('Failed to send message', 'error');
@@ -4029,6 +4360,47 @@ function initSocket() {
       }
     }
   });
+
+  // ── QUEUE EVENTS ────────────────────────────────────────────────────────────
+
+  // A chat has been assigned to ME
+  socket.on('chat_assigned', (data) => {
+    playChime();
+    toast(`💬 New chat: ${data.visitorName || 'Visitor'}`, 'info');
+    showQueueAlert(data);
+    if (S.section === 'chat') refreshMyChats();
+    updateQueueBadge();
+  });
+
+  // SLA warning — haven't responded fast enough
+  socket.on('sla_warning', (data) => {
+    playChime();
+    toast(data.message || `⚠️ Visitor ${data.visitorName} is waiting`, 'warning');
+    const el = document.querySelector(`[data-session="${data.sessionId}"]`);
+    if (el) el.classList.add('sla-breach');
+  });
+
+  // Chat was transferred to me after rotation
+  socket.on('agent_transferred', (data) => {
+    playChime();
+    toast(`🔄 Chat transferred: ${data.agentName || 'you'} is now handling it`, 'info');
+    if (S.section === 'chat') refreshMyChats();
+  });
+
+  // Queue metrics broadcast — update supervisor panel
+  socket.on('queue_metrics', (data) => {
+    S.queueMetrics = data;
+    if (S.section === 'chat') renderQueueMetricsBar(data);
+  });
+
+  // Another agent's status changed
+  socket.on('agent_status_changed', (data) => {
+    updateAgentStatusDot(data.adminId, data.status);
+    if (S.section === 'chat') renderQueueMetricsBar(S.queueMetrics);
+  });
+
+  // Register service worker + push once socket is up
+  initPushNotifications();
 }
 
 // ── TASKS ──

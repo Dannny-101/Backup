@@ -10,6 +10,8 @@ require('dotenv').config();
 const ChatMessage = require('./models/ChatMessage');
 const Lead = require('./models/Lead');
 const Notification = require('./models/Notification');
+const chatQueue = require('./services/chatQueue');
+const chatPager = require('./services/chatPager');
 
 const app = express();
 const server = http.createServer(app);
@@ -25,6 +27,9 @@ const io = new Server(server, {
 // Make io accessible to routes
 app.set('io', io);
 
+// Initialise live chat queue engine
+chatQueue.init(io, chatPager);
+
 // Track active admin sessions (sessionId -> adminSocketId)
 const activeAdminSessions = new Map();
 
@@ -37,6 +42,42 @@ io.on('connection', (socket) => {
         socket.join('all_admins');
         socket.adminId = adminId;
         console.log(`Admin ${adminId} joined all_admins room. Socket rooms:`, Array.from(socket.rooms));
+        // Register agent socket for queue assignment
+        chatQueue.registerAgentSocket(adminId, socket);
+        // Send current metrics immediately on join
+        chatQueue.broadcastQueueMetrics();
+    });
+
+    // ── QUEUE: Agent sets their availability status ────────────────────────────
+    socket.on('set_chat_status', async (data) => {
+        const { adminId, status } = data;
+        if (!adminId || !status) return;
+        await chatQueue.setAgentStatus(adminId, status);
+        emitToAdmins('agent_status_changed', {
+            adminId,
+            status,
+            timestamp: new Date().toISOString()
+        });
+        console.log(`[Queue] Agent ${adminId} set status → ${status}`);
+    });
+
+    // ── QUEUE: Agent accepts an assigned chat ─────────────────────────────────
+    socket.on('accept_chat', async (data) => {
+        const { sessionId, adminId } = data;
+        if (!sessionId || !adminId) return;
+        const result = await chatQueue.acceptChat(sessionId, adminId);
+        if (result.success) {
+            socket.emit('chat_accept_confirmed', { sessionId });
+        }
+    });
+
+    // ── QUEUE: Agent rejects / passes chat ────────────────────────────────────
+    socket.on('reject_chat', async (data) => {
+        const { sessionId, adminId } = data;
+        if (!sessionId) return;
+        const ChatSession = require('./models/ChatSession');
+        const session = await ChatSession.findOne({ sessionId }).catch(() => null);
+        if (session) await chatQueue.rotateChat(session);
     });
     
     // Visitor joins their chat session room
@@ -92,7 +133,7 @@ io.on('connection', (socket) => {
     
     // Visitor sends message - save to DB and notify admins
     socket.on('send_message', async (data) => {
-        const { sessionId, message, name, email } = data;
+        const { sessionId, message, name, email, phone, topic } = data;
         if (!sessionId || !message) return;
         
         try {
@@ -101,17 +142,22 @@ io.on('connection', (socket) => {
                 sessionId,
                 name: name || 'Anonymous',
                 email,
+                phone,
                 message,
                 isAdmin: false,
                 senderType: 'visitor',
                 ipAddress: socket.handshake.address
             });
+
+            // ── QUEUE: Enqueue / update session on first visitor message ──────
+            await chatQueue.enqueue(sessionId, { name, email, phone, topic });
             
             // Emit to admin room
             emitToAdmins('new_chat_message', {
                 sessionId,
                 name: name || 'Anonymous',
                 email,
+                phone,
                 message,
                 createdAt: chatMessage.createdAt,
                 isAdmin: false,
@@ -204,8 +250,12 @@ io.on('connection', (socket) => {
     });
     
     // Admin sends reply - broadcast to visitor's room
-    socket.on('admin_reply', (data) => {
-        const { sessionId, message, adminName } = data;
+    socket.on('admin_reply', async (data) => {
+        const { sessionId, message, adminName, adminId } = data;
+        // ── QUEUE: Record agent reply for SLA tracking ──────────────────────
+        if (sessionId && adminId) {
+            chatQueue.recordAgentReply(sessionId, adminId).catch(() => {});
+        }
         if (!sessionId || !message) {
             console.log(`⚠️ admin_reply missing data:`, { sessionId, hasMessage: !!message });
             return;
@@ -345,7 +395,7 @@ io.on('connection', (socket) => {
         console.log(`Group created: ${name} (${groupId}) by ${createdBy}`);
     });
     
-    socket.on('disconnect', () => {
+    socket.on('disconnect', async () => {
         console.log('Client disconnected:', socket.id);
         
         // If admin disconnects, clean up their session
@@ -354,6 +404,25 @@ io.on('connection', (socket) => {
             io.to(`chat_${socket.adminSessionId}`).emit('admin_disconnected', { sessionId: socket.adminSessionId });
             emitToAdmins('admin_left', { sessionId: socket.adminSessionId });
             console.log(`Admin disconnected from session ${socket.adminSessionId}`);
+        }
+
+        // ── QUEUE: Unregister agent socket, set status away ────────────────
+        if (socket.adminId) {
+            chatQueue.unregisterAgentSocket(socket.adminId);
+            // Mark away only if no other socket is connected for same admin
+            // (they may have multiple tabs open)
+            const Admin = require('./models/Admin');
+            await Admin.updateOne(
+                { _id: socket.adminId, chatStatus: 'online' },
+                { $set: { chatStatus: 'away' } }
+            ).catch(() => {});
+            emitToAdmins('agent_status_changed', {
+                adminId: socket.adminId,
+                status: 'away',
+                timestamp: new Date().toISOString()
+            });
+            chatQueue.broadcastQueueMetrics();
+            console.log(`[Queue] Agent ${socket.adminId} went away on disconnect`);
         }
     });
 });
@@ -401,6 +470,8 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/audit', require('./routes/audit').router);
 app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/queue', require('./routes/chatQueue'));
+app.use('/api/push', require('./routes/push'));
 
 // Serve frontend
 app.get('/', (req, res) => {
