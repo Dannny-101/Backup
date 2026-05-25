@@ -185,8 +185,8 @@ router.put('/avatar', authMiddleware, async (req, res) => {
     
     const admin = await Admin.findByIdAndUpdate(
       req.admin.id,
-      { avatar: { emoji, bg }, updatedAt: Date.now() },
-      { new: true }
+      { $set: { avatar: { emoji, bg }, updatedAt: Date.now() } },
+      { new: true, overwrite: false }
     ).select('-password');
     
     if (!admin) return res.status(404).json({ success: false, error: 'Admin not found' });
