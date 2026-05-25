@@ -35,8 +35,12 @@
         .logo img { width: 72px; height: 72px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
         .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 600; color: var(--color-accent); margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
         .logo-text span { color: var(--color-accent); font-weight: 700; }
-        .theme-toggle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .theme-toggle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; position: relative; overflow: hidden; }
         .theme-toggle:hover { border-color: var(--color-accent); color: var(--color-accent); }
+        .theme-toggle .fa-sun { position: absolute; opacity: 0; transform: translateY(10px); transition: all 0.3s; }
+        .theme-toggle .fa-moon { position: absolute; opacity: 1; transform: translateY(0); transition: all 0.3s; }
+        [data-theme="dark"] .theme-toggle .fa-sun { opacity: 1; transform: translateY(0); }
+        [data-theme="dark"] .theme-toggle .fa-moon { opacity: 0; transform: translateY(-10px); }
 
         /* HERO */
         .property-hero { position: relative; height: 420px; overflow: hidden; background: var(--color-primary); }
@@ -112,7 +116,8 @@
         <a href="/" class="logo" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"><span class="logo-text">Ten<span>&</span>See</span></a>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
-                <i class="fas fa-moon"></i>
+                <i class="fas fa-moon" aria-hidden="true"></i>
+                <i class="fas fa-sun" aria-hidden="true"></i>
             </button>
             <a class="nav-back" href="/listings.html"><i class="fas fa-arrow-left"></i> All Properties</a>
         </div>
@@ -322,14 +327,26 @@
         }
         document.getElementById('bookingModal').addEventListener('click', e => { if (e.target === document.getElementById('bookingModal')) closeBooking(); });
 
-        // Theme toggle functionality
+        // Theme toggle functionality - match homepage implementation
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        
         document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+            const updateAria = () => {
+                const current = document.documentElement.getAttribute('data-theme');
+                btn.setAttribute('aria-label', current === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+            };
+            updateAria();
             btn.addEventListener('click', () => {
                 const currentTheme = document.documentElement.getAttribute('data-theme');
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 document.documentElement.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
-                btn.setAttribute('aria-label', newTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+                updateAria();
             });
         });
 

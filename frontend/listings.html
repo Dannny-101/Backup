@@ -2325,7 +2325,7 @@
                             <div class="room-types-summary">
                                 ${roomTypeEntries.map(([type, count]) => `
                                     <div class="room-type-summary">
-                                        <span class="room-type-name">${type.replace('_',' ')}</span>
+                                        <span class="room-type-name">${type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
                                         <span class="room-type-count">${count}</span>
                                     </div>
                                 `).join('')}
