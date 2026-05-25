@@ -34,7 +34,7 @@ async function seed() {
             availableUntil: new Date("2027-05-31"),
             isActive: true,
             isFeatured: true,
-            whatsappNumber: "+60123456789",
+            whatsappNumber: "+60184022169",
             agentName: "Sarah Ahmad"
         },
         {
@@ -60,7 +60,7 @@ async function seed() {
             availableUntil: new Date("2027-06-30"),
             isActive: true,
             isFeatured: false,
-            whatsappNumber: "+60123456789",
+            whatsappNumber: "+60184022169",
             agentName: "Muhammad Chen"
         },
         {
@@ -86,7 +86,7 @@ async function seed() {
             availableUntil: new Date("2027-07-31"),
             isActive: true,
             isFeatured: true,
-            whatsappNumber: "+60123456789",
+            whatsappNumber: "+60184022169",
             agentName: "Emma Abdullah"
         },
         {
@@ -112,7 +112,7 @@ async function seed() {
             availableUntil: new Date("2027-05-15"),
             isActive: true,
             isFeatured: false,
-            whatsappNumber: "+60123456789",
+            whatsappNumber: "+60184022169",
             agentName: "James Wilson"
         },
         {
@@ -138,7 +138,7 @@ async function seed() {
             availableUntil: new Date("2027-08-31"),
             isActive: true,
             isFeatured: false,
-            whatsappNumber: "+60123456789",
+            whatsappNumber: "+60184022169",
             agentName: "Lisa Wong"
         }
     ];

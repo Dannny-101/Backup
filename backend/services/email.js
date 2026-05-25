@@ -142,7 +142,7 @@ async function sendBookingConfirmation(customerEmail, bookingData) {
               <li>Pay the 30% deposit to secure your room</li>
             </ol>
             
-            <p style="margin-top: 20px;">Questions? Reply to this email or WhatsApp us at <a href="https://wa.me/601xxxxxxxx" style="color: #B8954A;">+60 1x-xxx xxxx</a></p>
+            <p style="margin-top: 20px;">Questions? Reply to this email or WhatsApp us at <a href="https://wa.me/60184022169" style="color: #B8954A;">+60 18-402 2169</a></p>
             
             <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
             
