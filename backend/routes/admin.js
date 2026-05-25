@@ -130,13 +130,16 @@ router.get('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// POST create admin (superadmin only)
+// POST create admin (admins can create admins, only superadmins can create superadmins)
 router.post('/create', authMiddleware, async (req, res) => {
   try {
-    if (req.admin.role !== 'superadmin') {
-      return res.status(403).json({ success: false, error: 'Superadmin access required' });
-    }
     const { username, password, name, email, role } = req.body;
+    
+    // Only superadmins can create superadmins
+    if (role === 'superadmin' && req.admin.role !== 'superadmin') {
+      return res.status(403).json({ success: false, error: 'Only superadmins can create superadmins' });
+    }
+    
     const admin = await Admin.create({ username, password, name, email, role: role || 'admin' });
     
     await createAuditLog('admin_created', {
