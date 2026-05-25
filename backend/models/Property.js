@@ -11,6 +11,12 @@ const propertySchema = new mongoose.Schema({
         lat: Number,
         lng: Number
     },
+    linkedUniversities: [{
+        name: { type: String, required: true },
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true }
+    }],
+    recommendedUniversity: { type: String, default: '' },
     amenities: [String],
     images: [String],
     whatsappNumber: String,

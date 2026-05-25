@@ -1,0 +1,256 @@
+/* ── Ten&See Map Feature Styles ── */
+
+/* Container */
+#map-container {
+    width: 100%;
+    margin: 2.5rem 0;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--color-border, #e8e4dc);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.map-wrapper {
+    position: relative;
+    height: 480px;
+}
+
+#map-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Empty state */
+.map-empty {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: var(--color-surface, #fff);
+    color: var(--color-text-muted, #6b7280);
+}
+.map-empty i { font-size: 2.5rem; opacity: 0.3; }
+.map-empty p { font-size: 0.9rem; }
+
+/* ── Side Nav ── */
+.map-side-nav {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 180px;
+}
+
+.map-nav-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.6);
+    padding: 0 0.25rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.map-uni-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    background: rgba(26,33,24,0.82);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.map-uni-btn i { color: rgba(201,168,76,0.7); font-size: 0.75rem; flex-shrink: 0; }
+
+.map-uni-btn:hover {
+    background: rgba(44,56,48,0.95);
+    border-color: rgba(201,168,76,0.5);
+    color: #c9a84c;
+    transform: translateX(3px);
+}
+
+.map-uni-btn.active {
+    background: rgba(201,168,76,0.2);
+    border-color: #c9a84c;
+    color: #c9a84c;
+    box-shadow: 0 0 12px rgba(201,168,76,0.25);
+}
+.map-uni-btn.active i { color: #c9a84c; }
+
+/* ── Sub Nav (Drive / Walk) ── */
+.map-sub-nav {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.map-sub-nav.slide-in {
+    animation: slideIn 0.3s ease forwards;
+}
+
+.map-sub-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 1rem;
+    background: rgba(26,33,24,0.82);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.map-sub-btn i { font-size: 0.8rem; }
+
+.map-sub-btn:hover {
+    border-color: rgba(201,168,76,0.5);
+    color: #c9a84c;
+}
+
+.map-sub-btn.active {
+    background: rgba(201,168,76,0.2);
+    border-color: #c9a84c;
+    color: #c9a84c;
+    box-shadow: 0 0 10px rgba(201,168,76,0.2);
+}
+
+/* ── Markers ── */
+.map-marker {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.marker-pin {
+    width: 40px;
+    height: 40px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+.map-marker--property .marker-pin {
+    background: linear-gradient(135deg, #c9a84c, #b8941f);
+}
+
+.map-marker--university .marker-pin {
+    background: linear-gradient(135deg, #2C3830, #4a6258);
+    border: 2px solid #c9a84c;
+}
+
+.marker-pin i {
+    transform: rotate(45deg);
+    color: white;
+    font-size: 0.9rem;
+}
+
+.marker-label {
+    margin-top: 6px;
+    background: rgba(26,33,24,0.88);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    border: 1px solid rgba(201,168,76,0.3);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* ── Pulse Animation ── */
+.marker-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.3);
+    pointer-events: none;
+}
+
+.map-marker--university .marker-pulse {
+    background: rgba(74,98,88,0.3);
+}
+
+@keyframes pulseRing {
+    0% { transform: translate(-50%, -60%) scale(1); opacity: 0.7; }
+    100% { transform: translate(-50%, -60%) scale(2.2); opacity: 0; }
+}
+
+.marker-pulse.pulsing {
+    animation: pulseRing 1.8s ease-out infinite;
+}
+
+/* ── Waypoint dots ── */
+.map-waypoint {
+    width: 10px;
+    height: 10px;
+    background: #c9a84c;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    cursor: default;
+}
+
+/* ── Section title ── */
+.map-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-main, #1a2118);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.map-section-title i { color: var(--color-accent, #c9a84c); }
+
+@media (max-width: 600px) {
+    .map-wrapper { height: 360px; }
+    .map-side-nav { min-width: 140px; }
+    .map-uni-btn, .map-sub-btn { font-size: 0.75rem; padding: 0.5rem 0.7rem; }
+    .map-sub-nav { top: auto; bottom: 3.5rem; right: 0.5rem; }
+}

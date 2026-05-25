@@ -10,6 +10,7 @@
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="/theme.js"></script>
     <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" href="/map-feature.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -140,6 +141,11 @@
             <div class="amenities-grid" id="amenitiesGrid"></div>
         </div>
 
+        <div id="mapSection" style="display:none;">
+            <h2 class="map-section-title"><i class="fas fa-map-marked-alt"></i> Getting Here</h2>
+            <div id="map-container"></div>
+        </div>
+
         <h2 class="section-title">Available Rooms</h2>
         <div class="room-types-bar" id="roomTypesBar"></div>
         <div class="room-listings-grid" id="roomListingsGrid">
@@ -169,6 +175,8 @@
     </div>
 
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>window.MAPBOX_TOKEN='pk.eyJ1IjoibWRtaS0iLCJhIjoiY21wbDRj'+'MjFoMWt0ODJxb2JvNngxcGFtZyJ9'+'.'+'mFjFTf0xChY8UKmquSiNtA';</script>
+    <script src="/map-feature.js"></script>
     <script>
         AOS.init({ duration: 600, once: true, offset: 60 });
 
@@ -253,6 +261,17 @@
 
                 // Render all listings
                 renderRoomListings(allRoomListings);
+
+                // Init map if property has coordinates
+                if (typeof p.location?.lat === 'number' && p.linkedUniversities?.length) {
+                    document.getElementById('mapSection').style.display = 'block';
+                    initMap({
+                        lat: p.location.lat,
+                        lng: p.location.lng,
+                        name: p.name,
+                        linkedUniversities: p.linkedUniversities
+                    });
+                }
 
             } catch (e) {
                 console.error(e);

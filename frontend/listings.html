@@ -2301,6 +2301,7 @@
                         <div class="property-content">
                             <div class="uni-tags">${uniTagsHtml}</div>
                             <div class="property-meta">
+                                ${p.recommendedUniversity ? `<span class="property-badge" style="background:rgba(201,168,76,0.15);color:var(--color-accent);border:1px solid rgba(201,168,76,0.3);"><i class="fas fa-star" style="font-size:0.7rem;"></i> ${p.recommendedUniversity}</span>` : ''}
                                 <span class="property-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                             </div>
                             <h3 class="property-title">${p.name}</h3>
@@ -2370,6 +2371,7 @@
                     <div class="listing-content">
                         <div class="listing-meta">
                             <span class="listing-type">${typeLabel}</span>
+                            ${listing.recommendedUniversity ? `<span class="listing-badge" style="background:rgba(201,168,76,0.15);color:var(--color-accent);border:1px solid rgba(201,168,76,0.3);font-size:0.7rem;"><i class="fas fa-star"></i> ${listing.recommendedUniversity}</span>` : ''}
                             <span class="listing-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</span>
                         </div>
                         <h3 class="listing-title">${listing.title}</h3>

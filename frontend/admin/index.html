@@ -1198,6 +1198,22 @@
           <label class="form-label">Address</label>
           <input class="form-input" id="pAddress">
         </div>
+        <div class="form-group">
+          <label class="form-label">Latitude <span style="font-size:0.72rem;color:var(--text-muted)">(property location)</span></label>
+          <input class="form-input" type="number" step="any" id="pLat" placeholder="e.g. 3.0738">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Longitude <span style="font-size:0.72rem;color:var(--text-muted)">(property location)</span></label>
+          <input class="form-input" type="number" step="any" id="pLng" placeholder="e.g. 101.5183">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Recommended University <span style="font-size:0.72rem;color:var(--text-muted)">(shows as tag on card)</span></label>
+          <input class="form-input" id="pRecommendedUni" placeholder="e.g. Taylor's University">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Linked Universities <span style="font-size:0.72rem;color:var(--text-muted)">(for map — one per line: Name|lat|lng)</span></label>
+          <textarea class="form-textarea" id="pLinkedUnis" rows="4" placeholder="Taylor's University|3.0738|101.6066&#10;Sunway University|3.0731|101.6050"></textarea>
+        </div>
         <div class="form-group" style="grid-column:1/-1">
           <label class="form-label">Amenities (comma separated)</label>
           <input class="form-input" id="pAmenities" placeholder="WiFi, Parking, Gym, Swimming Pool...">
@@ -1279,6 +1295,22 @@
           <select class="form-select" id="lProperty" onchange="autoFillFromProperty()">
             <option value="">— Standalone listing —</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Latitude <span style="font-size:0.72rem;color:var(--text-muted)">(room location)</span></label>
+          <input class="form-input" type="number" step="any" id="lLat" placeholder="e.g. 3.0738">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Longitude <span style="font-size:0.72rem;color:var(--text-muted)">(room location)</span></label>
+          <input class="form-input" type="number" step="any" id="lLng" placeholder="e.g. 101.5183">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Recommended University <span style="font-size:0.72rem;color:var(--text-muted)">(shows as tag on card)</span></label>
+          <input class="form-input" id="lRecommendedUni" placeholder="e.g. Taylor's University">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Linked Universities <span style="font-size:0.72rem;color:var(--text-muted)">(for map — one per line: Name|lat|lng)</span></label>
+          <textarea class="form-textarea" id="lLinkedUnis" rows="4" placeholder="Taylor's University|3.0738|101.6066&#10;Sunway University|3.0731|101.6050"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">University</label>
@@ -1903,6 +1935,10 @@ async function openPropertyModal(p = null) {
   set('pArea', p?.location?.area); set('pAddress', p?.location?.address);
   set('pAmenities', (p?.amenities || []).join(', ')); set('pImages', (p?.images || []).join(', '));
   set('pWhatsapp', p?.whatsappNumber); set('pAgent', p?.agentName);
+  set('pLat', p?.location?.lat ?? ''); set('pLng', p?.location?.lng ?? '');
+  set('pRecommendedUni', p?.recommendedUniversity || '');
+  const linkedUniStr = (p?.linkedUniversities || []).map(u => `${u.name}|${u.lat}|${u.lng}`).join('\n');
+  set('pLinkedUnis', linkedUniStr);
   document.getElementById('pActive').checked = p ? p.isActive : true;
   await loadUniversitiesFor('pUniversity');
   if (p?.location?.university) document.getElementById('pUniversity').value = p.location.university;
@@ -1916,7 +1952,9 @@ async function saveProperty() {
   const body = {
     name: document.getElementById('pName').value,
     description: document.getElementById('pDesc').value,
-    location: { city: document.getElementById('pCity').value, area: document.getElementById('pArea').value, university: document.getElementById('pUniversity').value, address: document.getElementById('pAddress').value },
+    location: { city: document.getElementById('pCity').value, area: document.getElementById('pArea').value, university: document.getElementById('pUniversity').value, address: document.getElementById('pAddress').value, lat: parseFloat(document.getElementById('pLat').value) || null, lng: parseFloat(document.getElementById('pLng').value) || null },
+    recommendedUniversity: document.getElementById('pRecommendedUni').value.trim(),
+    linkedUniversities: document.getElementById('pLinkedUnis').value.split('\n').map(s=>s.trim()).filter(Boolean).map(line => { const [name,lat,lng] = line.split('|'); return { name: name?.trim(), lat: parseFloat(lat), lng: parseFloat(lng) }; }).filter(u => u.name && !isNaN(u.lat) && !isNaN(u.lng)),
     amenities: document.getElementById('pAmenities').value.split(',').map(s=>s.trim()).filter(Boolean),
     images: document.getElementById('pImages').value.split(',').map(s=>s.trim()).filter(Boolean),
     whatsappNumber: document.getElementById('pWhatsapp').value,
@@ -2091,6 +2129,10 @@ async function openListingModal(l = null) {
   set('lAmenities', (l?.amenities || []).join(', '));
   set('lImages', (l?.images || []).join(', '));
   set('lFrom', l?.availableFrom?.split('T')[0]); set('lUntil', l?.availableUntil?.split('T')[0]);
+  set('lLat', l?.location?.lat ?? ''); set('lLng', l?.location?.lng ?? '');
+  set('lRecommendedUni', l?.recommendedUniversity || '');
+  const linkedUniStr = (l?.linkedUniversities || []).map(u => `${u.name}|${u.lat}|${u.lng}`).join('\n');
+  set('lLinkedUnis', linkedUniStr);
   document.getElementById('lActive').checked = l ? l.isActive : true;
   document.getElementById('lFeatured').checked = l?.isFeatured || false;
   await loadUniversities();
@@ -2110,7 +2152,7 @@ async function saveListing() {
     price: parseInt(document.getElementById('lPrice').value),
     pricePeriod: document.getElementById('lPeriod').value,
     propertyType: document.getElementById('lType').value,
-    location: { city: document.getElementById('lCity').value, area: document.getElementById('lArea').value, university: document.getElementById('lUniversity').value, address: document.getElementById('lAddress').value },
+    location: { city: document.getElementById('lCity').value, area: document.getElementById('lArea').value, university: document.getElementById('lUniversity').value, address: document.getElementById('lAddress').value, lat: parseFloat(document.getElementById('lLat').value) || null, lng: parseFloat(document.getElementById('lLng').value) || null },
     bedrooms: parseInt(document.getElementById('lBedrooms').value)||0,
     bathrooms: parseFloat(document.getElementById('lBathrooms').value)||0,
     maxOccupants: parseInt(document.getElementById('lOccupants').value)||1,
@@ -2122,7 +2164,9 @@ async function saveListing() {
     availableUntil: document.getElementById('lUntil').value,
     isActive: document.getElementById('lActive').checked,
     isFeatured: document.getElementById('lFeatured').checked,
-    property: document.getElementById('lProperty').value || null
+    property: document.getElementById('lProperty').value || null,
+    recommendedUniversity: document.getElementById('lRecommendedUni').value.trim(),
+    linkedUniversities: document.getElementById('lLinkedUnis').value.split('\n').map(s=>s.trim()).filter(Boolean).map(line => { const [name,lat,lng] = line.split('|'); return { name: name?.trim(), lat: parseFloat(lat), lng: parseFloat(lng) }; }).filter(u => u.name && !isNaN(u.lat) && !isNaN(u.lng))
   };
   try {
     const r = await api(id ? `/api/listings/${id}` : '/api/listings', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });

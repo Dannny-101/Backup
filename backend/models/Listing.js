@@ -14,6 +14,12 @@ const listingSchema = new mongoose.Schema({
         lat: Number,
         lng: Number
     },
+    linkedUniversities: [{
+        name: { type: String, required: true },
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true }
+    }],
+    recommendedUniversity: { type: String, default: '' },
     propertyType: { 
         type: String, 
         enum: ['apartment', 'studio', 'shared_room', 'private_room', 'house'],
