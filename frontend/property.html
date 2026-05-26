@@ -29,13 +29,12 @@
 
         /* NAV - Fixed dark green like homepage */
         .nav { position: sticky; top: 0; z-index: 100; background: #2C3830; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; }
-        .nav-logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: #c9a84c; text-decoration: none; }
         .nav-back { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.7); font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
         .nav-back:hover { color: #c9a84c; }
         .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: #c9a84c; text-decoration: none; display: inline-flex; align-items: center; }
         .logo img { width: 64px; height: 64px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
-        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 600; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
-        .logo-text span { color: #c9a84c; font-weight: 700; }
+        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
+        .logo-text span { color: var(--color-accent); font-weight: 700; }
         /* Theme toggle - inherits rounded square from theme.css, override colors for dark nav */
         .nav .theme-toggle { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; }
         .nav .theme-toggle:hover { border-color: #c9a84c; color: #c9a84c; }

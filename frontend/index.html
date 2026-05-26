@@ -44,7 +44,7 @@
             display: inline-flex; align-items: center;
         }
         .logo img { width: 64px; height: 64px; object-fit: contain; display: block; border-radius: 0; background: transparent; }
-        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 600; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
+        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; display: flex; align-items: center; }
         .logo-text span { color: var(--color-accent); font-weight: 700; }
         .nav-links { display: flex; gap: 2.5rem; align-items: center; list-style: none; position: absolute; left: 50%; transform: translateX(-50%); }
         .nav-links a {
@@ -449,11 +449,17 @@
         }
         .feature-icon {
             width: 48px; height: 48px; border-radius: 14px;
-            background: rgba(201,168,76,0.08);
-            border: 1px solid rgba(201,168,76,0.15);
+            background: rgba(201,168,76,0.12);
+            border: 1px solid rgba(201,168,76,0.3);
             display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; color: var(--color-accent);
             margin-bottom: 1.25rem;
+            box-shadow: 0 0 14px 4px rgba(201,168,76,0.25), 0 0 4px 1px rgba(201,168,76,0.15);
+        }
+        [data-theme="dark"] .feature-icon {
+            background: rgba(201,168,76,0.15);
+            border: 1px solid rgba(201,168,76,0.4);
+            box-shadow: 0 0 18px 6px rgba(201,168,76,0.35), 0 0 6px 2px rgba(201,168,76,0.2);
         }
         .feature-card h3 { font-size: 1.05rem; color: var(--color-text-main); margin-bottom: 0.5rem; }
         .feature-card p { font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; }
@@ -475,13 +481,13 @@
             background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
             z-index: 1;
         }
-        .uni-card-taylors { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card-monash { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card-inti { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card-help { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card-segi { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card-sunway { background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
-        .uni-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .uni-card-taylors { --uni-glow: rgba(210, 45, 45, 0.62); --uni-glow-soft: rgba(210, 45, 45, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-monash { --uni-glow: rgba(45, 105, 220, 0.62); --uni-glow-soft: rgba(45, 105, 220, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-inti { --uni-glow: rgba(184, 149, 74, 0.64); --uni-glow-soft: rgba(184, 149, 74, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-help { --uni-glow: rgba(135, 80, 210, 0.62); --uni-glow-soft: rgba(135, 80, 210, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-segi { --uni-glow: rgba(30, 170, 120, 0.62); --uni-glow-soft: rgba(30, 170, 120, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .uni-card-sunway { --uni-glow: rgba(245, 130, 45, 0.62); --uni-glow-soft: rgba(245, 130, 45, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
+        .unis-section .uni-card:hover { transform: translateY(-4px); box-shadow: 0 0 24px 6px var(--uni-glow), 0 0 8px 2px var(--uni-glow-soft), 0 20px 40px rgba(0,0,0,0.2); }
         .uni-card-content { position: relative; z-index: 2; }
         .uni-name { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.25rem; }
         .uni-city { font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 500; }
@@ -610,7 +616,7 @@
         .cta-section::before {
             content: '';
             position: absolute; inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 60%);
+            background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.05) 40%, transparent 80%);
         }
         .cta-section .section-inner { position: relative; z-index: 1; }
         .cta-section .section-title { color: white; }
@@ -657,7 +663,7 @@
 
         /* ── FOOTER ── */
         .footer {
-            background: var(--color-primary);
+            background: #141a17;
             padding: 4rem 2rem 2rem;
             border-top: 1px solid rgba(255,255,255,0.06);
         }
@@ -680,9 +686,11 @@
             margin-bottom: 0.5rem; transition: color 0.2s;
         }
         .footer-col a:hover { color: var(--color-accent); }
-        .contact-item {
+        .contact-item,
+        .footer .contact-item,
+        .footer .contact-item a {
             display: flex; align-items: center; gap: 0.6rem;
-            color: rgba(255,255,255,0.55); font-size: 0.875rem; margin-bottom: 0.625rem;
+            color: rgba(255,255,255,0.55) !important; font-size: 0.875rem; margin-bottom: 0.625rem;
         }
         .contact-item i { color: var(--color-accent); width: 16px; }
         .footer-bottom {
@@ -698,7 +706,41 @@
         .chat-widget {
             position: fixed; bottom: 1.5rem; right: 1.5rem;
             z-index: 10001;
+            transition: opacity 0.4s cubic-bezier(0.4,0,0.2,1), transform 0.4s cubic-bezier(0.4,0,0.2,1);
         }
+        .chat-widget--hidden {
+            opacity: 0;
+            transform: translate(20px, 20px);
+            pointer-events: none;
+        }
+        /* Inline chat panel in contact section */
+        .inline-chat-panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 20px; overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            display: flex; flex-direction: column;
+        }
+        .inline-chat-header {
+            background: var(--color-primary);
+            padding: 1rem 1.25rem;
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .inline-chat-header h4 { color: white; font-size: 0.9rem; margin: 0; }
+        .inline-chat-header p { color: rgba(255,255,255,0.6); font-size: 0.75rem; margin: 0; }
+        .inline-chat-pre-form {
+            padding: 1.25rem;
+            display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        .inline-chat-pre-form h5 { font-size: 1rem; color: var(--color-text-main); margin: 0; }
+        .inline-chat-pre-form p { font-size: 0.85rem; color: var(--color-text-muted); margin: 0; }
+        .inline-chat-pre-form input {
+            padding: 0.65rem 0.9rem; border-radius: 10px;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg); color: var(--color-text-main);
+            font-size: 0.875rem; font-family: inherit; outline: none;
+        }
+        .inline-chat-pre-form input:focus { border-color: var(--color-accent); }
         .chat-toggle {
             width: 56px; height: 56px; border-radius: 50%;
             background: var(--color-accent); color: var(--color-primary);
@@ -860,40 +902,66 @@
         }
         .chat-send:hover { filter: brightness(1.1); }
 
-        /* ── DARK MODE SECTION GRADIENTS ── */
-        [data-theme="dark"] .why-section {
-            background: linear-gradient(135deg, #1a2420 0%, #161c1a 100%);
-        }
-        [data-theme="dark"] .unis-section {
-            background: linear-gradient(135deg, #1c2620 0%, #141a18 100%);
-        }
-        [data-theme="dark"] .cta-section {
-            background: linear-gradient(135deg, #182018 0%, #1a2420 100%);
-        }
-        [data-theme="dark"] .search-section .search-card {
-            background: linear-gradient(135deg, #1e2820 0%, #161c1a 100%);
-        }
-        [data-theme="dark"] .why-visual {
-            background: linear-gradient(135deg, #1c2820 0%, #141c18 100%);
-        }
+        /* ── WHY SECTION LIGHT MODE CARD FIX ── */
+        .why-section .feature-card { background: var(--color-surface) !important; border: 1px solid var(--color-border) !important; }
+        [data-theme="dark"] .why-section .feature-card { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+
+        /* ── CONTINUOUS GRADIENT FLOW: Featured Listings → Contact ── */
+        [data-theme="dark"] .search-section { background: linear-gradient(180deg, #141a17 0%, #161d1a 100%) !important; }
+        [data-theme="dark"] #listings { background: linear-gradient(180deg, #161d1a 0%, #192a1f 100%) !important; }
+        [data-theme="dark"] #universities { background: linear-gradient(180deg, #192a1f 0%, #1a2e22 100%) !important; }
+        [data-theme="dark"] #how-it-works { background: linear-gradient(180deg, #1a2e22 0%, #182820 100%) !important; }
+        [data-theme="dark"] .why-section { background: linear-gradient(180deg, #182820 0%, #141a17 100%) !important; }
+        [data-theme="dark"] .why-section .section-title,
+        [data-theme="dark"] .why-section .section-desc,
+        [data-theme="dark"] .why-section .feature-card h3,
+        [data-theme="dark"] .why-section .feature-card p { color: white !important; }
+        [data-theme="dark"] .why-section .section-desc,
+        [data-theme="dark"] .why-section .feature-card p { opacity: 0.75; }
+        [data-theme="dark"] .cta-section { background: linear-gradient(180deg, #141a17 0%, #0f1210 100%) !important; }
+        [data-theme="dark"] #contact { background: linear-gradient(180deg, #0f1210 0%, #0d1410 100%) !important; }
+        [data-theme="dark"] .search-section .search-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+        [data-theme="dark"] .why-visual { background: linear-gradient(135deg, #1c2820 0%, #141c18 100%); }
         [data-theme="dark"] .contact-form-card,
-        [data-theme="dark"] .contact-card {
-            background: linear-gradient(135deg, #1a2420 0%, #161a1a 100%);
-        }
+        [data-theme="dark"] .contact-card { background: linear-gradient(135deg, #1a2420 0%, #161a1a 100%); }
         [data-theme="dark"] .why-item,
-        [data-theme="dark"] .feature-card {
-            background: linear-gradient(135deg, #1c2620 0%, #181c1a 100%);
-        }
+        [data-theme="dark"] .feature-card { background: linear-gradient(135deg, #1c2620 0%, #181c1a 100%); }
         [data-theme="dark"] .float-badge,
-        [data-theme="dark"] .chat-popup {
-            background: linear-gradient(135deg, #1e2a22 0%, #161e1a 100%);
-        }
+        [data-theme="dark"] .chat-popup { background: linear-gradient(135deg, #1e2a22 0%, #161e1a 100%); }
 
         /* ── BUTTON HOVER GLOW ── */
-        .btn, .btn-primary, .btn-outline, .btn-outline-dark, .filter-btn, .tab-btn, .pill-btn {
+        .btn,
+        .btn-primary,
+        .btn-outline,
+        .btn-outline-dark,
+        .filter-btn,
+        .tab-btn,
+        .pill-btn,
+        .search-section button,
+        .search-section a,
+        .listing-filters button,
+        .listing-filters a,
+        .filters button,
+        .filters a {
             transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
-        .btn:hover, .btn-primary:hover, .btn-outline:hover, .btn-outline-dark:hover, .filter-btn:hover, .tab-btn:hover, .pill-btn:hover {
+        .float-badge {
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .btn:hover,
+        .btn-primary:hover,
+        .btn-outline:hover,
+        .btn-outline-dark:hover,
+        .filter-btn:hover,
+        .tab-btn:hover,
+        .pill-btn:hover,
+        .search-section button:hover,
+        .search-section a:hover,
+        .listing-filters button:hover,
+        .listing-filters a:hover,
+        .filters button:hover,
+        .filters a:hover,
+        .float-badge:hover {
             transform: translateY(-1px);
             box-shadow: 0 0 14px 4px rgba(44, 56, 48, 0.35), 0 0 4px 1px rgba(44, 56, 48, 0.2);
         }
@@ -903,8 +971,50 @@
         [data-theme="dark"] .btn-outline-dark:hover,
         [data-theme="dark"] .filter-btn:hover,
         [data-theme="dark"] .tab-btn:hover,
-        [data-theme="dark"] .pill-btn:hover {
+        [data-theme="dark"] .pill-btn:hover,
+        [data-theme="dark"] .search-section button:hover,
+        [data-theme="dark"] .search-section a:hover,
+        [data-theme="dark"] .listing-filters button:hover,
+        [data-theme="dark"] .listing-filters a:hover,
+        [data-theme="dark"] .filters button:hover,
+        [data-theme="dark"] .filters a:hover,
+        [data-theme="dark"] .float-badge:hover {
             box-shadow: 0 0 14px 4px rgba(44, 80, 55, 0.5), 0 0 4px 1px rgba(44, 80, 55, 0.3);
+        }
+        .theme-toggle,
+        .nav-actions button,
+        .nav-actions a,
+        .chat-toggle,
+        .chat-close,
+        .chat-send,
+        button[aria-label],
+        a[aria-label] {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-toggle:hover,
+        .nav-actions button:hover,
+        .nav-actions a:hover,
+        .chat-toggle:hover,
+        .chat-close:hover,
+        .chat-send:hover,
+        button[aria-label]:hover,
+        a[aria-label]:hover {
+            background: rgba(44, 56, 48, 0.12);
+            backdrop-filter: blur(8px) saturate(1.6);
+            -webkit-backdrop-filter: blur(8px) saturate(1.6);
+            border: 1px solid rgba(184, 149, 74, 0.3);
+            box-shadow: 0 4px 16px rgba(44, 56, 48, 0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+            transform: translateY(-1px) scale(1.05);
+        }
+        [data-theme="dark"] .theme-toggle:hover,
+        [data-theme="dark"] .nav-actions button:hover,
+        [data-theme="dark"] .nav-actions a:hover,
+        [data-theme="dark"] .chat-toggle:hover,
+        [data-theme="dark"] .chat-close:hover,
+        [data-theme="dark"] .chat-send:hover,
+        [data-theme="dark"] button[aria-label]:hover,
+        [data-theme="dark"] a[aria-label]:hover {
+            background: rgba(44, 80, 55, 0.2);
         }
 
         /* ── RESPONSIVE ── */
@@ -952,7 +1062,6 @@
             <div class="nav-actions">
                 <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
                     <i class="fas fa-moon" aria-hidden="true"></i>
-                    <i class="fas fa-sun" aria-hidden="true"></i>
                 </button>
                 <button class="hamburger" onclick="toggleMobileNav()" aria-label="Open menu">☰</button>
             </div>
@@ -1094,39 +1203,6 @@
         </div>
     </div>
 
-    <!-- ── HOW IT WORKS ── -->
-    <section class="section" id="how-it-works" style="padding-top:6rem;">
-        <div class="section-inner">
-            <div class="section-header" data-aos="fade-up">
-                <span class="section-label">Simple Process</span>
-                <h2 class="section-title">How <span class="accent">Tenandsee</span> Works</h2>
-                <p class="section-desc">Finding student accommodation in KL & Selangor has never been this easy. Four steps and you're home.</p>
-            </div>
-            <div class="how-timeline">
-                <div class="how-step" data-aos="fade-up" data-aos-delay="0">
-                    <div class="how-step-num">01</div>
-                    <h3>Search</h3>
-                    <p>Find verified rooms near your campus in minutes</p>
-                </div>
-                <div class="how-step" data-aos="fade-up" data-aos-delay="100">
-                    <div class="how-step-num">02</div>
-                    <h3>Connect</h3>
-                    <p>Message us on WhatsApp or enquire instantly</p>
-                </div>
-                <div class="how-step" data-aos="fade-up" data-aos-delay="200">
-                    <div class="how-step-num">03</div>
-                    <h3>View & Finalize</h3>
-                    <p>Tour your unit and confirm by paying the first month's rent as your deposit — no extra payment needed for move-in month</p>
-                </div>
-                <div class="how-step" data-aos="fade-up" data-aos-delay="300">
-                    <div class="how-step-num">04</div>
-                    <h3>Move In</h3>
-                    <p>Sign your agreement, pay the refundable deposit, and collect your keys</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- ── FEATURED LISTINGS ── -->
     <section class="section" id="listings" style="padding-top:0;">
         <div class="section-inner">
@@ -1208,92 +1284,77 @@
         </div>
     </section>
 
-    <!-- ── FEATURES ── -->
-    <section class="section" id="features">
+    <!-- ── HOW IT WORKS ── -->
+    <section class="section" id="how-it-works" style="padding-top:6rem;">
         <div class="section-inner">
             <div class="section-header" data-aos="fade-up">
-                <span class="section-label">Why Tenandsee</span>
-                <h2 class="section-title">Built For <span class="accent">KL & Selangor Students</span></h2>
-                <p class="section-desc">Every feature is designed around the real challenges students face when finding accommodation in the Klang Valley.</p>
+                <span class="section-label">Simple Process</span>
+                <h2 class="section-title">How <span class="accent">Tenandsee</span> Works</h2>
+                <p class="section-desc">Finding student accommodation in KL & Selangor has never been this easy. Four steps and you're home.</p>
             </div>
-            <div class="features-grid" style="grid-template-columns: repeat(2, 1fr);">
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Verified Listings Only</h3>
-                    <p>Every property is personally reviewed before going live. No fake listings, no misleading photos — what you see is what you get.</p>
+            <div class="how-timeline">
+                <div class="how-step" data-aos="fade-up" data-aos-delay="0">
+                    <div class="how-step-num">01</div>
+                    <h3>Search</h3>
+                    <p>Find verified rooms near your campus in minutes</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
-                    <div class="feature-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <h3>Campus-Adjacent</h3>
-                    <p>All listings are within walking distance or short commute to partner universities in KL and Selangor.</p>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="100">
+                    <div class="how-step-num">02</div>
+                    <h3>Connect</h3>
+                    <p>Message us on WhatsApp or enquire instantly</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
-                    <div class="feature-icon"><i class="fab fa-whatsapp"></i></div>
-                    <h3>WhatsApp First</h3>
-                    <p>Direct line to our team. No call centres, no hold music — just real people who understand student needs.</p>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="200">
+                    <div class="how-step-num">03</div>
+                    <h3>View & Finalize</h3>
+                    <p>Tour your unit and confirm by paying the first month's rent as your deposit — no extra payment needed for move-in month</p>
                 </div>
-                <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
-                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-                    <h3>Fast Matching</h3>
-                    <p>Submit an enquiry and get responses the same day. We know housing deadlines don't wait.</p>
+                <div class="how-step" data-aos="fade-up" data-aos-delay="300">
+                    <div class="how-step-num">04</div>
+                    <h3>Move In</h3>
+                    <p>Sign your agreement, pay the refundable deposit, and collect your keys</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- ── WHY US ── -->
-    <section class="section why-section" style="background:var(--color-primary);padding:6rem 2rem;">
+    <section class="section why-section" style="padding:6rem 2rem;">
         <div class="section-inner">
-            <div class="why-premium-grid" style="display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:center;">
-                <div data-aos="fade-right">
-                    <span class="section-label" style="color:var(--color-accent);border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.1);">Our Difference</span>
-                    <h2 class="section-title" style="color:white;margin-top:1rem;">Built Different for <span class="accent">KL Students</span></h2>
-                    <p class="section-desc" style="color:rgba(255,255,255,0.65);margin-top:1rem;">We started Tenandsee because finding quality student housing in the Klang Valley shouldn't be a nightmare. Direct partnerships, transparent pricing, same-day responses.</p>
-                    <div class="why-pillars" style="margin-top:2.5rem;display:flex;flex-direction:column;gap:1.5rem;">
-                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
-                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fas fa-user-check" style="color:var(--color-accent);font-size:1.25rem;"></i>
-                            </div>
-                            <div>
-                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Direct Partnerships</h4>
-                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">No agents. No hidden fees. Just verified properties from owners we know personally.</p>
-                            </div>
-                        </div>
-                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
-                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fas fa-bolt" style="color:var(--color-accent);font-size:1.25rem;"></i>
-                            </div>
-                            <div>
-                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Same-Day Response</h4>
-                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">We know housing deadlines don't wait. Get answers when you need them.</p>
-                            </div>
-                        </div>
-                        <div class="why-pillar" style="display:flex;align-items:flex-start;gap:1.25rem;">
-                            <div style="width:52px;height:52px;border-radius:14px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fas fa-graduation-cap" style="color:var(--color-accent);font-size:1.25rem;"></i>
-                            </div>
-                            <div>
-                                <h4 style="color:white;font-size:1.1rem;margin-bottom:0.5rem;">Student-Built</h4>
-                                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;line-height:1.6;">Flexible terms that work with your semester calendar and student budget.</p>
-                            </div>
-                        </div>
-                    </div>
+            <div class="section-header" data-aos="fade-up" style="text-align:center;">
+                <span class="section-label" style="color:var(--color-accent);border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.1);">Why Ten&See</span>
+                <h2 class="section-title" style="margin-top:1rem;">Built for <span class="accent">KL & Selangor Students</span></h2>
+                <p class="section-desc" style="margin:1rem auto 0;">We started Ten&See because finding quality student housing in the Klang Valley shouldn't be a nightmare.</p>
+            </div>
+            <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));margin-top:3rem;">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="0" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fas fa-hand-holding-dollar"></i></div>
+                    <h3 style="font-weight:700;">No Hidden Fees</h3>
+                    <p>No agents, no middlemen. Direct from verified property owners.</p>
                 </div>
-                <div data-aos="fade-left" style="display:flex;flex-direction:column;gap:1rem;">
-                    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:2rem;text-align:center;">
-                        <div class="wv-stat-num" id="wvTotalRooms" style="font-size:3rem;color:var(--color-accent);font-weight:700;">—</div>
-                        <div style="color:rgba(255,255,255,0.7);font-size:0.95rem;margin-top:0.5rem;">Verified rooms available now</div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;text-align:center;">
-                            <div style="font-size:2rem;color:var(--color-accent);font-weight:700;">5</div>
-                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Partner Universities</div>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:1.5rem;text-align:center;">
-                            <div style="font-size:2rem;color:var(--color-accent);font-weight:700;">KL</div>
-                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Focused Coverage</div>
-                        </div>
-                    </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="80" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fas fa-shield-alt"></i></div>
+                    <h3 style="font-weight:700;">Verified Listings</h3>
+                    <p>Every property personally reviewed before going live. No fake listings.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="160" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fas fa-bolt"></i></div>
+                    <h3 style="font-weight:700;">Same-Day Response</h3>
+                    <p>Submit an enquiry and hear back the same day. We know deadlines don't wait.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="0" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fas fa-map-marker-alt"></i></div>
+                    <h3 style="font-weight:700;">Campus-Adjacent</h3>
+                    <p>All listings within walking distance or short commute to partner universities.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="80" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fab fa-whatsapp"></i></div>
+                    <h3 style="font-weight:700;">WhatsApp First</h3>
+                    <p>Direct line to our team. Real people, no call centres.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="160" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+                    <div class="feature-icon" style="color:var(--color-accent);"><i class="fas fa-calendar-alt"></i></div>
+                    <h3 style="font-weight:700;">Flexible Terms</h3>
+                    <p>Tenancy terms built around your semester calendar and student budget.</p>
                 </div>
             </div>
         </div>
@@ -1363,37 +1424,30 @@
                         <div style="font-size:0.8rem;color:#15803d;margin-top:0.5rem;">Point your phone camera here</div>
                     </div>
                 </div>
-                <div class="contact-form-card" data-aos="fade-left">
-                    <h3>Send us a message</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" id="cName" placeholder="Your name">
+                <div class="inline-chat-panel" data-aos="fade-left" id="inlineChatPanel">
+                    <div class="inline-chat-header">
+                        <div class="chat-avatar">T</div>
+                        <div>
+                            <h4>Ten&See Support</h4>
+                            <p id="inlineChatHeaderStatus">Usually replies within minutes</p>
                         </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="cEmail" placeholder="your@email.com">
-                        </div>
+                        <div class="chat-online" style="margin-left:auto;"></div>
                     </div>
-                    <div class="form-group">
-                        <label>University</label>
-                        <select id="cUni">
-                            <option value="">Select your university</option>
-                            <option>Taylor's University</option>
-                            <option>Monash University Malaysia</option>
-                            <option>INTI International University</option>
-                            <option>Help University</option>
-                            <option>SEGi University</option>
-                            <option>Other</option>
-                        </select>
+                    <div class="inline-chat-pre-form" id="inlineChatPreForm">
+                        <h5>Start a conversation</h5>
+                        <p>Enter your details to chat with us live</p>
+                        <input type="text" id="inlineChatName" placeholder="Your name *" required>
+                        <input type="tel" id="inlineChatPhone" placeholder="Phone number *" required>
+                        <input type="email" id="inlineChatEmail" placeholder="Email (optional)">
+                        <button class="chat-start-btn" onclick="startInlineChat()">Start Chat</button>
                     </div>
-                    <div class="form-group">
-                        <label>Message</label>
-                        <textarea id="cMsg" placeholder="Tell us what you're looking for..."></textarea>
+                    <div class="chat-messages-area" id="inlineChatMessagesArea" style="display:none;max-height:280px;">
+                        <div class="chat-welcome">Hi! 👋 Looking for a room near your uni? Tell us your university and budget and we'll help you find something.</div>
                     </div>
-                    <button class="btn btn-primary" style="width:100%;" onclick="submitContact()">
-                        <i class="fas fa-paper-plane"></i> Send Message
-                    </button>
+                    <div class="chat-input-row" id="inlineChatInputRow" style="display:none;">
+                        <input type="text" id="inlineChatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendInlineChat()" oninput="onInlineTyping()">
+                        <button class="chat-send" onclick="sendInlineChat()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2329,7 +2383,78 @@
             loadFilterOptions();
             loadFeatured();
             initWhatsAppQR();
+            initChatScrollTransition();
         });
+
+        // ── INLINE CHAT (contact section) — reuses same socket + session ──
+        function startInlineChat() {
+            const nameInput = document.getElementById('inlineChatName');
+            const phoneInput = document.getElementById('inlineChatPhone');
+            const emailInput = document.getElementById('inlineChatEmail');
+            if (!nameInput.value.trim() || !phoneInput.value.trim()) {
+                alert('Please enter your name and phone number.'); return;
+            }
+            // Mirror values into the floating widget's fields so startChatSession() works
+            document.getElementById('chatUserName').value = nameInput.value.trim();
+            document.getElementById('chatUserPhone').value = phoneInput.value.trim();
+            document.getElementById('chatUserEmail').value = emailInput.value.trim();
+            // Kick off the shared session
+            startChatSession().then(() => {
+                syncInlineChatUI();
+            }).catch(() => syncInlineChatUI());
+        }
+
+        function syncInlineChatUI() {
+            const preForm = document.getElementById('inlineChatPreForm');
+            const msgArea = document.getElementById('inlineChatMessagesArea');
+            const inputRow = document.getElementById('inlineChatInputRow');
+            if (!preForm || !msgArea || !inputRow) return;
+            const floatMsgArea = document.getElementById('chatMessagesArea');
+            if (floatMsgArea && floatMsgArea.style.display !== 'none') {
+                preForm.style.display = 'none';
+                msgArea.style.display = 'block';
+                inputRow.style.display = 'flex';
+                // Mirror messages from floating widget
+                msgArea.innerHTML = floatMsgArea.innerHTML;
+                msgArea.scrollTop = msgArea.scrollHeight;
+            }
+        }
+
+        function sendInlineChat() {
+            const input = document.getElementById('inlineChatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            // Mirror to the floating widget input and trigger sendChat
+            document.getElementById('chatInput').value = msg;
+            input.value = '';
+            sendChat();
+            // Sync messages back after a tick
+            setTimeout(syncInlineChatUI, 100);
+        }
+
+        function onInlineTyping() {
+            onTyping();
+        }
+
+        function initChatScrollTransition() {
+            const contactSection = document.getElementById('contact');
+            const chatWidget = document.querySelector('.chat-widget');
+            if (!contactSection || !chatWidget) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        chatWidget.classList.add('chat-widget--hidden');
+                        // Sync inline UI with current chat state
+                        syncInlineChatUI();
+                    } else {
+                        chatWidget.classList.remove('chat-widget--hidden');
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            observer.observe(contactSection);
+        }
 
         // WhatsApp QR Code - Desktop only
         function initWhatsAppQR() {
