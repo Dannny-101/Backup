@@ -165,14 +165,22 @@
     .notif-btn:hover { color: var(--gold); border-color: var(--border-accent); }
     .notif-dot {
       position: absolute;
-      top: 6px; right: 6px;
-      width: 8px; height: 8px;
+      top: -5px; right: -5px;
+      min-width: 16px; height: 16px;
+      padding: 0 4px;
       background: var(--danger);
-      border-radius: 50%;
+      color: #fff;
+      border-radius: 999px;
       border: 2px solid var(--bg);
       display: none;
+      font-size: 0.62rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      box-sizing: border-box;
     }
-    .notif-dot.visible { display: block; }
+    .notif-dot.visible { display: flex; }
 
     /* ── CONTENT ── */
     .content { flex: 1; padding: 2rem; }
@@ -2038,7 +2046,7 @@ ${S.adminRole === 'superadmin' ? `<div class="nav-section-label">System</div>
             </button>
             <button class="notif-btn" onclick="toggleNotifPanel()" title="Notifications">
               <i class="fas fa-bell"></i>
-              <span class="notif-dot" id="notifDot"></span>
+              <span class="notif-dot" id="notifDot">0</span>
             </button>
           </div>
         </header>
@@ -4046,7 +4054,10 @@ async function pollNotifications() {
     S.notifications = newNotifs;
     
     const dot = document.getElementById('notifDot');
-    if (dot) dot.classList.toggle('visible', unreadCount > 0);
+    if (dot) {
+      dot.textContent = unreadCount > 99 ? '99+' : unreadCount;
+      dot.classList.toggle('visible', unreadCount > 0);
+    }
     renderNotifPanel();
   } catch {}
 }
