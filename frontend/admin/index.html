@@ -4099,8 +4099,14 @@ async function handleNotifClick(id, leadId) {
   }
 }
 
-function toggleNotifPanel() {
-  document.getElementById('notifPanel').classList.toggle('active');
+async function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  const willOpen = !panel.classList.contains('active');
+  panel.classList.toggle('active');
+  if (willOpen) {
+    // Refresh data when opening
+    await pollNotifications();
+  }
 }
 
 async function markRead(id) {
@@ -4738,6 +4744,11 @@ async function handleTaskDrop(e, newStatus) {
 }
 
 async function openTaskModal() {
+  // Ensure team members are loaded first
+  if (!S.teamMembers || S.teamMembers.length === 0) {
+    await loadTeamMembers();
+  }
+  
   // Reset form for new task
   document.getElementById('taskId').value = '';
   document.getElementById('taskModalTitle').textContent = 'New Task';
@@ -4752,9 +4763,11 @@ async function openTaskModal() {
   // Populate assignee dropdown with multi-select
   const assigneeSelect = document.getElementById('taskAssignedTo');
   assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
-  S.teamMembers.forEach(m => {
-    assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
-  });
+  if (S.teamMembers && S.teamMembers.length > 0) {
+    S.teamMembers.forEach(m => {
+      assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
+    });
+  }
   assigneeSelect.value = '';
   
   openModal('taskModal');
@@ -4775,6 +4788,11 @@ async function editTask(id) {
   const task = S.allTasks.find(t => t._id === id);
   if (!task) return;
   
+  // Ensure team members are loaded
+  if (!S.teamMembers || S.teamMembers.length === 0) {
+    await loadTeamMembers();
+  }
+  
   // Populate form for edit
   document.getElementById('taskId').value = task._id;
   document.getElementById('taskModalTitle').textContent = 'Edit Task';
@@ -4789,9 +4807,11 @@ async function editTask(id) {
   // Populate assignee dropdown with multi-select
   const assigneeSelect = document.getElementById('taskAssignedTo');
   assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
-  S.teamMembers.forEach(m => {
-    assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
-  });
+  if (S.teamMembers && S.teamMembers.length > 0) {
+    S.teamMembers.forEach(m => {
+      assigneeSelect.innerHTML += `<option value="${m._id}" data-name="${m.name || ''}" data-username="${m.username}">${m.name || m.username}</option>`;
+    });
+  }
   
   // Handle multi-assignees - can be array or single object for backward compatibility
   const assignedTo = task.assignedTo;
@@ -5128,7 +5148,11 @@ async function renderStaffChatList() {
     try {
       const data = await api('/api/admin/list');
       onlineStaff = data.data || [];
-    } catch { onlineStaff = []; }
+      console.log('[TeamChat] Loaded staff:', onlineStaff.length, onlineStaff);
+    } catch (err) {
+      console.error('[TeamChat] Failed to load staff:', err);
+      onlineStaff = [];
+    }
     
     // Sort by latest message timestamp (most recent first)
     const sorted = [...onlineStaff].sort((a, b) => {
@@ -5156,7 +5180,11 @@ async function renderStaffChatList() {
           </div>
         </div>
       `;
-    }).join('') || '<div style="padding:1rem;text-align:center;color:var(--text-muted);">No staff found</div>';
+    }).join('') || `<div style="padding:1.5rem;text-align:center;color:var(--text-muted);">
+      <i class="fas fa-users-slash" style="font-size:1.5rem;margin-bottom:0.5rem;display:block;opacity:0.5;"></i>
+      <div style="font-size:0.85rem;margin-bottom:0.75rem;">No team members found</div>
+      <button onclick="renderStaffChatList()" class="btn btn-sm btn-ghost" style="font-size:0.75rem;"><i class="fas fa-sync"></i> Reload</button>
+    </div>`;
   } else {
     // Groups
     list.innerHTML = staffGroups.map(g => `

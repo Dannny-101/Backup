@@ -191,6 +191,21 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// POST track view (for when listing is displayed in cards/modals)
+router.post('/:id/view', async (req, res) => {
+    try {
+        const listing = await Listing.findByIdAndUpdate(
+            req.params.id,
+            { $inc: { views: 1 } },
+            { new: true }
+        );
+        if (!listing) return res.status(404).json({ success: false, error: 'Listing not found' });
+        res.json({ success: true, views: listing.views });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // POST create listing (admin only)
 // Auto-populates area from university if not provided
 router.post('/', async (req, res) => {

@@ -984,7 +984,13 @@
         .listing-actions {
             display: flex; gap: 0.75rem;
         }
-        .listing-actions .btn { flex: 1; justify-content: center; }
+        .listing-actions .btn {
+            flex: 1;
+            justify-content: center;
+            white-space: nowrap;
+            min-width: fit-content;
+            overflow: visible;
+        }
 
         /* Empty State */
         .empty-state {
