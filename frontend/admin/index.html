@@ -973,6 +973,8 @@
 .staff-msg.own .staff-msg-header { color: rgba(0,0,0,0.6); }
 .staff-msg-role { background: rgba(255,255,255,0.2); padding: 0 6px; border-radius: 4px; font-size: 0.65rem; }
 .staff-msg-text { font-size: 0.85rem; line-height: 1.4; }
+.chat-date-separator { display: flex; align-items: center; justify-content: center; margin: 0.5rem 0; }
+.chat-date-separator span { background: var(--surface2); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.7rem; color: var(--text-muted); border: 1px solid var(--border); }
 .teamchat-input { padding: 0.875rem; border-top: 1px solid var(--border); display: flex; gap: 0.625rem; }
 .teamchat-input input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.625rem 0.875rem; color: var(--text); font-size: 0.85rem; }
 .teamchat-input button { padding: 0.625rem 1rem; background: var(--gold); color: var(--navy); border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -5279,13 +5281,35 @@ function getAvatarForMessage(msg) {
   return `<div class="staff-msg-avatar">${msg.fromName?.charAt(0).toUpperCase() || '?'}</div>`;
 }
 
+// Helper to format date for chat
+function fmtChatDate(ts) {
+  const d = new Date(ts);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  if (d.toDateString() === today.toDateString()) return 'Today';
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
 function renderStaffMessages() {
   const container = document.getElementById('staffChatMessages');
   if (!container) return;
   
+  let lastDate = null;
+  
   container.innerHTML = staffChatMessages.map(m => {
     const isOwn = m.fromId === S.adminId;
-    return `
+    const msgDate = new Date(m.timestamp).toDateString();
+    let dateSeparator = '';
+    
+    if (msgDate !== lastDate) {
+      dateSeparator = `<div class="chat-date-separator"><span>${fmtChatDate(m.timestamp)}</span></div>`;
+      lastDate = msgDate;
+    }
+    
+    return dateSeparator + `
       <div class="staff-msg ${isOwn ? 'own' : ''}">
         ${getAvatarForMessage(m)}
         <div class="staff-msg-content">
