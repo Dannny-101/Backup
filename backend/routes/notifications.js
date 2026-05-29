@@ -12,7 +12,9 @@ const getRelevantNotifications = async (admin) => {
   if (admin.role !== 'superadmin') {
     query.$or = [
       { 'recipient.type': 'all' },
-      { 'recipient.type': 'specific', 'recipient.userId': admin.id }
+      { 'recipient.type': 'specific', 'recipient.userId': admin.id },
+      { recipient: { $exists: false } }, // Legacy notifications without recipient field
+      { recipient: null } // Legacy notifications with null recipient
     ];
   }
   // Superadmin sees everything (no filter) or explicit superadmin ones
@@ -50,7 +52,7 @@ router.get('/recent', async (req, res) => {
     const query = await getRelevantNotifications(req.admin);
     const notifications = await Notification.find(query)
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(50);
     const unreadCount = await Notification.countDocuments({ ...query, isRead: false });
     const unplayedCount = await Notification.countDocuments({ ...query, soundPlayed: false });
     res.json({ success: true, unreadCount, unplayedCount, data: notifications });
