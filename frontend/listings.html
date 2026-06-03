@@ -1091,7 +1091,7 @@
             margin-bottom: 0.5rem;
         }
         .footer-col h5 {
-            color: rgba(255,255,255,0.9);
+            color: var(--color-accent);
             font-size: 1rem;
             margin-bottom: 1rem;
             font-weight: 600;
@@ -1105,17 +1105,21 @@
             transition: color 0.2s;
         }
         .footer-col a:hover { color: var(--color-accent); }
-        .footer-col .contact-item {
+        .footer-col .contact-item,
+        .footer-col .contact-item span {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: rgba(255,255,255,0.9);
+            color: rgba(255,255,255,0.95) !important;
             font-size: 0.9rem;
             margin-bottom: 0.5rem;
         }
         .footer-col .contact-item i {
-            color: rgba(255,255,255,0.9);
+            color: rgba(255,255,255,0.95) !important;
             width: 18px;
+        }
+        .footer-col .contact-item span {
+            color: rgba(255,255,255,0.95) !important;
         }
         .footer-bottom {
             max-width: 1200px;

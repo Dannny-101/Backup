@@ -678,7 +678,7 @@
         .footer-col h4 span { font-weight: 300; color: rgba(255,255,255,0.9); }
         .footer-logo img { width: 64px; height: 64px; object-fit: contain; display: block; border-radius: 12px; }
         .footer-col p { color: rgba(255,255,255,0.9); font-size: 0.875rem; line-height: 1.7; margin-bottom: 0.5rem; }
-        .footer-col h5 { color: rgba(255,255,255,0.9); font-size: 0.875rem; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .footer-col h5 { color: var(--color-accent); font-size: 0.875rem; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .footer-col a {
             display: block; color: rgba(255,255,255,0.9);
             text-decoration: none; font-size: 0.875rem;
@@ -687,11 +687,13 @@
         .footer-col a:hover { color: var(--color-accent); }
         .contact-item,
         .footer .contact-item,
-        .footer .contact-item a {
+        .footer .contact-item a,
+        .footer .contact-item span {
             display: flex; align-items: center; gap: 0.6rem;
-            color: rgba(255,255,255,0.9) !important; font-size: 0.875rem; margin-bottom: 0.625rem;
+            color: rgba(255,255,255,0.95) !important; font-size: 0.875rem; margin-bottom: 0.625rem;
         }
-        .contact-item i { color: rgba(255,255,255,0.9); width: 16px; }
+        .contact-item i { color: rgba(255,255,255,0.95) !important; width: 16px; }
+        .contact-item span { color: rgba(255,255,255,0.95) !important; }
         .footer-bottom {
             max-width: 1200px; margin: 0 auto;
             padding-top: 2rem;
