@@ -3340,7 +3340,9 @@ function urlBase64ToUint8Array(base64String) {
 })();
 
 // ── CHAT ──
-let chatFilter = 'active'; // 'active', 'closed', 'all'
+let chatFilter = 'all'; // 'active', 'closed', 'all' - default 'all' to show closed chats for history
+const seenChatSessions = new Set(); // Track sessions we've already notified about to prevent duplicates
+const notifiedSessionIds = new Set(); // Track recently notified session IDs with timestamp check
 
 // Track which left-panel tab is active: 'mine' | 'queue' | 'all'
 let chatLeftTab = 'mine';
@@ -4320,6 +4322,17 @@ function initSocket() {
       console.log('Skipping AI message - admin has taken over this session');
       return;
     }
+    
+    // DEDUPLICATION: Skip if we've already notified about this session recently (within last 30 seconds)
+    const now = Date.now();
+    const sessionKey = `${data.sessionId}_${Math.floor(now / 30000)}`; // Bucket in 30-second windows
+    if (notifiedSessionIds.has(sessionKey)) {
+      console.log('Skipping duplicate notification for session:', data.sessionId);
+      return;
+    }
+    notifiedSessionIds.add(sessionKey);
+    // Cleanup old entries after 60 seconds
+    setTimeout(() => notifiedSessionIds.delete(sessionKey), 60000);
     
     // Update visitor name if this is a visitor message with a name
     if (senderType === 'visitor' && data.name && data.name !== 'AI Assistant' && data.name !== 'System') {
