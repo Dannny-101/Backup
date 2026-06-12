@@ -1,0 +1,28 @@
+---
+description: Token economy rules — read less, target edits, keep chats short
+alwaysApply: true
+---
+
+# Token Discipline
+
+## Reading
+
+- NEVER read `node_modules/`, `package-lock.json`, or `frontend/assets/`
+- NEVER read `frontend/admin/index.html` or `frontend/index.html` top-to-bottom.
+  Grep for the function/id first, then read only the surrounding ~80 lines
+- Trust the project-context rule for architecture; do not re-explore the repo
+  unless the task names a file that the map does not cover
+- Read a file at most once per task; work from what you read
+
+## Editing
+
+- Smallest diff that completes the task. No drive-by refactors, renames,
+  or formatting churn outside the named files
+- Do not regenerate whole files when a targeted edit works
+- No new dependencies unless the task explicitly says to install one
+
+## Chat hygiene
+
+- One roadmap day = one chat. Do not continue into the next day in the same chat
+- If a task is done, stop. Suggest follow-ups in one line, do not start them
+- Verification = one curl or one browser check, stated in one line

@@ -1,0 +1,35 @@
+---
+description: Ten&See project map and known pitfalls — saves the agent from re-exploring
+alwaysApply: true
+---
+
+# Ten&See — Project Context
+
+Student-housing platform. Express monolith serves REST API + static frontend.
+MongoDB (Mongoose), Socket.io live chat with agent queue, WhatsApp Cloud API, SMTP email.
+
+## Map (do not re-discover this)
+
+- `backend/server.js` — entry; Socket.io handlers, chat queue init, lead-alert cron
+- `backend/routes/` — 14 routers: admin (has `authMiddleware`), leads, bookings, listings,
+  properties, chat, chatQueue, whatsapp, notifications, reports, analytics, audit, tasks, push
+- `backend/models/` — Lead, Booking, Listing, Property, ChatMessage, ChatSession, Admin,
+  Task, Notification, auditlog
+- `backend/services/` — chatQueue (546 lines, SLA queue engine), chatPager, whatsapp, email
+- `frontend/` — vanilla HTML/JS: index (2.6k lines), listings, listing, property,
+  admin/index.html (5.9k lines, whole dashboard in one file)
+
+## Known pitfalls
+
+- Email module exists in 3 places; ONLY `backend/services/email.js` is canonical
+- WhatsApp Cloud API base must be `https://graph.facebook.com/<version>` (NOT instagram)
+- `Lead.email` is required but WhatsApp leads have no email — handle before creating leads
+- Auth: import `{ authMiddleware }` from `./admin`; public routes are ONLY: GET listings/properties,
+  POST leads, POST bookings, POST chat, whatsapp webhook
+- JWT secret comes from `process.env.JWT_SECRET` — never add a fallback string
+
+## Conventions
+
+- Responses: `{ success, data | error }`
+- Real-time: get `io` / `emitToAdmins` via `req.app.get(...)`
+- Audit anything admin-initiated via `createAuditLog` from `routes/audit`

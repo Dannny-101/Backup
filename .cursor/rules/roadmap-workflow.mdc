@@ -1,0 +1,23 @@
+---
+description: How to execute roadmap days from ROADMAP.md
+alwaysApply: true
+---
+
+# Roadmap Workflow
+
+The build plan lives in `ROADMAP.md` (one task per day, 6 phases).
+
+When the user says "day N" (or uses the day-runner skill):
+
+1. Read ONLY the Day N entry in `ROADMAP.md` — not the whole file's phases
+2. Restate the task in one sentence; list the files you will touch (usually 1–3)
+3. Make the edits per token-discipline rules
+4. Verify: run the check named in the task (curl/browser), report pass or fail honestly
+5. Stop. Commit message format: `day-N: <task name>`. Do not start Day N+1
+
+Guardrails:
+
+- Days 4–10 are security work: never weaken auth to "make tests pass";
+  401 on a protected route is the desired outcome
+- Never print or commit real secrets; reference `.env` keys by name only
+- If a task depends on an unfinished earlier day, say so and stop instead of improvising
