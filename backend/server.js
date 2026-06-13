@@ -1,11 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const http = require('http');
 const { Server } = require('socket.io');
 require('dotenv').config();
+
+const ALLOWED_ORIGINS = ['https://tensee.my', 'http://localhost:5000'];
 
 const ChatMessage = require('./models/ChatMessage');
 const Lead = require('./models/Lead');
@@ -19,7 +23,7 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: ALLOWED_ORIGINS,
         methods: ["GET", "POST"]
     }
 });
@@ -465,7 +469,8 @@ function emitToAdmins(event, data) {
 app.set('emitToAdmins', emitToAdmins);
 
 // Middleware
-app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -488,6 +493,24 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee
     } catch(e) { console.error('Avatar migration error:', e.message); }
 })
 .catch(err => console.error('MongoDB Connection Error:', err));
+
+// Rate limiting
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Too many login attempts, please try again later.' }
+});
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { success: false, error: 'Too many requests, please try again later.' }
+});
+app.use('/api/admin/login', loginLimiter);
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/listings', require('./routes/listings'));
