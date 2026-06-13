@@ -22,11 +22,11 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 5 — Protect listings/properties/audit/whatsapp-send: authMiddleware on
   POST/PUT/DELETE in listings.js + properties.js (GETs stay public), all of audit.js,
   and POST /api/whatsapp/send. Verify: curl each without token → 401.
-- [ ] Day 6 — Kill fallback secrets: remove || 'tenandsee_secret' (admin.js ×2); throw at
+- [x] Day 6 — Kill fallback secrets: remove || 'tenandsee_secret' (admin.js ×2); throw at
   boot if !process.env.JWT_SECRET. Generate: openssl rand -base64 48 → backend/.env.
   docker-compose: replace hardcoded JWT_SECRET with env_file. Verify: boot without
   JWT_SECRET crashes; with it, login works.
-- [ ] Day 7 — CORS + helmet + rate limits: npm i helmet express-rate-limit. cors origin
+- [x] Day 7 — CORS + helmet + rate limits: npm i helmet express-rate-limit. cors origin
   allowlist ['https://tensee.my','http://localhost:5000'] on Express AND Socket.io.
   Limit /api/admin/login 10/15min, /api 300/15min. Verify: 11th login attempt → 429.
 - [ ] Day 8 — WhatsApp webhook signature: capture raw body via express.json({verify});

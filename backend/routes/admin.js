@@ -20,7 +20,7 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: admin._id, username: admin.username, role: admin.role, name: admin.name },
-      process.env.JWT_SECRET || 'tenandsee_secret',
+      process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -61,7 +61,7 @@ const authMiddleware = (req, res, next) => {
   if (!token) return res.status(401).json({ success: false, error: 'Access denied' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'tenandsee_secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.admin = decoded;
     next();
   } catch (error) {
