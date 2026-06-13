@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Listing = require('../models/Listing');
 const { createAuditLog } = require('./audit');
+const { authMiddleware } = require('./admin');
 
 // ── UNIVERSITY TO AREA MAPPING (Single Source of Truth) ──
 // Maps each supported university to its specific area(s) in KL/Selangor
@@ -192,7 +193,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST track view (for when listing is displayed in cards/modals)
-router.post('/:id/view', async (req, res) => {
+router.post('/:id/view', authMiddleware, async (req, res) => {
     try {
         const listing = await Listing.findByIdAndUpdate(
             req.params.id,
@@ -208,7 +209,7 @@ router.post('/:id/view', async (req, res) => {
 
 // POST create listing (admin only)
 // Auto-populates area from university if not provided
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         // Auto-populate area from university if not provided
         if (req.body.location?.university && !req.body.location?.area) {
@@ -237,7 +238,7 @@ router.post('/', async (req, res) => {
 
 // PUT update listing
 // Auto-populates area from university if not provided
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         // Auto-populate area from university if not provided but university changed
         if (req.body.location?.university && !req.body.location?.area) {
@@ -261,7 +262,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE listing
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const listing = await Listing.findByIdAndDelete(req.params.id);
         if (!listing) return res.status(404).json({ success: false, error: 'Listing not found' });

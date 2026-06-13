@@ -4,6 +4,7 @@ const whatsappService = require('../services/whatsapp');
 const Lead = require('../models/Lead');
 const Notification = require('../models/Notification');
 const emailService = require('../services/email');
+const { authMiddleware } = require('./admin');
 
 /**
  * POST /api/whatsapp/webhook
@@ -117,7 +118,7 @@ router.get('/webhook', (req, res) => {
  * POST /api/whatsapp/send
  * Send WhatsApp message to specific number (admin only)
  */
-router.post('/send', async (req, res) => {
+router.post('/send', authMiddleware, async (req, res) => {
   try {
     const { phoneNumber, message } = req.body;
 

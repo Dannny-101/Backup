@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Property = require('../models/Property');
 const Listing = require('../models/Listing');
+const { authMiddleware } = require('./admin');
 
 // GET all properties (with aggregated listing info)
 router.get('/', async (req, res) => {
@@ -77,7 +78,7 @@ router.get('/:id/listings', async (req, res) => {
 });
 
 // POST create property (admin)
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         req.body.updatedAt = Date.now();
         const property = await Property.create(req.body);
@@ -88,7 +89,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update property (admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         req.body.updatedAt = Date.now();
         const property = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -100,7 +101,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE property (admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const property = await Property.findByIdAndDelete(req.params.id);
         if (!property) return res.status(404).json({ success: false, error: 'Property not found' });

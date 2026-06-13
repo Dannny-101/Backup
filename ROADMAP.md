@@ -19,7 +19,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 4 — Protect leads + bookings: in routes/leads.js and routes/bookings.js import
   { authMiddleware } from './admin'; apply to every GET/PUT/DELETE. Keep POST / public.
   Verify: curl /api/leads → 401; login token → 200.
-- [ ] Day 5 — Protect listings/properties/audit/whatsapp-send: authMiddleware on
+- [x] Day 5 — Protect listings/properties/audit/whatsapp-send: authMiddleware on
   POST/PUT/DELETE in listings.js + properties.js (GETs stay public), all of audit.js,
   and POST /api/whatsapp/send. Verify: curl each without token → 401.
 - [ ] Day 6 — Kill fallback secrets: remove || 'tenandsee_secret' (admin.js ×2); throw at

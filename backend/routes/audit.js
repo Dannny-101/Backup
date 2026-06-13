@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const AuditLog = require('../models/AuditLog');
 
-router.get('/', async (req, res) => {
+// Lazy require: admin.js imports createAuditLog from this file, so a top-level
+// require('./admin') would resolve authMiddleware before that cycle settles.
+const authMiddleware = (req, res, next) => require('./admin').authMiddleware(req, res, next);
+
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const { page = 1, limit = 50, action, entityType, entityId, username, startDate, endDate } = req.query;
     let query = {};
@@ -28,7 +32,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/entity/:entityType/:entityId', async (req, res) => {
+router.get('/entity/:entityType/:entityId', authMiddleware, async (req, res) => {
   try {
     const { entityType, entityId } = req.params;
     const logs = await AuditLog.find({ 'target.entityType': entityType, 'target.entityId': entityId }).sort({ createdAt: -1 });
@@ -38,7 +42,7 @@ router.get('/entity/:entityType/:entityId', async (req, res) => {
   }
 });
 
-router.get('/recent/:hours?', async (req, res) => {
+router.get('/recent/:hours?', authMiddleware, async (req, res) => {
   try {
     const hours = parseInt(req.params.hours) || 24;
     const since = new Date(Date.now() - hours * 60 * 60 * 1000);
@@ -50,7 +54,7 @@ router.get('/recent/:hours?', async (req, res) => {
   }
 });
 
-router.delete('/cleanup/:days', async (req, res) => {
+router.delete('/cleanup/:days', authMiddleware, async (req, res) => {
   try {
     const days = parseInt(req.params.days) || 90;
     const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
