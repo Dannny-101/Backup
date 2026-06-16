@@ -80,7 +80,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 
 ## Phase 4 — Frontend & SEO
 
-- [ ] Day 23 — Split monster files: extract inline JS/CSS from admin/index.html (5.9k lines)
+- [x] Day 23 — Split monster files: extract inline JS/CSS from admin/index.html (5.9k lines)
   → admin/app.js + admin/styles.css; same for index.html. No behavior change.
   Verify: dashboard + landing fully work.
 - [ ] Day 24 — SEO meta: per-page title, description, OpenGraph, canonical on the 4 public
