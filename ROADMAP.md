@@ -45,7 +45,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [ ] Day 12 — Lead email validation: models/Lead.js make email required only when
   source !== 'whatsapp'. Verify: send WhatsApp sandbox message → lead appears in dashboard.
   (needs day 11)
-- [ ] Day 13 — One email module: keep backend/services/email.js; fold in anything unique from
+- [x] Day 13 — One email module: keep backend/services/email.js; fold in anything unique from
   utils/email.js + root email.js; update bookings.js import; delete the two dupes.
   Verify: booking creation still sends both emails.
 - [ ] Day 14 — staffGroups + cron: move staffGroups Map outside io.on('connection') in
