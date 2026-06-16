@@ -85,7 +85,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
   Verify: dashboard + landing fully work.
 - [x] Day 24 — SEO meta: per-page title, description, OpenGraph, canonical on the 4 public
   pages; sitemap.xml + robots.txt; submit to Search Console. Verify: Search Console fetch OK.
-- [ ] Day 25 — Structured data: JSON-LD (schema.org Accommodation/Offer) on listing.html with
+- [x] Day 25 — Structured data: JSON-LD (schema.org Accommodation/Offer) on listing.html with
   price/location/availability. Verify: Google Rich Results test passes.
 - [ ] Day 26 — Performance: Lighthouse run; lazy-load images, compress listing photos,
   preconnect Mapbox, Cloudflare cache static assets. Verify: Lighthouse perf ≥ 85 mobile.

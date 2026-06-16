@@ -271,10 +271,66 @@
             currentListing = data.data;
             document.title = `${currentListing.title} — Ten&See`;
             renderListing(currentListing);
+            injectListingSchema(currentListing);
             initListingMap(currentListing);
         } catch (e) {
             showError('Could not load listing. Please try again.');
         }
+    }
+
+    function injectListingSchema(l) {
+        const typeMap = { apartment: 'Apartment', room: 'Room', shared_room: 'Room', studio: 'Apartment', house: 'House', condo: 'Apartment' };
+        const ptype = (l.propertyType || '').toLowerCase();
+        const schemaType = typeMap[ptype] || 'Accommodation';
+
+        const schema = {
+            '@context': 'https://schema.org',
+            '@type': schemaType,
+            name: l.title,
+            url: window.location.href,
+            numberOfBedrooms: l.bedrooms || undefined,
+            numberOfBathroomsTotal: l.bathrooms || undefined,
+            occupancy: l.maxOccupants ? { '@type': 'QuantitativeValue', maxValue: l.maxOccupants, unitText: 'person' } : undefined,
+            address: {
+                '@type': 'PostalAddress',
+                streetAddress: l.location?.address || undefined,
+                addressLocality: l.location?.area || l.location?.city || undefined,
+                addressRegion: l.location?.city || undefined,
+                addressCountry: 'MY'
+            },
+            offers: {
+                '@type': 'Offer',
+                price: l.price,
+                priceCurrency: 'MYR',
+                availability: 'https://schema.org/InStock',
+                url: window.location.href,
+                availabilityStarts: l.availableFrom || undefined,
+                availabilityEnds: l.availableUntil || undefined,
+                priceSpecification: {
+                    '@type': 'UnitPriceSpecification',
+                    price: l.price,
+                    priceCurrency: 'MYR',
+                    unitText: l.pricePeriod || 'month'
+                }
+            }
+        };
+
+        if (l.description) schema.description = l.description.replace(/\s+/g, ' ').trim().slice(0, 5000);
+        if (l.images && l.images.length) schema.image = l.images;
+        if (l.amenities && l.amenities.length) {
+            schema.amenityFeature = l.amenities.map(a => ({ '@type': 'LocationFeatureSpecification', name: a, value: true }));
+        }
+        if (typeof l.location?.lat === 'number' && typeof l.location?.lng === 'number') {
+            schema.geo = { '@type': 'GeoCoordinates', latitude: l.location.lat, longitude: l.location.lng };
+        }
+
+        const existing = document.getElementById('listing-jsonld');
+        if (existing) existing.remove();
+        const el = document.createElement('script');
+        el.type = 'application/ld+json';
+        el.id = 'listing-jsonld';
+        el.textContent = JSON.stringify(schema);
+        document.head.appendChild(el);
     }
 
     function renderListing(l) {
