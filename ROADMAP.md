@@ -48,7 +48,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 13 — One email module: keep backend/services/email.js; fold in anything unique from
   utils/email.js + root email.js; update bookings.js import; delete the two dupes.
   Verify: booking creation still sends both emails.
-- [ ] Day 14 — staffGroups + cron: move staffGroups Map outside io.on('connection') in
+- [x] Day 14 — staffGroups + cron: move staffGroups Map outside io.on('connection') in
   server.js (currently per-socket = groups invisible). Replace setInterval lead-checker with
   node-cron '*/15 * * * *'. Verify: two browser tabs share a created group.
 - [ ] Day 15 — Multi-room overlap: add units:Number (default 1) to Listing; overlap check
