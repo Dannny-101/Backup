@@ -509,7 +509,18 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend'), {
+    maxAge: '7d',
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            // Always revalidate HTML so deploys show immediately
+            res.setHeader('Cache-Control', 'no-cache');
+        } else if (/\.(?:css|js|png|jpe?g|webp|svg|gif|ico|woff2?)$/i.test(filePath)) {
+            // Long cache for fingerprint-free static assets
+            res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+        }
+    }
+}));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee', {

@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.mapbox.com">
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
     <title>Property — Ten&See</title>
     <meta name="description" content="Explore a student housing property on Ten&See — available rooms, amenities, photos and location near Malaysian universities. Book a viewing online.">
     <link rel="canonical" href="https://tenandsee.homes/property.html">
@@ -303,7 +308,7 @@
             grid.innerHTML = sorted.map((l, i) => `
                 <a href="/listing.html?id=${l._id}" class="listing-card" data-aos="fade-up" data-aos-delay="${(i % 2) * 80}" onclick="trackListingView('${l._id}')">
                     <div class="listing-image">
-                        <img src="${l.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${l.title}">
+                        <img src="${l.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'}" alt="${l.title}" loading="lazy" decoding="async">
                         <span class="listing-type-badge">${l.propertyType.replace('_',' ')}</span>
                         <div class="listing-price-tag">RM ${l.price}<span style="font-size:0.75rem;font-weight:500;">/${l.pricePeriod}</span></div>
                     </div>
