@@ -83,7 +83,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 23 — Split monster files: extract inline JS/CSS from admin/index.html (5.9k lines)
   → admin/app.js + admin/styles.css; same for index.html. No behavior change.
   Verify: dashboard + landing fully work.
-- [ ] Day 24 — SEO meta: per-page title, description, OpenGraph, canonical on the 4 public
+- [x] Day 24 — SEO meta: per-page title, description, OpenGraph, canonical on the 4 public
   pages; sitemap.xml + robots.txt; submit to Search Console. Verify: Search Console fetch OK.
 - [ ] Day 25 — Structured data: JSON-LD (schema.org Accommodation/Offer) on listing.html with
   price/location/availability. Verify: Google Rich Results test passes.
