@@ -4,7 +4,7 @@ const ChatMessage = require('../models/ChatMessage');
 const ChatSession = require('../models/ChatSession');
 const { v4: uuidv4 } = require('uuid');
 const { createNotification } = require('./notifications');
-const emailService = require('../utils/email');
+const emailService = require('../services/email');
 
 router.post('/', async (req, res) => {
   try {

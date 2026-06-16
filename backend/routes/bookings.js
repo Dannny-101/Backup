@@ -4,7 +4,7 @@ const Booking = require('../models/Booking');
 const Listing = require('../models/Listing');
 const Lead = require('../models/Lead');
 const { createNotification } = require('./notifications');
-const emailService = require('../utils/email');
+const emailService = require('../services/email');
 const { authMiddleware } = require('./admin');
 
 router.get('/', authMiddleware, async (req, res) => {

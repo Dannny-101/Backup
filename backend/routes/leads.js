@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Lead = require('../models/Lead');
 const Notification = require('../models/Notification');
-const emailService = require('../utils/email');
+const emailService = require('../services/email');
 const { authMiddleware } = require('./admin');
 
 // POST /api/leads — Create new lead

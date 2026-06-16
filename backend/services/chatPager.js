@@ -1,4 +1,5 @@
 const { sendWhatsAppMessage } = require('./whatsapp');
+const { sendRaw } = require('./email');
 
 // web-push is optional — gracefully skip if not installed yet
 let webpush = null;
@@ -85,21 +86,7 @@ async function sendEmailAlert(agent, session) {
             </div>
         </div>`;
 
-        // Use nodemailer directly via transporter
-        const nodemailer = require('nodemailer');
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: process.env.SMTP_PORT || 587,
-            secure: process.env.SMTP_SECURE === 'true',
-            auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD }
-        });
-
-        await transporter.sendMail({
-            from: process.env.SMTP_FROM || 'hello@tensee.my',
-            to: agent.email,
-            subject: `[Chat] ${session.name || 'Visitor'} is waiting — Ten&See`,
-            html
-        });
+        await sendRaw(agent.email, `[Chat] ${session.name || 'Visitor'} is waiting — Ten&See`, html);
         console.log(`[Pager] Email sent to ${agent.email}`);
     } catch (err) {
         console.error('[Pager] Email error:', err.message);
