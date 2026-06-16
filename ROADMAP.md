@@ -51,7 +51,7 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 14 — staffGroups + cron: move staffGroups Map outside io.on('connection') in
   server.js (currently per-socket = groups invisible). Replace setInterval lead-checker with
   node-cron '*/15 * * * *'. Verify: two browser tabs share a created group.
-- [ ] Day 15 — Multi-room overlap: add units:Number (default 1) to Listing; overlap check
+- [x] Day 15 — Multi-room overlap: add units:Number (default 1) to Listing; overlap check
   counts overlapping bookings and rejects only when count >= units. Verify: 2 bookings OK
   on units=2 listing, 3rd rejected.
 
