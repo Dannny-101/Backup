@@ -68,15 +68,15 @@ Deps: a day lists "needs day N" when it cannot start before N is done.
 - [x] Day 19 — Lead extraction: after each AI reply, second LLM call extracts
   {name,budget,university,moveIn} JSON → upsert onto the Lead. Verify: dashboard lead
   fills in after a chat.
-- [ ] Day 20 — Property→agent matrix: new model PropertyAgent {propertyId, agentName,
+- [x] Day 20 — Property→agent matrix: new model PropertyAgent {propertyId, agentName,
   agentPhone, priority}; seed with the real list via script/mongosh. Verify: query returns
   the right agent for a known property.
 - [ ] Day 21 — Booking → agent WhatsApp: in routes/bookings.js after Booking.create, look up
   PropertyAgent, sendWhatsAppMessage(agentPhone, template w/ student+property+dates); log on
-  booking. Verify: sandbox message received. (needs days 11, 20)
+  booking. Verify: sandbox message received. (needs days 11, 20) [SKIP — needs WhatsApp number]
 - [ ] Day 22 — Agent reply closes the loop: webhook detects sender == PropertyAgent phone;
   LLM-extract confirmed time/notes; update booking; email student the status.
-  Verify: full role-play — book, reply as agent, student email arrives. (needs day 21)
+  Verify: full role-play — book, reply as agent, student email arrives. (needs day 21) [SKIP — needs WhatsApp number]
 
 ## Phase 4 — Frontend & SEO
 
