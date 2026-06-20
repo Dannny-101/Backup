@@ -6,6 +6,7 @@
       {
         "id": "653e9030725bd7cb",
         "type": "tabs",
+        "dimension": 90.97472924187726,
         "children": [
           {
             "id": "8f646473581c7648",
@@ -23,6 +24,7 @@
       {
         "id": "953e3b6cbf7414d3",
         "type": "tabs",
+        "dimension": 9.025270758122744,
         "children": [
           {
             "id": "39734126c66d131a",
@@ -30,6 +32,7 @@
             "state": {
               "type": "localgraph",
               "state": {
+                "file": "04-team/Onboarding.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -53,11 +56,11 @@
                   "linkStrength": 1,
                   "linkDistance": 250,
                   "scale": 1,
-                  "close": false
+                  "close": true
                 }
               },
               "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "title": "Graph of Onboarding"
             },
             "group": "13c6357f1232f24d"
           }
@@ -221,8 +224,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "8f646473581c7648",
+  "active": "39734126c66d131a",
   "lastOpenFiles": [
+    "04-team/Onboarding.md",
     "daily/Daily Hub.md",
     "08-sops/Playbooks.md",
     "08-sops/Runbooks.md",
@@ -234,7 +238,6 @@
     "05-roadmap/Backlog.md",
     "05-roadmap/Milestones.md",
     "05-roadmap/Roadmap Hub.md",
-    "04-team/Onboarding.md",
     "04-team/Meetings.md",
     "04-team/Org Chart.md",
     "04-team/Team Hub.md",

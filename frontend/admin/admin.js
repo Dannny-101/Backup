@@ -119,6 +119,7 @@ function renderApp() {
           <div class="nav-item" id="nav-analytics" onclick="showSection('analytics')"><i class="fas fa-chart-bar"></i> Analytics</div>
           <div class="nav-item" id="nav-reports" onclick="showSection('reports')"><i class="fas fa-file-alt"></i> Reports</div>
           <div class="nav-item" id="nav-audit" onclick="showSection('audit')"><i class="fas fa-shield-alt"></i> Audit Log</div>
+          <div class="nav-item" id="nav-vaultgraph" onclick="showSection('vaultgraph')"><i class="fas fa-project-diagram"></i> Vault Graph</div>
         <div class="nav-section-label">Team</div>
 <div class="nav-item" id="nav-teamchat" onclick="showSection('teamchat')"><i class="fas fa-user-friends"></i> Team Chat <span class="nav-badge" id="teamChatBadge" style="display:none">0</span></div>
 <div class="nav-item" id="nav-tasks" onclick="showSection('tasks')"><i class="fas fa-tasks"></i> Task Board</div>
@@ -167,6 +168,7 @@ ${S.adminRole === 'superadmin' ? `<div class="nav-section-label">System</div>
           <div class="section" id="sec-tasks"></div>
           <div class="section" id="sec-team"></div>
           <div class="section" id="sec-adminmgmt"></div>
+          <div class="section" id="sec-vaultgraph"></div>
         </div>
       </div>
     </div>
@@ -209,7 +211,8 @@ const TITLES = {
   tasks: ['Task Board', 'Team task management'],
   properties: ['Properties', 'Manage properties and rooms'],
   team: ['Team', 'Manage admin users'],
-  adminmgmt: ['Admin Management', 'Manage admin accounts']
+  adminmgmt: ['Admin Management', 'Manage admin accounts'],
+  vaultgraph: ['Vault Graph', 'Obsidian-style knowledge graph']
 };
 
 function showSection(sec) {
@@ -229,7 +232,8 @@ function showSection(sec) {
     teamchat: loadTeamChat,
     analytics: loadAnalytics, reports: loadReports, audit: loadAudit, tasks: loadTasks,
     team: loadTeam,
-    adminmgmt: loadAdminManagement
+    adminmgmt: loadAdminManagement,
+    vaultgraph: loadVaultGraph
   };
   loaders[sec]?.();
 
@@ -4017,6 +4021,233 @@ function initPullToRefresh() {
     }
     startY = 0;
   }, { passive: true });
+}
+
+// ── VAULT GRAPH ──
+let vaultGraphSim = null;
+
+async function loadVaultGraph() {
+  const sec = document.getElementById('sec-vaultgraph');
+  sec.innerHTML = `
+    <div class="vault-graph-wrap" id="vaultGraphWrap">
+      <div class="vault-graph-controls">
+        <div class="vg-filters">
+          <label class="vg-label">Sections</label>
+          <div class="vg-sections" id="vgSections"></div>
+        </div>
+        <div class="vg-filters">
+          <label class="vg-label">Radius</label>
+          <div class="vg-radii" id="vgRadii"></div>
+        </div>
+        <div class="vg-search">
+          <input type="text" id="vgSearch" placeholder="Search nodes..." oninput="vgFilterSearch(this.value)">
+        </div>
+      </div>
+      <div class="vault-graph-canvas" id="vgCanvas"></div>
+      <div class="vault-graph-tooltip" id="vgTooltip"></div>
+      <div class="vault-graph-sidebar" id="vgSidebar">
+        <button class="vg-close" onclick="vgCloseSidebar()">&times;</button>
+        <h3 id="vgSbTitle"></h3>
+        <div class="vg-sb-meta" id="vgSbMeta"></div>
+        <div class="vg-sb-tags" id="vgSbTags"></div>
+        <div class="vg-sb-links">
+          <h4>Connections</h4>
+          <ul id="vgSbLinks"></ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  try {
+    const res = await api('/api/vault-graph');
+    if (!res.success) { sec.innerHTML = '<div class="empty-state">Failed to load graph</div>'; return; }
+    const data = res.data;
+    vgRender(data.nodes, data.edges);
+  } catch (e) {
+    sec.innerHTML = '<div class="empty-state">Error loading vault graph</div>';
+  }
+}
+
+const VG_COLORS = {
+  '01-company': '#7ee787',
+  '02-product': '#a5d6ff',
+  '03-operations': '#d2a8ff',
+  '04-team': '#ffca5f',
+  '05-roadmap': '#ffab70',
+  '06-brand': '#ff7b72',
+  '07-competitive': '#79c0ff',
+  '08-sops': '#56d4dd',
+  'daily': '#8b949e',
+  '99-templates': '#6e7681',
+  'root': '#58a6ff'
+};
+const VG_R_SIZES = { 0: 18, 1: 12, 2: 7, 3: 4 };
+
+let vgNodes = [], vgEdges = [], vgActiveSections = new Set(), vgActiveRadii = new Set([0,1,2,3]);
+
+function vgRender(nodes, edges) {
+  vgNodes = nodes.map(n => ({...n}));
+  vgEdges = edges.map(e => ({...e}));
+  vgNodes.forEach(n => vgActiveSections.add(n.section));
+  vgBuildFilters();
+  vgDraw();
+}
+
+function vgBuildFilters() {
+  const sections = [...new Set(vgNodes.map(n => n.section))].sort();
+  const sf = document.getElementById('vgSections');
+  sf.innerHTML = '';
+  sections.forEach(s => {
+    const el = document.createElement('button');
+    el.className = 'vg-chip active';
+    el.style.setProperty('--c', VG_COLORS[s] || '#58a6ff');
+    el.innerHTML = `<span class="vg-dot" style="background:${VG_COLORS[s]||'#58a6ff'}"></span>${vgFmtSec(s)}`;
+    el.onclick = () => {
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) vgActiveSections.add(s); else vgActiveSections.delete(s);
+      vgDraw();
+    };
+    sf.appendChild(el);
+  });
+
+  const rf = document.getElementById('vgRadii');
+  rf.innerHTML = '';
+  [0,1,2,3].forEach(r => {
+    const el = document.createElement('button');
+    el.className = 'vg-chip active';
+    const labels = {0:'Center',1:'Hub',2:'Topic',3:'Detail'};
+    el.textContent = labels[r];
+    el.onclick = () => {
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) vgActiveRadii.add(r); else vgActiveRadii.delete(r);
+      vgDraw();
+    };
+    rf.appendChild(el);
+  });
+}
+
+function vgFmtSec(s) {
+  return s.replace(/^\d{2}-/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+let vgSvg, vgSim, vgG, vgZoom;
+
+function vgDraw() {
+  const container = document.getElementById('vgCanvas');
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  container.innerHTML = '';
+
+  const fNodes = vgNodes.filter(n => vgActiveSections.has(n.section) && vgActiveRadii.has(n.radius));
+  const fIds = new Set(fNodes.map(n => n.id));
+  const fEdges = vgEdges.filter(e => fIds.has(e.source) && fIds.has(e.target));
+
+  vgSvg = d3.select('#vgCanvas').append('svg').attr('width', w).attr('height', h).attr('viewBox', [0,0,w,h]);
+  vgG = vgSvg.append('g');
+  vgZoom = d3.zoom().scaleExtent([0.1,4]).on('zoom', e => vgG.attr('transform', e.transform));
+  vgSvg.call(vgZoom);
+
+  vgSim = d3.forceSimulation()
+    .force('link', d3.forceLink().id(d => d.id).distance(d =>
+      d.source.radius === 0 || d.target.radius === 0 ? 180 :
+      d.source.radius === 1 && d.target.radius === 1 ? 260 : 130
+    ))
+    .force('charge', d3.forceManyBody().strength(d =>
+      d.radius === 0 ? -600 : d.radius === 1 ? -400 : -150
+    ))
+    .force('center', d3.forceCenter(w/2, h/2))
+    .force('collide', d3.forceCollide().radius(d => VG_R_SIZES[d.radius] + 8));
+
+  let link = vgG.selectAll('.vgl').data(fEdges, d => d.source.id + '-' + d.target.id);
+  link.exit().remove();
+  const linkEnter = link.enter().append('line').attr('class','vgl')
+    .attr('stroke', 'var(--border)').attr('stroke-width', 1).attr('stroke-opacity', 0.5);
+  link = linkEnter.merge(link);
+
+  let node = vgG.selectAll('.vgn').data(fNodes, d => d.id);
+  node.exit().transition().duration(150).attr('r',0).remove();
+
+  const nodeEnter = node.enter().append('g').attr('class','vgn')
+    .call(d3.drag().on('start', vgDragStart).on('drag', vgDrag).on('end', vgDragEnd));
+
+  nodeEnter.append('circle').attr('r',0)
+    .attr('fill', d => VG_COLORS[d.section] || '#58a6ff')
+    .attr('stroke', 'var(--bg)').attr('stroke-width', 2)
+    .transition().duration(250).attr('r', d => VG_R_SIZES[d.radius] || 6);
+
+  nodeEnter.append('text').attr('class','vgn-label')
+    .attr('dy', d => VG_R_SIZES[d.radius] + 11)
+    .attr('text-anchor','middle').text(d => d.title)
+    .style('opacity', d => d.radius <= 1 ? 1 : 0)
+    .transition().duration(250).style('opacity', d => d.radius <= 2 ? 0.85 : 0);
+
+  node = nodeEnter.merge(node);
+
+  node.select('circle')
+    .on('mouseover', function(e,d) {
+      d3.select(this).transition().duration(120).attr('r', VG_R_SIZES[d.radius]*1.4);
+      vgTooltip(e, d);
+    })
+    .on('mouseout', function(e,d) {
+      d3.select(this).transition().duration(120).attr('r', VG_R_SIZES[d.radius]);
+      vgHideTooltip();
+    })
+    .on('click', (e,d) => { e.stopPropagation(); vgSidebar(d); });
+
+  vgSvg.on('click', () => vgCloseSidebar());
+
+  vgSim.nodes(fNodes);
+  vgSim.force('link').links(fEdges);
+  vgSim.alpha(1).restart();
+
+  vgSim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+}
+
+function vgDragStart(e,d) { if (!e.active) vgSim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }
+function vgDrag(e,d) { d.fx=e.x; d.fy=e.y; }
+function vgDragEnd(e,d) { if (!e.active) vgSim.alphaTarget(0); d.fx=null; d.fy=null; }
+
+function vgTooltip(e,d) {
+  const t = document.getElementById('vgTooltip');
+  t.innerHTML = `<strong>${d.title}</strong><br><small>${vgFmtSec(d.section)} &middot; ${d.type}</small>`;
+  t.classList.add('visible');
+  t.style.left = (e.pageX + 10) + 'px';
+  t.style.top = (e.pageY + 10) + 'px';
+}
+function vgHideTooltip() { document.getElementById('vgTooltip').classList.remove('visible'); }
+
+function vgSidebar(d) {
+  const sb = document.getElementById('vgSidebar');
+  document.getElementById('vgSbTitle').textContent = d.title;
+  const meta = document.getElementById('vgSbMeta');
+  meta.innerHTML = `<span>Type: ${d.type}</span><span>Radius: ${d.radius}</span><span>Section: ${vgFmtSec(d.section)}</span>`;
+  const tags = document.getElementById('vgSbTags');
+  tags.innerHTML = (d.tags || []).map(t => `<span class="vg-tag">${t}</span>`).join('');
+  const links = document.getElementById('vgSbLinks');
+  const connected = vgEdges.filter(e => e.source.id === d.id || e.target.id === d.id);
+  links.innerHTML = connected.length ? connected.map(e => {
+    const o = e.source.id === d.id ? e.target : e.source;
+    return `<li onclick="vgShowNode('${o.id}')">${o.title}</li>`;
+  }).join('') : '<li style="color:var(--text-muted)">No connections</li>';
+  sb.classList.add('open');
+}
+function vgCloseSidebar() { document.getElementById('vgSidebar').classList.remove('open'); }
+function vgShowNode(id) {
+  const n = vgNodes.find(x => x.id === id);
+  if (n) vgSidebar(n);
+}
+
+function vgFilterSearch(q) {
+  const val = q.toLowerCase();
+  vgG.selectAll('.vgn').each(function(d) {
+    const match = !val || d.title.toLowerCase().includes(val) || d.id.toLowerCase().includes(val);
+    d3.select(this).style('opacity', match ? 1 : 0.08);
+  });
+  vgG.selectAll('.vgl').style('opacity', val ? 0.05 : 0.5);
 }
 
 // ── INIT ──

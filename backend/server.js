@@ -581,6 +581,7 @@ app.use('/api/audit', require('./routes/audit').router);
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/queue', require('./routes/chatQueue'));
 app.use('/api/push', require('./routes/push'));
+app.use('/api/vault-graph', require('./routes/vaultGraph'));
 
 // Serve frontend
 app.get('/', (req, res) => {
