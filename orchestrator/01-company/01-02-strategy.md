@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -37,3 +38,7 @@ Pick one pivot direction. Build a ninety-day MVP. Measure retention and NPS.
 - [[01-company/01-03-metrics]] — How we measure success
 - [[04-team/04-01-org-chart]] — Team implications of each option
 - [[05-roadmap/05-02-backlog]] — Backlog items organized by strategy
+
+## Parent
+
+[[01-company/_hub|← Back to hub]]

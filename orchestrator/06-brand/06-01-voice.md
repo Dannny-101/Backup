@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -44,3 +45,7 @@ The product is always "Ten&See" with an ampersand, never "Ten and See." Service 
 ## Content Pillars
 
 Housing guides cover how to find, inspect, and rent student housing in Malaysia. Neighborhood spotlights feature Sunway, Subang, KLCC, and other areas. Student life content covers budgeting, moving tips, and roommate advice. Trust and safety content explains how we verify properties and warns about scams.
+
+## Parent
+
+[[06-brand/_hub|← Back to hub]]

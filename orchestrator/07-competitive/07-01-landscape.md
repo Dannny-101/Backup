@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 section: competitive
 created: 2026-06-20
@@ -60,3 +61,6 @@ Track competitors monthly:
 
 ---
 
+## Parent
+
+[[07-competitive/_hub|← Back to hub]]

@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -35,3 +36,7 @@ When a student opens the chat widget, a chat session is created with status wait
 ## WhatsApp Outreach
 
 Outreach can be automated (triggered by a new listing match) or manual (a follow-up). The team composes a message from a template or freeform text, sends it via the whatsapp service to the Meta WhatsApp Cloud API, logs the message to the chat and lead history, and handles incoming replies via the webhook. This is owned by the platform when automated, or by the admin when manual.
+
+## Parent
+
+[[03-operations/_hub|← Back to hub]]

@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -58,3 +59,6 @@ Right now (solo founder): informal daily/weekly reviews with yourself. No formal
 
 ---
 
+## Parent
+
+[[04-team/_hub|← Back to hub]]

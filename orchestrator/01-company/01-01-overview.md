@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -38,3 +39,7 @@ The current platform model is **functional but commoditized**. Competitors like 
 ## Legal Entity
 
 Ten&See is the brand name. Legal structure is TBD — either sole proprietorship or Sdn Bhd. Compliance needs to align with Malaysian tenancy laws, data privacy (PDPA), and student visa accommodation requirements for internationals.
+
+## Parent
+
+[[01-company/_hub|← Back to hub]]

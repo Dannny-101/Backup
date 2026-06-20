@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -52,3 +53,6 @@ tags:
 
 ---
 
+## Parent
+
+[[05-roadmap/_hub|← Back to hub]]

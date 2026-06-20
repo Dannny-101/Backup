@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -36,3 +37,7 @@ When a new featured property is available or a campaign is running, compose a me
 ## Deploying Code
 
 When a feature is ready or a bug fix is complete, ensure all changes are committed locally. Run tests if available, or perform a manual smoke test. Commit with a descriptive message in the format day-N: task name. Push to the Dannny-101/Ten-See main branch using `git push tenandsee HEAD:main`. Verify the deployment by checking the live site and testing critical flows. Update the ROADMAP.md checkbox from empty to checked.
+
+## Parent
+
+[[08-sops/_hub|← Back to hub]]

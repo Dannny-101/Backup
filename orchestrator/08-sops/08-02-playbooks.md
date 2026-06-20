@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -43,3 +44,7 @@ Intake season runs July through September. This is peak demand when internationa
 Off-season is December through February. Demand is lower but there is more negotiating power. The focus is landlord retention and early-bird bookings. Marketing pushes "Book early, get the best rooms."
 
 Mid-year intake is January through March for secondary program intakes. The focus is targeted ads for mid-year starters.
+
+## Parent
+
+[[08-sops/_hub|← Back to hub]]

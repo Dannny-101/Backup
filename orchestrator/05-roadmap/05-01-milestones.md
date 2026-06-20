@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -73,3 +74,6 @@ When updating this file after completing a ROADMAP day, cross-reference `ROADMAP
 
 ---
 
+## Parent
+
+[[05-roadmap/_hub|← Back to hub]]

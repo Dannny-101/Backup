@@ -30,7 +30,7 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "99-index.md",
+                "file": "path/to/note.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -58,7 +58,7 @@
                 }
               },
               "icon": "lucide-git-fork",
-              "title": "Graph of 99-index"
+              "title": "Graph of note"
             },
             "group": "13c6357f1232f24d"
           }
@@ -224,6 +224,23 @@
   },
   "active": "8f646473581c7648",
   "lastOpenFiles": [
+    "path/to/note.md",
+    "path/to",
+    "path",
+    "daily/_hub.md",
+    "99-templates/detail.md",
+    "99-templates/hub.md",
+    "99-templates/topic.md",
+    "99-templates",
+    "08-sops/_hub.md",
+    "07-competitive/_hub.md",
+    "06-brand/_hub.md",
+    "05-roadmap/_hub.md",
+    "04-team/_hub.md",
+    "03-operations/_hub.md",
+    "02-product/_hub.md",
+    "01-company/_hub.md",
+    "01-company/01-01-overview.md",
     "99-index.md",
     "01-company/01-03-metrics.md",
     "05-roadmap/05-01-milestones.md",

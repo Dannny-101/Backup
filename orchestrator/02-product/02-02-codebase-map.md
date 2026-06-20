@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -82,3 +83,6 @@ All live in `backend/models/`.
 
 ---
 
+## Parent
+
+[[02-product/_hub|← Back to hub]]

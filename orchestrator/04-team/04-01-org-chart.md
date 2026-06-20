@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -41,3 +42,7 @@ Early hires get equity plus below-market cash where possible. Start with contrac
 ## AI as a Team Member
 
 AI is the fourth team member alongside you and two humans. Its responsibilities include drafting communications like emails and WhatsApp templates, data analysis and reporting, code review and bug fixes, knowledge base maintenance in this vault, and ideation and strategy stress-testing. AI does not face customers directly without human review, does not make financial decisions, and does not give legal advice.
+
+## Parent
+
+[[04-team/_hub|← Back to hub]]

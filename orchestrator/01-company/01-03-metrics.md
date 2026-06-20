@@ -1,5 +1,6 @@
 ---
 type: topic
+radius: 2
 status: active
 created: 2026-06-20
 tags:
@@ -42,3 +43,6 @@ Weekly reports cover enquiries, bookings, active chats, and admin activity. Mont
 
 ---
 
+## Parent
+
+[[01-company/_hub|← Back to hub]]
