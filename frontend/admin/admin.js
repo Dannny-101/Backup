@@ -4035,30 +4035,71 @@ async function loadVaultGraph() {
   sec.innerHTML = `
     <div class="vault-graph-wrap" id="vaultGraphWrap">
       <div class="vault-graph-filetree" id="vgFileTree">
-        <div class="vg-ft-header"><i class="fas fa-folder-open"></i> Vault Files</div>
+        <div class="vg-ft-header">
+          <span><i class="fas fa-folder-open"></i> Vault Files</span>
+          <div class="vg-ft-actions">
+            <button class="vg-btn-icon" onclick="vgToggleFileMenu()" title="Add file"><i class="fas fa-plus"></i></button>
+            <div class="vg-menu" id="vgFileMenu" style="display:none;">
+              <div class="vg-menu-item" onclick="vgCreateFileModal()"><i class="fas fa-file-alt"></i> New note</div>
+              <div class="vg-menu-item" onclick="document.getElementById('vgPdfInput').click()"><i class="fas fa-file-pdf"></i> Upload PDF</div>
+            </div>
+          </div>
+        </div>
         <div class="vg-ft-body" id="vgFileTreeBody"><div class="loading" style="padding:1rem"><div class="spinner"></div></div></div>
+        <div class="vg-resizer" id="vgResizer"></div>
       </div>
       <div class="vault-graph-main">
         <div class="vault-graph-controls">
-          <div class="vg-filters">
-            <label class="vg-label">Sections</label>
-            <div class="vg-sections" id="vgSections"></div>
-          </div>
-          <div class="vg-filters">
-            <label class="vg-label">Radius</label>
-            <div class="vg-radii" id="vgRadii"></div>
+          <div class="vg-controls-left">
+            <button class="vg-btn-icon" onclick="vgOpenSettings()" title="Settings"><i class="fas fa-cog"></i></button>
+            <div class="vg-filters">
+              <label class="vg-label">Sections</label>
+              <div class="vg-sections" id="vgSections"></div>
+            </div>
+            <div class="vg-filters">
+              <label class="vg-label">Radius</label>
+              <div class="vg-radii" id="vgRadii"></div>
+            </div>
           </div>
           <div class="vg-search">
             <input type="text" id="vgSearch" placeholder="Search nodes..." oninput="vgFilterSearch(this.value)">
           </div>
+        </div>
+        <div class="vault-graph-settings" id="vgSettings" style="display:none;">
+          <div class="vg-settings-header">
+            <h4><i class="fas fa-sliders-h"></i> Graph Settings</h4>
+            <button class="vg-btn-icon" onclick="vgCloseSettings()"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="vg-settings-body" id="vgSettingsBody"></div>
         </div>
         <div class="vault-graph-canvas" id="vgCanvas"></div>
         <div class="vault-graph-tooltip" id="vgTooltip"></div>
         <div class="vault-graph-sidebar" id="vgSidebar">
           <button class="vg-close" onclick="vgCloseSidebar()">&times;</button>
           <div id="vgSbNode">
-            <h3 id="vgSbTitle"></h3>
+            <div class="vg-sb-title-row">
+              <h3 id="vgSbTitle"></h3>
+              <button class="vg-btn-icon" onclick="vgStartRenameNode()" title="Rename"><i class="fas fa-pen"></i></button>
+            </div>
+            <div class="vg-sb-rename" id="vgSbRename" style="display:none;">
+              <input type="text" id="vgSbRenameInput" class="vg-input">
+              <button class="vg-btn-sm" onclick="vgSaveNodeTitle()">Save</button>
+            </div>
             <div class="vg-sb-meta" id="vgSbMeta"></div>
+            <div class="vg-sb-edit-row">
+              <label class="vg-label">Radius</label>
+              <select id="vgSbRadius" class="vg-select" onchange="vgSaveNodeRadius()">
+                <option value="0">Center (0)</option>
+                <option value="1">Hub (1)</option>
+                <option value="2">Topic (2)</option>
+                <option value="3">Detail (3)</option>
+              </select>
+            </div>
+            <div class="vg-sb-edit-row">
+              <label class="vg-label">Color</label>
+              <input type="color" id="vgSbColor" class="vg-color-input" onchange="vgSaveNodeColor()">
+              <button class="vg-btn-sm" onclick="vgResetNodeColor()">Reset</button>
+            </div>
             <div class="vg-sb-tags" id="vgSbTags"></div>
             <div class="vg-sb-links">
               <h4>Connections</h4>
@@ -4069,6 +4110,44 @@ async function loadVaultGraph() {
         </div>
       </div>
     </div>
+
+    <div class="vg-modal-overlay" id="vgCreateModal" onclick="if(event.target===this)vgCloseCreateModal()">
+      <div class="vg-modal">
+        <div class="vg-modal-header">
+          <h4><i class="fas fa-file-alt"></i> Create New Note</h4>
+          <button class="vg-btn-icon" onclick="vgCloseCreateModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="vg-modal-body">
+          <div class="vg-form-group">
+            <label class="vg-label">Title</label>
+            <input type="text" id="vgNewTitle" class="vg-input" placeholder="Note title">
+          </div>
+          <div class="vg-form-group">
+            <label class="vg-label">Folder path</label>
+            <input type="text" id="vgNewFolder" class="vg-input" placeholder="01-company">
+          </div>
+          <div class="vg-form-group">
+            <label class="vg-label">Radius</label>
+            <select id="vgNewRadius" class="vg-select">
+              <option value="0">Center (0)</option>
+              <option value="1">Hub (1)</option>
+              <option value="2" selected>Topic (2)</option>
+              <option value="3">Detail (3)</option>
+            </select>
+          </div>
+          <div class="vg-form-group">
+            <label class="vg-label">Initial content</label>
+            <textarea id="vgNewContent" class="vg-textarea" rows="4" placeholder="Optional markdown content"></textarea>
+          </div>
+          <div class="vg-form-actions">
+            <button class="vg-btn-secondary" onclick="vgCloseCreateModal()">Cancel</button>
+            <button class="vg-btn-primary" onclick="vgSaveNewFile()">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" id="vgPdfInput" accept="application/pdf" style="display:none;" onchange="vgUploadPdf(this)">
   `;
 
   try {
@@ -4077,14 +4156,16 @@ async function loadVaultGraph() {
     const data = res.data;
     if (!data.nodes || !data.nodes.length) { sec.innerHTML = '<div class="empty-state">No vault nodes found</div>'; return; }
     vgRender(data.nodes, data.edges);
+    vgLoadSettings();
     vgLoadFileTree();
+    vgInitResizer();
   } catch (e) {
     sec.innerHTML = '<div class="empty-state">Error loading vault graph: ' + e.message + '</div>';
     console.error('Vault graph error:', e);
   }
 }
 
-const VG_COLORS = {
+let VG_COLORS = {
   '01-company': '#7ee787',
   '02-product': '#a5d6ff',
   '03-operations': '#d2a8ff',
@@ -4097,9 +4178,29 @@ const VG_COLORS = {
   '99-templates': '#6e7681',
   'root': '#58a6ff'
 };
+const VG_COLORS_DEFAULT = JSON.parse(JSON.stringify(VG_COLORS));
 const VG_R_SIZES = { 0: 18, 1: 12, 2: 7, 3: 4 };
 
 let vgNodes = [], vgEdges = [], vgActiveSections = new Set(), vgActiveRadii = new Set([0,1,2,3]);
+let vgNodeColors = {}; // nodeId -> custom color
+let vgCurrentNode = null;
+
+let vgSettings = {
+  linkDistance: 130,
+  hubLinkDistance: 260,
+  centerLinkDistance: 180,
+  chargeCenter: -600,
+  chargeHub: -400,
+  chargeOther: -150,
+  centerGravity: 1,
+  collisionPadding: 8,
+  ambientMotion: true,
+  ambientRotation: false,
+  ambientSpeed: 0.15
+};
+
+let vgAmbientId = null;
+let vgAmbientTime = 0;
 
 function vgRender(nodes, edges) {
   vgNodes = nodes.map(n => ({...n}));
@@ -4183,16 +4284,19 @@ function vgDraw() {
   // Stop any previous simulation
   if (vgSim) vgSim.stop();
 
+  const cg = vgSettings.centerGravity;
   vgSim = d3.forceSimulation()
+    .alphaMin(0)
+    .alphaDecay(0.02)
     .force('link', d3.forceLink().id(d => d.id).distance(d =>
-      d.source.radius === 0 || d.target.radius === 0 ? 180 :
-      d.source.radius === 1 && d.target.radius === 1 ? 260 : 130
+      d.source.radius === 0 || d.target.radius === 0 ? vgSettings.centerLinkDistance :
+      d.source.radius === 1 && d.target.radius === 1 ? vgSettings.hubLinkDistance : vgSettings.linkDistance
     ))
     .force('charge', d3.forceManyBody().strength(d =>
-      d.radius === 0 ? -600 : d.radius === 1 ? -400 : -150
+      d.radius === 0 ? vgSettings.chargeCenter : d.radius === 1 ? vgSettings.chargeHub : vgSettings.chargeOther
     ))
-    .force('center', d3.forceCenter(w/2, h/2))
-    .force('collide', d3.forceCollide().radius(d => VG_R_SIZES[d.radius] + 8));
+    .force('center', d3.forceCenter(w/2, h/2).strength(cg))
+    .force('collide', d3.forceCollide().radius(d => VG_R_SIZES[d.radius] + vgSettings.collisionPadding));
 
   let link = vgG.selectAll('.vgl').data(rawEdges, d => d.source + '-' + d.target);
   link.exit().remove();
@@ -4207,7 +4311,7 @@ function vgDraw() {
     .call(d3.drag().on('start', vgDragStart).on('drag', vgDrag).on('end', vgDragEnd));
 
   nodeEnter.append('circle').attr('r',0)
-    .attr('fill', d => VG_COLORS[d.section] || '#58a6ff')
+    .attr('fill', d => vgNodeColors[d.id] || VG_COLORS[d.section] || '#58a6ff')
     .attr('stroke', 'var(--bg)').attr('stroke-width', 2)
     .transition().duration(250).attr('r', d => VG_R_SIZES[d.radius] || 6);
 
@@ -4274,11 +4378,8 @@ function vgDraw() {
   vgSim.force('link').links(rawEdges);
   vgSim.alpha(1).restart();
 
-  vgSim.on('tick', () => {
-    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-    node.attr('transform', d => `translate(${d.x},${d.y})`);
-  });
+  // Rendering is handled by the ambient RAF loop so physics and visual motion are synced
+  vgStartAmbient();
 }
 
 function vgDragStart(e,d) { if (!e.active) vgSim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; }
@@ -4295,12 +4396,17 @@ function vgTooltip(e,d) {
 function vgHideTooltip() { document.getElementById('vgTooltip').classList.remove('visible'); }
 
 function vgSidebar(d) {
+  vgCurrentNode = d;
   const sb = document.getElementById('vgSidebar');
   document.getElementById('vgSbNode').style.display = '';
   document.getElementById('vgSbFile').style.display = 'none';
   document.getElementById('vgSbTitle').textContent = d.title;
+  document.getElementById('vgSbRename').style.display = 'none';
+  document.getElementById('vgSbRenameInput').value = d.title;
   const meta = document.getElementById('vgSbMeta');
   meta.innerHTML = `<span>Type: ${d.type}</span><span>Radius: ${d.radius}</span><span>Section: ${vgFmtSec(d.section)}</span>`;
+  document.getElementById('vgSbRadius').value = String(d.radius);
+  document.getElementById('vgSbColor').value = vgNodeColors[d.id] || VG_COLORS[d.section] || '#58a6ff';
   const tags = document.getElementById('vgSbTags');
   tags.innerHTML = (d.tags || []).map(t => `<span class="vg-tag">${t}</span>`).join('');
   const links = document.getElementById('vgSbLinks');
@@ -4358,8 +4464,9 @@ function vgRenderTree(items, level = 0) {
       </div>`;
     } else {
       const icon = item.name.endsWith('.pdf') ? 'fa-file-pdf' : 'fa-file-alt';
-      return `<div class="vg-ft-file" style="padding-left:${pad}px" onclick="vgOpenFile('${encodeURIComponent(item.path)}','${encodeURIComponent(item.name)}')">
-          <i class="fas ${icon}"></i> ${escapeHtml(item.name)}
+      return `<div class="vg-ft-file" style="padding-left:${pad}px">
+          <span class="vg-ft-name" onclick="vgOpenFile('${encodeURIComponent(item.path)}','${encodeURIComponent(item.name)}')"><i class="fas ${icon}"></i> ${escapeHtml(item.name)}</span>
+          <button class="vg-btn-icon vg-ft-delete" onclick="event.stopPropagation(); vgDeleteFile('${encodeURIComponent(item.path)}','${escapeHtml(item.name)}')" title="Delete"><i class="fas fa-trash"></i></button>
         </div>`;
     }
   }).join('');
@@ -4444,6 +4551,332 @@ function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 }
+
+// ── SETTINGS PANEL ──
+function vgOpenSettings() {
+  const panel = document.getElementById('vgSettings');
+  if (panel.style.display === 'none') {
+    vgBuildSettings();
+    panel.style.display = 'block';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+function vgCloseSettings() { document.getElementById('vgSettings').style.display = 'none'; }
+
+function vgBuildSettings() {
+  const body = document.getElementById('vgSettingsBody');
+  const s = vgSettings;
+  const sections = [...new Set(vgNodes.map(n => n.section))].sort();
+  body.innerHTML = `
+    <div class="vg-settings-group">
+      <label class="vg-label">Motion</label>
+      <div class="vg-slider-row"><span>Link distance</span><input type="range" min="30" max="400" value="${s.linkDistance}" oninput="vgUpdateSetting('linkDistance', this.value)"><span id="vgVal-linkDistance">${s.linkDistance}</span></div>
+      <div class="vg-slider-row"><span>Hub link distance</span><input type="range" min="50" max="600" value="${s.hubLinkDistance}" oninput="vgUpdateSetting('hubLinkDistance', this.value)"><span id="vgVal-hubLinkDistance">${s.hubLinkDistance}</span></div>
+      <div class="vg-slider-row"><span>Center link distance</span><input type="range" min="50" max="500" value="${s.centerLinkDistance}" oninput="vgUpdateSetting('centerLinkDistance', this.value)"><span id="vgVal-centerLinkDistance">${s.centerLinkDistance}</span></div>
+      <div class="vg-slider-row"><span>Charge center</span><input type="range" min="-1200" max="-100" value="${s.chargeCenter}" oninput="vgUpdateSetting('chargeCenter', this.value)"><span id="vgVal-chargeCenter">${s.chargeCenter}</span></div>
+      <div class="vg-slider-row"><span>Charge hub</span><input type="range" min="-1000" max="-50" value="${s.chargeHub}" oninput="vgUpdateSetting('chargeHub', this.value)"><span id="vgVal-chargeHub">${s.chargeHub}</span></div>
+      <div class="vg-slider-row"><span>Charge other</span><input type="range" min="-500" max="-20" value="${s.chargeOther}" oninput="vgUpdateSetting('chargeOther', this.value)"><span id="vgVal-chargeOther">${s.chargeOther}</span></div>
+      <div class="vg-slider-row"><span>Center gravity</span><input type="range" min="0" max="1" step="0.05" value="${s.centerGravity}" oninput="vgUpdateSetting('centerGravity', this.value)"><span id="vgVal-centerGravity">${s.centerGravity}</span></div>
+      <div class="vg-slider-row"><span>Collision padding</span><input type="range" min="0" max="40" value="${s.collisionPadding}" oninput="vgUpdateSetting('collisionPadding', this.value)"><span id="vgVal-collisionPadding">${s.collisionPadding}</span></div>
+    </div>
+    <div class="vg-settings-group">
+      <label class="vg-label">Ambient Motion</label>
+      <div class="vg-toggle-row"><span>Enable drift</span><input type="checkbox" ${s.ambientMotion ? 'checked' : ''} onchange="vgUpdateSetting('ambientMotion', this.checked)"></div>
+      <div class="vg-toggle-row"><span>Orbit around center</span><input type="checkbox" ${s.ambientRotation ? 'checked' : ''} onchange="vgUpdateSetting('ambientRotation', this.checked)"></div>
+      <div class="vg-slider-row"><span>Motion speed</span><input type="range" min="0.02" max="1" step="0.01" value="${s.ambientSpeed}" oninput="vgUpdateSetting('ambientSpeed', this.value)"><span id="vgVal-ambientSpeed">${s.ambientSpeed}</span></div>
+    </div>
+    <div class="vg-settings-group">
+      <label class="vg-label">Section Colors</label>
+      ${sections.map(sec => `<div class="vg-color-row"><span>${vgFmtSec(sec)}</span><input type="color" value="${VG_COLORS[sec] || '#58a6ff'}" onchange="vgUpdateSectionColor('${sec}', this.value)"></div>`).join('')}
+    </div>
+    <div class="vg-settings-actions">
+      <button class="vg-btn-secondary" onclick="vgResetSettings()">Reset defaults</button>
+      <button class="vg-btn-primary" onclick="vgReheatSimulation()">Reheat</button>
+    </div>
+  `;
+}
+
+function vgUpdateSetting(key, value) {
+  const num = Number(value);
+  vgSettings[key] = isNaN(num) ? value : num;
+  const span = document.getElementById('vgVal-' + key);
+  if (span) span.textContent = vgSettings[key];
+  if (key === 'ambientMotion' || key === 'ambientRotation' || key === 'ambientSpeed') {
+    if (vgSettings.ambientMotion) vgStartAmbient(); else vgStopAmbient();
+    vgSaveSettings();
+    return;
+  }
+  if (vgSim) {
+    vgSim.force('link').distance(d =>
+      d.source.radius === 0 || d.target.radius === 0 ? vgSettings.centerLinkDistance :
+      d.source.radius === 1 && d.target.radius === 1 ? vgSettings.hubLinkDistance : vgSettings.linkDistance
+    );
+    vgSim.force('charge').strength(d =>
+      d.radius === 0 ? vgSettings.chargeCenter : d.radius === 1 ? vgSettings.chargeHub : vgSettings.chargeOther
+    );
+    vgSim.force('center').strength(vgSettings.centerGravity);
+    vgSim.force('collide').radius(d => VG_R_SIZES[d.radius] + vgSettings.collisionPadding);
+    vgSim.alpha(0.6).restart();
+  }
+  vgSaveSettings();
+}
+
+function vgUpdateSectionColor(section, color) {
+  VG_COLORS[section] = color;
+  vgBuildFilters();
+  vgDraw();
+  vgSaveSettings();
+}
+
+function vgReheatSimulation() { if (vgSim) vgSim.alpha(1).restart(); }
+
+function vgResetSettings() {
+  vgSettings = {
+    linkDistance: 130, hubLinkDistance: 260, centerLinkDistance: 180,
+    chargeCenter: -600, chargeHub: -400, chargeOther: -150,
+    centerGravity: 1, collisionPadding: 8,
+    ambientMotion: true, ambientRotation: false, ambientSpeed: 0.15
+  };
+  VG_COLORS = JSON.parse(JSON.stringify(VG_COLORS_DEFAULT));
+  vgNodeColors = {};
+  vgSaveSettings();
+  vgBuildFilters();
+  vgDraw();
+  vgBuildSettings();
+  vgStartAmbient();
+}
+
+function vgSaveSettings() {
+  try {
+    localStorage.setItem('vgSettings', JSON.stringify(vgSettings));
+    localStorage.setItem('vgColors', JSON.stringify(VG_COLORS));
+    localStorage.setItem('vgNodeColors', JSON.stringify(vgNodeColors));
+  } catch(e) {}
+}
+
+function vgLoadSettings() {
+  try {
+    const s = localStorage.getItem('vgSettings');
+    const c = localStorage.getItem('vgColors');
+    const nc = localStorage.getItem('vgNodeColors');
+    if (s) vgSettings = { ...vgSettings, ...JSON.parse(s) };
+    if (c) VG_COLORS = { ...VG_COLORS, ...JSON.parse(c) };
+    if (nc) vgNodeColors = JSON.parse(nc);
+  } catch(e) {}
+}
+
+// ── AMBIENT MOTION ──
+function vgStartAmbient() {
+  vgStopAmbient();
+  if (!vgSettings.ambientMotion) return;
+  vgAmbientId = requestAnimationFrame(vgAmbientTick);
+}
+function vgStopAmbient() { if (vgAmbientId) cancelAnimationFrame(vgAmbientId); vgAmbientId = null; }
+
+function vgAmbientOffset(d, cx, cy) {
+  if (vgSettings.ambientRotation) {
+    const angle = Math.atan2(d.y - cy, d.x - cx);
+    const dist = Math.sqrt((d.x - cx)**2 + (d.y - cy)**2);
+    const newAngle = angle + vgSettings.ambientSpeed * 0.002;
+    return { x: (cx + Math.cos(newAngle) * dist) - d.x, y: (cy + Math.sin(newAngle) * dist) - d.y };
+  }
+  return {
+    x: Math.sin(vgAmbientTime + d.x * 0.01) * 2,
+    y: Math.cos(vgAmbientTime + d.y * 0.01) * 2
+  };
+}
+
+function vgAmbientTick() {
+  if (!vgG || !vgSettings.ambientMotion) return;
+  vgAmbientTime += vgSettings.ambientSpeed * 0.005;
+  const w = vgSvg.attr('width') / 2;
+  const h = vgSvg.attr('height') / 2;
+  const links = vgG.selectAll('.vgl');
+  const nodes = vgG.selectAll('.vgn');
+  if (links.empty() && nodes.empty()) return;
+  links.attr('x1', d => d.source.x + vgAmbientOffset(d.source, w, h).x)
+       .attr('y1', d => d.source.y + vgAmbientOffset(d.source, w, h).y)
+       .attr('x2', d => d.target.x + vgAmbientOffset(d.target, w, h).x)
+       .attr('y2', d => d.target.y + vgAmbientOffset(d.target, w, h).y);
+  nodes.attr('transform', d => {
+    const off = vgAmbientOffset(d, w, h);
+    return `translate(${d.x + off.x},${d.y + off.y})`;
+  });
+  vgAmbientId = requestAnimationFrame(vgAmbientTick);
+}
+
+// ── NODE EDIT ──
+function vgStartRenameNode() {
+  document.getElementById('vgSbTitle').style.display = 'none';
+  document.getElementById('vgSbRename').style.display = 'flex';
+  document.getElementById('vgSbRenameInput').focus();
+}
+
+function vgSaveNodeTitle() {
+  if (!vgCurrentNode) return;
+  const newTitle = document.getElementById('vgSbRenameInput').value.trim();
+  if (!newTitle || newTitle === vgCurrentNode.title) {
+    vgSidebar(vgCurrentNode);
+    return;
+  }
+  api('/api/vault-graph/files', {
+    method: 'PUT',
+    body: JSON.stringify({ path: vgCurrentNode.id, updates: { title: newTitle } })
+  }).then(res => {
+    if (res.success) {
+      vgCurrentNode.title = newTitle;
+      vgSidebar(vgCurrentNode);
+      vgDraw();
+      vgLoadFileTree();
+    } else toast(res.error || 'Rename failed', 'error');
+  }).catch(() => toast('Rename failed', 'error'));
+}
+
+function vgSaveNodeRadius() {
+  if (!vgCurrentNode) return;
+  const newRadius = parseInt(document.getElementById('vgSbRadius').value, 10);
+  if (newRadius === vgCurrentNode.radius) return;
+  api('/api/vault-graph/files', {
+    method: 'PUT',
+    body: JSON.stringify({ path: vgCurrentNode.id, updates: { radius: newRadius } })
+  }).then(res => {
+    if (res.success) {
+      vgCurrentNode.radius = newRadius;
+      vgSidebar(vgCurrentNode);
+      vgDraw();
+      vgLoadFileTree();
+    } else toast(res.error || 'Radius update failed', 'error');
+  }).catch(() => toast('Radius update failed', 'error'));
+}
+
+function vgSaveNodeColor() {
+  if (!vgCurrentNode) return;
+  vgNodeColors[vgCurrentNode.id] = document.getElementById('vgSbColor').value;
+  vgSaveSettings();
+  vgDraw();
+}
+
+function vgResetNodeColor() {
+  if (!vgCurrentNode) return;
+  delete vgNodeColors[vgCurrentNode.id];
+  vgSaveSettings();
+  document.getElementById('vgSbColor').value = VG_COLORS[vgCurrentNode.section] || '#58a6ff';
+  vgDraw();
+}
+
+// ── FILE MANAGER ──
+function vgToggleFileMenu() {
+  const menu = document.getElementById('vgFileMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+function vgCreateFileModal() {
+  document.getElementById('vgFileMenu').style.display = 'none';
+  document.getElementById('vgCreateModal').style.display = 'flex';
+  document.getElementById('vgNewTitle').focus();
+}
+
+function vgCloseCreateModal() {
+  document.getElementById('vgCreateModal').style.display = 'none';
+  document.getElementById('vgNewTitle').value = '';
+  document.getElementById('vgNewFolder').value = '';
+  document.getElementById('vgNewContent').value = '';
+}
+
+function vgSaveNewFile() {
+  const title = document.getElementById('vgNewTitle').value.trim();
+  const folder = document.getElementById('vgNewFolder').value.trim().replace(/\/+$/, '');
+  const radius = parseInt(document.getElementById('vgNewRadius').value, 10);
+  const content = document.getElementById('vgNewContent').value.trim();
+  if (!title) { toast('Title required', 'error'); return; }
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const filePath = folder ? `${folder}/${slug}.md` : `${slug}.md`;
+  api('/api/vault-graph/files', {
+    method: 'POST',
+    body: JSON.stringify({ path: filePath, title, content, radius })
+  }).then(res => {
+    if (res.success) {
+      toast('Note created', 'success');
+      vgCloseCreateModal();
+      vgLoadFileTree();
+      vgRefreshGraph();
+    } else toast(res.error || 'Create failed', 'error');
+  }).catch(() => toast('Create failed', 'error'));
+}
+
+async function vgUploadPdf(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') { toast('Please select a PDF', 'error'); return; }
+  const base64 = await new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(file);
+  });
+  const folder = prompt('Folder path (optional):') || '';
+  const filePath = folder ? `${folder}/${file.name}` : file.name;
+  api('/api/vault-graph/files/upload', {
+    method: 'POST',
+    body: JSON.stringify({ path: filePath, base64 })
+  }).then(res => {
+    if (res.success) {
+      toast('PDF uploaded', 'success');
+      vgLoadFileTree();
+    } else toast(res.error || 'Upload failed', 'error');
+  }).catch(() => toast('Upload failed', 'error'));
+  input.value = '';
+}
+
+function vgDeleteFile(filePath, fileName) {
+  if (!confirm(`Delete ${fileName}?`)) return;
+  api(`/api/vault-graph/files?path=${encodeURIComponent(filePath)}`, { method: 'DELETE' })
+    .then(res => {
+      if (res.success) {
+        toast('File deleted', 'success');
+        vgLoadFileTree();
+        vgRefreshGraph();
+      } else toast(res.error || 'Delete failed', 'error');
+    }).catch(() => toast('Delete failed', 'error'));
+}
+
+function vgRefreshGraph() {
+  api('/api/vault-graph').then(res => {
+    if (res.success) {
+      vgRender(res.data.nodes, res.data.edges);
+      vgStartAmbient();
+    }
+  });
+}
+
+// ── RESIZER ──
+function vgInitResizer() {
+  const resizer = document.getElementById('vgResizer');
+  const filetree = document.getElementById('vgFileTree');
+  if (!resizer || !filetree) return;
+  let isResizing = false;
+  resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'col-resize';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    const newWidth = Math.max(160, Math.min(400, e.clientX));
+    filetree.style.width = newWidth + 'px';
+    filetree.style.minWidth = newWidth + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    isResizing = false;
+    document.body.style.cursor = '';
+  });
+}
+
+// Close file menu when clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('vgFileMenu');
+  if (menu && !e.target.closest('.vg-ft-actions')) menu.style.display = 'none';
+});
 
 // ── INIT ──
 // Auto-render app or login on page load

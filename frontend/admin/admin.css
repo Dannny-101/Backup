@@ -1567,3 +1567,154 @@ table tr:hover td:first-child {
   background: var(--bg); padding: 0.1rem 0.35rem; border-radius: 4px;
   font-family: 'DM Mono', monospace; font-size: 0.75rem;
 }
+
+/* ── VAULT GRAPH POLISH ── */
+.vault-graph-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: nowrap;
+  z-index: 10;
+}
+.vg-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+.vg-btn-icon {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s ease;
+  font-size: 0.8rem; padding: 0;
+}
+.vg-btn-icon:hover { background: var(--surface2); color: var(--text); border-color: var(--gold); }
+
+/* File tree actions */
+.vg-ft-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem;
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted); border-bottom: 1px solid var(--border);
+}
+.vg-ft-actions { position: relative; }
+.vg-menu {
+  position: absolute; top: 100%; right: 0; margin-top: 0.3rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 50;
+  min-width: 150px; overflow: hidden;
+}
+.vg-menu-item {
+  padding: 0.5rem 0.7rem; font-size: 0.75rem; color: var(--text);
+  cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+  transition: background 0.12s;
+}
+.vg-menu-item:hover { background: var(--bg); }
+.vg-ft-file {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem; color: var(--text-muted);
+  cursor: pointer; border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+}
+.vg-ft-file:hover { background: var(--bg); color: var(--text); }
+.vg-ft-file:hover .vg-ft-delete { opacity: 1; }
+.vg-ft-name { display: flex; align-items: center; gap: 0.4rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vg-ft-delete { opacity: 0; width: 22px; height: 22px; color: var(--danger); }
+
+/* Resizer */
+.vg-resizer {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 5px;
+  cursor: col-resize; background: transparent; z-index: 10;
+}
+.vg-resizer:hover { background: var(--gold); opacity: 0.5; }
+
+/* Settings panel */
+.vault-graph-settings {
+  position: absolute; left: 50%; top: 60px; transform: translateX(-50%);
+  width: 420px; max-width: 90vw; max-height: calc(100% - 100px);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 40;
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.vg-settings-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+}
+.vg-settings-header h4 { font-size: 0.85rem; font-weight: 600; margin: 0; }
+.vg-settings-body { padding: 1rem; overflow-y: auto; }
+.vg-settings-group { margin-bottom: 1.25rem; }
+.vg-settings-group > .vg-label { margin-bottom: 0.5rem; display: block; }
+.vg-slider-row {
+  display: grid; grid-template-columns: 100px 1fr 40px; align-items: center;
+  gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;
+}
+.vg-slider-row input[type="range"] { width: 100%; }
+.vg-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem;
+}
+.vg-color-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;
+}
+.vg-color-row input[type="color"] { width: 32px; height: 22px; border: none; background: none; cursor: pointer; }
+.vg-settings-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+/* Sidebar edits */
+.vg-sb-title-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.vg-sb-title-row h3 { flex: 1; margin: 0; overflow: hidden; text-overflow: ellipsis; }
+.vg-sb-rename { display: flex; gap: 0.4rem; margin-bottom: 0.75rem; }
+.vg-sb-edit-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+.vg-sb-edit-row .vg-label { margin: 0; }
+.vg-input, .vg-select, .vg-textarea {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 0.35rem 0.5rem; font-size: 0.8rem; color: var(--text);
+  font-family: inherit; flex: 1;
+}
+.vg-select { cursor: pointer; }
+.vg-textarea { resize: vertical; min-height: 60px; }
+.vg-color-input { width: 36px; height: 26px; border: none; background: none; cursor: pointer; padding: 0; }
+.vg-btn-sm {
+  padding: 0.3rem 0.6rem; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text); font-size: 0.7rem; cursor: pointer;
+}
+.vg-btn-sm:hover { background: var(--surface2); }
+
+/* Modal */
+.vg-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: center; justify-content: center;
+  z-index: 500;
+}
+.vg-modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  width: 420px; max-width: 90vw; max-height: 90vh; overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.vg-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
+}
+.vg-modal-header h4 { font-size: 0.85rem; margin: 0; }
+.vg-modal-body { padding: 1rem; }
+.vg-form-group { margin-bottom: 0.75rem; }
+.vg-form-group .vg-label { display: block; margin-bottom: 0.25rem; }
+.vg-form-actions {
+  display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;
+}
+.vg-btn-primary, .vg-btn-secondary {
+  padding: 0.45rem 0.9rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--border);
+}
+.vg-btn-primary { background: var(--gold); color: #000; border-color: var(--gold); }
+.vg-btn-primary:hover { opacity: 0.9; }
+.vg-btn-secondary { background: var(--bg); color: var(--text); }
+.vg-btn-secondary:hover { background: var(--surface2); }

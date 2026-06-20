@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const { authMiddleware } = require('./admin');
+const { createAuditLog } = require('./audit');
 
 const VAULT_DIR = path.join(__dirname, '..', '..', 'orchestrator');
 
@@ -148,6 +149,64 @@ function buildGraph() {
   return cachedGraph;
 }
 
+function clearCache() {
+  cachedGraph = null;
+  cacheTime = 0;
+}
+
+function stringifyFrontmatter(fm) {
+  const lines = [];
+  for (const [key, val] of Object.entries(fm)) {
+    if (Array.isArray(val)) {
+      lines.push(`${key}:`);
+      val.forEach(item => lines.push(`  - ${item}`));
+    } else if (typeof val === 'boolean') {
+      lines.push(`${key}: ${val}`);
+    } else if (typeof val === 'number') {
+      lines.push(`${key}: ${val}`);
+    } else {
+      lines.push(`${key}: ${val}`);
+    }
+  }
+  return lines.join('\n');
+}
+
+function updateMdFile(fullPath, updates) {
+  const text = fs.readFileSync(fullPath, 'utf8');
+  const [fm, body] = parseFrontmatter(text);
+  let newBody = body;
+  if (updates.title !== undefined) {
+    fm.title = updates.title;
+    if (/^#\s+(.+)$/m.test(newBody)) {
+      newBody = newBody.replace(/^#\s+(.+)$/m, `# ${updates.title}`);
+    } else {
+      newBody = `# ${updates.title}\n\n${newBody}`;
+    }
+  }
+  if (updates.radius !== undefined) fm.radius = updates.radius;
+  if (updates.type !== undefined) fm.type = updates.type;
+  if (updates.tags !== undefined) fm.tags = updates.tags;
+  const newText = `---\n${stringifyFrontmatter(fm)}\n---\n${newBody}`;
+  fs.writeFileSync(fullPath, newText, 'utf8');
+}
+
+function auditPayload(req, filePath, title) {
+  return [
+    {
+      userId: req.admin?.id,
+      username: req.admin?.username,
+      role: req.admin?.role,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent']
+    },
+    {
+      entityType: 'vault_file',
+      entityId: filePath,
+      entityName: title || filePath
+    }
+  ];
+}
+
 router.get('/', authMiddleware, (req, res) => {
   try {
     const graph = buildGraph();
@@ -212,6 +271,96 @@ router.get('/raw', authMiddleware, (req, res) => {
     res.setHeader('Content-Type', mime);
     const stream = fs.createReadStream(fullPath);
     stream.pipe(res);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST create a new markdown file
+router.post('/files', authMiddleware, async (req, res) => {
+  try {
+    const { path: filePath, title, content = '', type = 'topic', radius = 2, tags = [] } = req.body;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    if (!filePath.endsWith('.md')) return res.status(400).json({ success: false, error: 'Path must end with .md' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (fs.existsSync(fullPath)) return res.status(409).json({ success: false, error: 'File already exists' });
+
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    const fm = { title, type, radius };
+    if (tags && tags.length) fm.tags = tags;
+    const fmText = stringifyFrontmatter(fm);
+    const bodyText = content.trim() ? `# ${title}\n\n${content}` : `# ${title}\n`;
+    const text = `---\n${fmText}\n---\n${bodyText}`;
+    fs.writeFileSync(fullPath, text, 'utf8');
+
+    clearCache();
+    const [performedBy, target] = auditPayload(req, filePath, title);
+    await createAuditLog('vault_file_created', performedBy, target);
+    res.json({ success: true, data: { path: filePath } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST upload a PDF (base64)
+router.post('/files/upload', authMiddleware, async (req, res) => {
+  try {
+    const { path: filePath, base64 } = req.body;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    if (!filePath.endsWith('.pdf')) return res.status(400).json({ success: false, error: 'Path must end with .pdf' });
+    if (!base64) return res.status(400).json({ success: false, error: 'File data required' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (fs.existsSync(fullPath)) return res.status(409).json({ success: false, error: 'File already exists' });
+
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    const buffer = Buffer.from(base64, 'base64');
+    fs.writeFileSync(fullPath, buffer);
+
+    clearCache();
+    const [performedBy, target] = auditPayload(req, filePath);
+    await createAuditLog('vault_file_uploaded', performedBy, target);
+    res.json({ success: true, data: { path: filePath } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// PUT update a markdown file (title, radius, type, tags)
+router.put('/files', authMiddleware, async (req, res) => {
+  try {
+    const { path: filePath, updates } = req.body;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (!fs.existsSync(fullPath)) return res.status(404).json({ success: false, error: 'File not found' });
+    if (!filePath.endsWith('.md')) return res.status(400).json({ success: false, error: 'Only .md files can be updated' });
+
+    updateMdFile(fullPath, updates);
+    clearCache();
+    const [performedBy, target] = auditPayload(req, filePath);
+    await createAuditLog('vault_file_updated', performedBy, target);
+    res.json({ success: true, data: { path: filePath } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// DELETE a file
+router.delete('/files', authMiddleware, async (req, res) => {
+  try {
+    const filePath = req.query.path;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (!fs.existsSync(fullPath)) return res.status(404).json({ success: false, error: 'File not found' });
+
+    fs.unlinkSync(fullPath);
+    clearCache();
+    const [performedBy, target] = auditPayload(req, filePath);
+    await createAuditLog('vault_file_deleted', performedBy, target);
+    res.json({ success: true, data: { path: filePath } });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
