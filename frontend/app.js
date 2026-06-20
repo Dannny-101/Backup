@@ -1,19 +1,8 @@
 AOS.init({ duration: 600, once: true, offset: 60 });
 
-        // Navbar scroll + scroll progress bar
+        // Navbar scroll
         window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            const scrolled = window.scrollY > 50;
-            navbar.classList.toggle('scrolled', scrolled);
-            navbar.classList.toggle('navbar-scrolled', scrolled);
-            navbar.classList.toggle('navbar-transparent', !scrolled);
-
-            const progressBar = document.getElementById('scrollProgressBar');
-            if (progressBar) {
-                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-                const pct = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-                progressBar.style.width = pct + '%';
-            }
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
         });
 
         // Mobile nav
@@ -85,160 +74,6 @@ AOS.init({ duration: 600, once: true, offset: 60 });
             if (area) params.set('area', area);
             if (type) params.set('type', type);
             window.location.href = `/listings.html${params.toString() ? '?' + params : ''}`;
-        }
-
-        // Hero search dropdown sync
-        function updateHeroAreaOptions() {
-            const uni = document.getElementById('heroUni').value;
-            const areaSelect = document.getElementById('heroArea');
-            const currentArea = areaSelect.value;
-            let mappedAreas = [];
-            if (uni && UNIVERSITY_AREA_MAP[uni]) mappedAreas = UNIVERSITY_AREA_MAP[uni];
-            const availableAreas = window.availableAreas || ALL_AREAS;
-            let areas = mappedAreas.length > 0 ? mappedAreas.filter(area => availableAreas.includes(area)) : availableAreas;
-            let options = uni ? '' : '<option value="">Select Area</option>';
-            areas.forEach(area => { options += `<option value="${area}">${area}</option>`; });
-            areaSelect.innerHTML = options;
-            if (uni && areas.length > 0) {
-                if (!currentArea || !areas.includes(currentArea)) areaSelect.value = areas[0];
-                else areaSelect.value = currentArea;
-            }
-        }
-
-        function heroSearch() {
-            const uni = document.getElementById('heroUni').value;
-            const area = document.getElementById('heroArea').value;
-            let params = new URLSearchParams();
-            if (uni) params.set('university', uni);
-            if (area) params.set('area', area);
-            window.location.href = `/listings.html${params.toString() ? '?' + params : ''}`;
-        }
-
-        // Triangle mesh canvas animation
-        function initMeshCanvas(canvasId, options = {}) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            let width, height;
-            const cols = options.cols || 18;
-            const rows = options.rows || 12;
-            const speed = options.speed || 0.0003;
-            const points = [];
-
-            function resize() {
-                const rect = canvas.getBoundingClientRect();
-                width = rect.width; height = rect.height;
-                canvas.width = width * dpr; canvas.height = height * dpr;
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                points.length = 0;
-                const xStep = width / (cols - 1);
-                const yStep = height / (rows - 1);
-                for (let y = 0; y < rows; y++) {
-                    for (let x = 0; x < cols; x++) {
-                        points.push({
-                            baseX: x * xStep,
-                            baseY: y * yStep,
-                            phase: Math.random() * Math.PI * 2,
-                            speed: 0.5 + Math.random() * 0.5
-                        });
-                    }
-                }
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            let time = 0;
-            function draw() {
-                time += 1;
-                ctx.clearRect(0, 0, width, height);
-                const activePoints = points.map(p => {
-                    const dx = Math.sin(time * speed * p.speed + p.phase) * (width * 0.015);
-                    const dy = Math.cos(time * speed * p.speed * 0.7 + p.phase) * (height * 0.015);
-                    return { x: p.baseX + dx, y: p.baseY + dy };
-                });
-
-                // Draw triangles
-                const color = options.color || '201, 168, 76';
-                const opacity = options.opacity || 0.12;
-                for (let y = 0; y < rows - 1; y++) {
-                    for (let x = 0; x < cols - 1; x++) {
-                        const i = y * cols + x;
-                        const p1 = activePoints[i];
-                        const p2 = activePoints[i + 1];
-                        const p3 = activePoints[i + cols];
-                        const p4 = activePoints[i + cols + 1];
-                        drawTriangle(ctx, p1, p2, p3, color, opacity);
-                        drawTriangle(ctx, p2, p3, p4, color, opacity * 0.8);
-                    }
-                }
-
-                // Draw connecting lines
-                ctx.strokeStyle = `rgba(${color}, ${opacity * 0.6})`;
-                ctx.lineWidth = 0.6;
-                ctx.beginPath();
-                for (let y = 0; y < rows; y++) {
-                    for (let x = 0; x < cols - 1; x++) {
-                        const i = y * cols + x;
-                        const p = activePoints[i];
-                        const p2 = activePoints[i + 1];
-                        ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
-                    }
-                }
-                for (let y = 0; y < rows - 1; y++) {
-                    for (let x = 0; x < cols; x++) {
-                        const i = y * cols + x;
-                        const p = activePoints[i];
-                        const p2 = activePoints[i + cols];
-                        ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y);
-                    }
-                }
-                ctx.stroke();
-
-                requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        function drawTriangle(ctx, p1, p2, p3, color, opacity) {
-            const cx = (p1.x + p2.x + p3.x) / 3;
-            const cy = (p1.y + p2.y + p3.y) / 3;
-            const distFromCenter = Math.sqrt(Math.pow(cx - ctx.canvas.width / (2 * (window.devicePixelRatio || 1)), 2) + Math.pow(cy - ctx.canvas.height / (2 * (window.devicePixelRatio || 1)), 2));
-            const maxDist = Math.max(ctx.canvas.width, ctx.canvas.height) / (2 * (window.devicePixelRatio || 1));
-            const fade = 1 - Math.min(distFromCenter / maxDist, 1) * 0.5;
-            ctx.fillStyle = `rgba(${color}, ${opacity * fade})`;
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        // Count-up animation for hero stats
-        function initCountUp() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const el = entry.target;
-                        const target = parseInt(el.dataset.count || '0');
-                        const prefix = el.dataset.prefix || '';
-                        const suffix = el.dataset.suffix || '';
-                        if (!target || el.dataset.counted) return;
-                        el.dataset.counted = 'true';
-                        const duration = 1500;
-                        const start = performance.now();
-                        function tick(now) {
-                            const progress = Math.min((now - start) / duration, 1);
-                            const ease = 1 - Math.pow(1 - progress, 3);
-                            const current = Math.floor(ease * target);
-                            el.textContent = prefix + current + suffix;
-                            if (progress < 1) requestAnimationFrame(tick);
-                            else el.textContent = prefix + target + suffix;
-                        }
-                        requestAnimationFrame(tick);
-                    }
-                });
-            }, { threshold: 0.5 });
-            document.querySelectorAll('[data-count]').forEach(el => observer.observe(el));
         }
 
         // Load featured listings
@@ -1017,9 +852,6 @@ AOS.init({ duration: 600, once: true, offset: 60 });
             loadFeatured();
             initWhatsAppQR();
             initChatScrollTransition();
-            initMeshCanvas('heroMeshCanvas', { cols: 20, rows: 14, speed: 0.0004, opacity: 0.08 });
-            initMeshCanvas('footerMeshCanvas', { cols: 16, rows: 10, speed: 0.0002, opacity: 0.12, color: '44, 56, 48' });
-            initCountUp();
         });
 
         // ── INLINE CHAT (contact section) — reuses same socket + session ──
@@ -1121,15 +953,13 @@ AOS.init({ duration: 600, once: true, offset: 60 });
                 const data = await res.json();
                 const options = data.data;
 
-                // Populate university dropdowns
+                // Populate university dropdown
                 const uniSelect = document.getElementById('qUni');
-                const heroUniSelect = document.getElementById('heroUni');
                 let uniOptions = '<option value="">Select University</option>';
                 (options.universities || []).forEach(uni => {
                     if (uni) uniOptions += `<option value="${uni}">${uni}</option>`;
                 });
-                if (uniSelect) uniSelect.innerHTML = uniOptions;
-                if (heroUniSelect) heroUniSelect.innerHTML = uniOptions;
+                uniSelect.innerHTML = uniOptions;
 
                 // Store available areas for later use
                 window.availableAreas = options.areas || [];
