@@ -157,4 +157,64 @@ router.get('/', authMiddleware, (req, res) => {
   }
 });
 
+// GET file tree (.md and .pdf only)
+router.get('/files', authMiddleware, (req, res) => {
+  try {
+    const tree = [];
+    function walk(dir, parent) {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name.startsWith('.')) continue;
+        const fullPath = path.join(dir, entry.name);
+        const relPath = path.relative(VAULT_DIR, fullPath).replace(/\\/g, '/');
+        if (entry.isDirectory()) {
+          const folder = { type: 'folder', name: entry.name, path: relPath, children: [] };
+          walk(fullPath, folder.children);
+          if (folder.children.length) parent.push(folder);
+        } else if (entry.name.endsWith('.md') || entry.name.endsWith('.pdf')) {
+          parent.push({ type: 'file', name: entry.name, path: relPath });
+        }
+      }
+    }
+    walk(VAULT_DIR, tree);
+    res.json({ success: true, data: tree });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET markdown file content
+router.get('/content', authMiddleware, (req, res) => {
+  try {
+    const filePath = req.query.path;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (!fs.existsSync(fullPath)) return res.status(404).json({ success: false, error: 'File not found' });
+    const content = fs.readFileSync(fullPath, 'utf8');
+    res.json({ success: true, data: { path: filePath, content } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// GET raw file (for PDFs and images)
+router.get('/raw', authMiddleware, (req, res) => {
+  try {
+    const filePath = req.query.path;
+    if (!filePath) return res.status(400).json({ success: false, error: 'Path required' });
+    const fullPath = path.join(VAULT_DIR, filePath);
+    if (!fullPath.startsWith(VAULT_DIR)) return res.status(403).json({ success: false, error: 'Invalid path' });
+    if (!fs.existsSync(fullPath)) return res.status(404).json({ success: false, error: 'File not found' });
+    const mime = filePath.endsWith('.pdf') ? 'application/pdf' :
+                 filePath.endsWith('.png') ? 'image/png' :
+                 filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') ? 'image/jpeg' :
+                 'application/octet-stream';
+    res.setHeader('Content-Type', mime);
+    const stream = fs.createReadStream(fullPath);
+    stream.pipe(res);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 module.exports = router;

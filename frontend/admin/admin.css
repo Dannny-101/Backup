@@ -1480,3 +1480,90 @@ table tr:hover td:first-child {
 .vg-sb-links ul { list-style: none; }
 .vg-sb-links li { padding: 0.35rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; cursor: pointer; color: var(--gold); }
 .vg-sb-links li:hover { color: var(--text); }
+
+/* ── VAULT GRAPH LAYOUT (file tree + main + sidebar) ── */
+.vault-graph-wrap {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+}
+.vault-graph-filetree {
+  width: 220px;
+  min-width: 220px;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.vault-graph-main {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.vault-graph-canvas { flex: 1; position: relative; background: var(--bg); }
+
+/* File tree */
+.vg-ft-header {
+  padding: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.vg-ft-body { padding: 0.35rem 0; }
+.vg-ft-folder .vg-ft-children { display: none; }
+.vg-ft-folder.open > .vg-ft-children { display: block; }
+.vg-ft-toggle {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem; color: var(--text);
+  cursor: pointer; border-radius: 4px;
+  transition: background 0.12s;
+  user-select: none;
+}
+.vg-ft-toggle:hover { background: var(--bg); }
+.vg-ft-toggle i:first-child { font-size: 0.6rem; transition: transform 0.2s; color: var(--text-muted); }
+.vg-ft-folder.open > .vg-ft-toggle i:first-child { transform: rotate(90deg); }
+.vg-ft-file {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.75rem; color: var(--text-muted);
+  cursor: pointer; border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vg-ft-file:hover { background: var(--bg); color: var(--text); }
+.vg-ft-file i { font-size: 0.7rem; }
+
+/* File viewer in sidebar */
+.vg-file-path {
+  font-size: 0.7rem; color: var(--text-muted);
+  margin-bottom: 0.75rem; word-break: break-all;
+}
+.vg-file-content {
+  font-size: 0.8rem; line-height: 1.6; color: var(--text);
+}
+.vg-file-content h1 { font-size: 1.1rem; margin: 0.5rem 0; }
+.vg-file-content h2 { font-size: 0.95rem; margin: 0.4rem 0; }
+.vg-file-content h3 { font-size: 0.85rem; margin: 0.3rem 0; }
+.vg-file-content h4 { font-size: 0.8rem; margin: 0.25rem 0; }
+.vg-file-content p { margin: 0.35rem 0; }
+.vg-file-content ul { margin: 0.35rem 0; padding-left: 1.2rem; }
+.vg-file-content li { margin: 0.15rem 0; }
+.vg-file-content blockquote {
+  border-left: 3px solid var(--gold);
+  padding-left: 0.6rem; margin: 0.4rem 0;
+  color: var(--text-muted); font-style: italic;
+}
+.vg-file-content code {
+  background: var(--bg); padding: 0.1rem 0.35rem; border-radius: 4px;
+  font-family: 'DM Mono', monospace; font-size: 0.75rem;
+}

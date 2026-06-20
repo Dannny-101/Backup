@@ -4034,29 +4034,38 @@ async function loadVaultGraph() {
   }
   sec.innerHTML = `
     <div class="vault-graph-wrap" id="vaultGraphWrap">
-      <div class="vault-graph-controls">
-        <div class="vg-filters">
-          <label class="vg-label">Sections</label>
-          <div class="vg-sections" id="vgSections"></div>
-        </div>
-        <div class="vg-filters">
-          <label class="vg-label">Radius</label>
-          <div class="vg-radii" id="vgRadii"></div>
-        </div>
-        <div class="vg-search">
-          <input type="text" id="vgSearch" placeholder="Search nodes..." oninput="vgFilterSearch(this.value)">
-        </div>
+      <div class="vault-graph-filetree" id="vgFileTree">
+        <div class="vg-ft-header"><i class="fas fa-folder-open"></i> Vault Files</div>
+        <div class="vg-ft-body" id="vgFileTreeBody"><div class="loading" style="padding:1rem"><div class="spinner"></div></div></div>
       </div>
-      <div class="vault-graph-canvas" id="vgCanvas"></div>
-      <div class="vault-graph-tooltip" id="vgTooltip"></div>
-      <div class="vault-graph-sidebar" id="vgSidebar">
-        <button class="vg-close" onclick="vgCloseSidebar()">&times;</button>
-        <h3 id="vgSbTitle"></h3>
-        <div class="vg-sb-meta" id="vgSbMeta"></div>
-        <div class="vg-sb-tags" id="vgSbTags"></div>
-        <div class="vg-sb-links">
-          <h4>Connections</h4>
-          <ul id="vgSbLinks"></ul>
+      <div class="vault-graph-main">
+        <div class="vault-graph-controls">
+          <div class="vg-filters">
+            <label class="vg-label">Sections</label>
+            <div class="vg-sections" id="vgSections"></div>
+          </div>
+          <div class="vg-filters">
+            <label class="vg-label">Radius</label>
+            <div class="vg-radii" id="vgRadii"></div>
+          </div>
+          <div class="vg-search">
+            <input type="text" id="vgSearch" placeholder="Search nodes..." oninput="vgFilterSearch(this.value)">
+          </div>
+        </div>
+        <div class="vault-graph-canvas" id="vgCanvas"></div>
+        <div class="vault-graph-tooltip" id="vgTooltip"></div>
+        <div class="vault-graph-sidebar" id="vgSidebar">
+          <button class="vg-close" onclick="vgCloseSidebar()">&times;</button>
+          <div id="vgSbNode">
+            <h3 id="vgSbTitle"></h3>
+            <div class="vg-sb-meta" id="vgSbMeta"></div>
+            <div class="vg-sb-tags" id="vgSbTags"></div>
+            <div class="vg-sb-links">
+              <h4>Connections</h4>
+              <ul id="vgSbLinks"></ul>
+            </div>
+          </div>
+          <div id="vgSbFile" style="display:none;"></div>
         </div>
       </div>
     </div>
@@ -4068,6 +4077,7 @@ async function loadVaultGraph() {
     const data = res.data;
     if (!data.nodes || !data.nodes.length) { sec.innerHTML = '<div class="empty-state">No vault nodes found</div>'; return; }
     vgRender(data.nodes, data.edges);
+    vgLoadFileTree();
   } catch (e) {
     sec.innerHTML = '<div class="empty-state">Error loading vault graph: ' + e.message + '</div>';
     console.error('Vault graph error:', e);
@@ -4145,6 +4155,7 @@ function vgFmtSec(s) {
 
 let vgSvg, vgSim, vgG, vgZoom;
 let vgEdgeIndex = new Map(); // sourceId -> Set(targetIds)
+let vgSearchVal = '';
 
 function vgDraw() {
   const container = document.getElementById('vgCanvas');
@@ -4209,13 +4220,51 @@ function vgDraw() {
   node = nodeEnter.merge(node);
 
   node.select('circle')
-    .on('mouseover', function(e,d) {
+    .on('mouseover', function(event,d) {
       d3.select(this).transition().duration(120).attr('r', VG_R_SIZES[d.radius]*1.4);
-      vgTooltip(e, d);
+      vgTooltip(event, d);
+      // Find all connected node IDs (both directions)
+      const connected = new Set([d.id]);
+      vgEdgeIndex.forEach((targets, src) => {
+        if (src === d.id) targets.forEach(t => connected.add(t));
+        targets.forEach(t => { if (t === d.id) connected.add(src); });
+      });
+      // Dim non-connected, highlight connected
+      vgG.selectAll('.vgn').transition().duration(150)
+        .style('opacity', n => connected.has(n.id) ? 1 : 0.12);
+      vgG.selectAll('.vgl').transition().duration(150)
+        .style('opacity', e => {
+          const s = typeof e.source === 'object' ? e.source.id : e.source;
+          const t = typeof e.target === 'object' ? e.target.id : e.target;
+          return (s === d.id || t === d.id) ? 0.9 : 0.04;
+        })
+        .attr('stroke', e => {
+          const s = typeof e.source === 'object' ? e.source.id : e.source;
+          const t = typeof e.target === 'object' ? e.target.id : e.target;
+          return (s === d.id || t === d.id) ? (VG_COLORS[d.section] || '#58a6ff') : 'var(--border)';
+        })
+        .attr('stroke-width', e => {
+          const s = typeof e.source === 'object' ? e.source.id : e.source;
+          const t = typeof e.target === 'object' ? e.target.id : e.target;
+          return (s === d.id || t === d.id) ? 2.5 : 1;
+        });
     })
-    .on('mouseout', function(e,d) {
+    .on('mouseout', function(event,d) {
       d3.select(this).transition().duration(120).attr('r', VG_R_SIZES[d.radius]);
       vgHideTooltip();
+      // Restore based on search state
+      if (vgSearchVal) {
+        vgG.selectAll('.vgn').each(function(n) {
+          const match = n.title.toLowerCase().includes(vgSearchVal) || n.id.toLowerCase().includes(vgSearchVal);
+          d3.select(this).transition().duration(150).style('opacity', match ? 1 : 0.08);
+        });
+        vgG.selectAll('.vgl').transition().duration(150)
+          .style('opacity', 0.05).attr('stroke', 'var(--border)').attr('stroke-width', 1);
+      } else {
+        vgG.selectAll('.vgn').transition().duration(150).style('opacity', 1);
+        vgG.selectAll('.vgl').transition().duration(150)
+          .style('opacity', 0.5).attr('stroke', 'var(--border)').attr('stroke-width', 1);
+      }
     })
     .on('click', (e,d) => { e.stopPropagation(); vgSidebar(d); });
 
@@ -4247,6 +4296,8 @@ function vgHideTooltip() { document.getElementById('vgTooltip').classList.remove
 
 function vgSidebar(d) {
   const sb = document.getElementById('vgSidebar');
+  document.getElementById('vgSbNode').style.display = '';
+  document.getElementById('vgSbFile').style.display = 'none';
   document.getElementById('vgSbTitle').textContent = d.title;
   const meta = document.getElementById('vgSbMeta');
   meta.innerHTML = `<span>Type: ${d.type}</span><span>Radius: ${d.radius}</span><span>Section: ${vgFmtSec(d.section)}</span>`;
@@ -4276,12 +4327,122 @@ function vgShowNode(id) {
 }
 
 function vgFilterSearch(q) {
-  const val = q.toLowerCase();
+  vgSearchVal = q.toLowerCase();
   vgG.selectAll('.vgn').each(function(d) {
-    const match = !val || d.title.toLowerCase().includes(val) || d.id.toLowerCase().includes(val);
+    const match = !vgSearchVal || d.title.toLowerCase().includes(vgSearchVal) || d.id.toLowerCase().includes(vgSearchVal);
     d3.select(this).style('opacity', match ? 1 : 0.08);
   });
-  vgG.selectAll('.vgl').style('opacity', val ? 0.05 : 0.5);
+  vgG.selectAll('.vgl').style('opacity', vgSearchVal ? 0.05 : 0.5);
+}
+
+// ── FILE TREE ──
+async function vgLoadFileTree() {
+  const body = document.getElementById('vgFileTreeBody');
+  try {
+    const res = await api('/api/vault-graph/files');
+    if (!res.success) { body.innerHTML = '<div class="empty-state">No files</div>'; return; }
+    body.innerHTML = vgRenderTree(res.data);
+  } catch (e) { body.innerHTML = '<div class="empty-state">Error loading files</div>'; }
+}
+
+function vgRenderTree(items, level = 0) {
+  if (!items || !items.length) return '';
+  return items.map(item => {
+    const pad = level * 12;
+    if (item.type === 'folder') {
+      return `<div class="vg-ft-folder">
+        <div class="vg-ft-toggle" style="padding-left:${pad}px" onclick="this.parentElement.classList.toggle('open')">
+          <i class="fas fa-chevron-right"></i> <i class="fas fa-folder"></i> ${escapeHtml(item.name)}
+        </div>
+        <div class="vg-ft-children">${vgRenderTree(item.children, level + 1)}</div>
+      </div>`;
+    } else {
+      const icon = item.name.endsWith('.pdf') ? 'fa-file-pdf' : 'fa-file-alt';
+      return `<div class="vg-ft-file" style="padding-left:${pad}px" onclick="vgOpenFile('${encodeURIComponent(item.path)}','${encodeURIComponent(item.name)}')">
+          <i class="fas ${icon}"></i> ${escapeHtml(item.name)}
+        </div>`;
+    }
+  }).join('');
+}
+
+async function vgOpenFile(encPath, encName) {
+  const filePath = decodeURIComponent(encPath);
+  const fileName = decodeURIComponent(encName);
+  const sb = document.getElementById('vgSidebar');
+  const nodeView = document.getElementById('vgSbNode');
+  const fileView = document.getElementById('vgSbFile');
+
+  if (fileName.endsWith('.pdf')) {
+    window.open(`/api/vault-graph/raw?path=${encodeURIComponent(filePath)}`, '_blank');
+    return;
+  }
+
+  try {
+    const res = await api(`/api/vault-graph/content?path=${encodeURIComponent(filePath)}`);
+    if (!res.success) {
+      fileView.innerHTML = '<div class="empty-state">Failed to load file</div>';
+    } else {
+      const [, bodyText] = parseFrontmatter(res.data.content);
+      const html = vgMarkdownToHtml(bodyText);
+      fileView.innerHTML = `
+        <button class="vg-close" onclick="vgCloseFile()">&times;</button>
+        <h3>${escapeHtml(fileName.replace(/\.md$/, ''))}</h3>
+        <div class="vg-file-path">${escapeHtml(filePath)}</div>
+        <div class="vg-file-content">${html}</div>
+      `;
+    }
+    nodeView.style.display = 'none';
+    fileView.style.display = '';
+    sb.classList.add('open');
+  } catch (e) {
+    fileView.innerHTML = '<div class="empty-state">Error loading file</div>';
+    nodeView.style.display = 'none';
+    fileView.style.display = '';
+    sb.classList.add('open');
+  }
+}
+
+function vgCloseFile() {
+  const sb = document.getElementById('vgSidebar');
+  sb.classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('vgSbNode').style.display = '';
+    document.getElementById('vgSbFile').style.display = 'none';
+  }, 300);
+}
+
+function vgMarkdownToHtml(md) {
+  if (!md) return '';
+  const lines = md.split('\n');
+  let html = '', inList = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) { if (inList) { html += '</ul>'; inList = false; } html += '<br>'; continue; }
+    if (t.startsWith('# ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h1>${escapeHtml(t.slice(2))}</h1>`; }
+    else if (t.startsWith('## ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h2>${escapeHtml(t.slice(3))}</h2>`; }
+    else if (t.startsWith('### ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h3>${escapeHtml(t.slice(4))}</h3>`; }
+    else if (t.startsWith('#### ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h4>${escapeHtml(t.slice(5))}</h4>`; }
+    else if (t.startsWith('> ')) { if (inList) { html += '</ul>'; inList = false; } html += `<blockquote>${escapeHtml(t.slice(2))}</blockquote>`; }
+    else if (t.startsWith('- ') || t.startsWith('* ')) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${escapeHtml(t.slice(2))}</li>`;
+    }
+    else {
+      if (inList) { html += '</ul>'; inList = false; }
+      let txt = escapeHtml(t)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
+      html += `<p>${txt}</p>`;
+    }
+  }
+  if (inList) html += '</ul>';
+  return html;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 }
 
 // ── INIT ──
