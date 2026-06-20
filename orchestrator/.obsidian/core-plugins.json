@@ -1,0 +1,12 @@
+{
+  "backlink": true,
+  "canvas": true,
+  "daily-notes": true,
+  "graph": true,
+  "note-composer": true,
+  "outgoing-link": true,
+  "page-preview": true,
+  "slash-command": true,
+  "tag-pane": true,
+  "templates": true
+}

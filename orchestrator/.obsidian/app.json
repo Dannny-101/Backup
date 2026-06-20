@@ -1,0 +1,7 @@
+{
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "daily",
+  "attachmentFolderPath": "99-archive",
+  "promptDelete": false
+}
