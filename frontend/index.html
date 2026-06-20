@@ -21,19 +21,22 @@
 <meta name="twitter:description" content="Verified student rooms near Malaysian universities. Browse listings from RM400/month.">
 <meta name="twitter:image" content="https://tenandsee.homes/assets/logo.png">
 <link rel="icon" type="image/png" href="/assets/logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
     <script src="/theme.js"></script>
     <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" href="/cookie-consent.css">
     <script src="/socket.io/socket.io.js"></script>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=2">
 </head>
 <body>
 
+    <!-- ── SCROLL PROGRESS BAR ── -->
+    <div class="scroll-progress-bar" id="scrollProgressBar" aria-hidden="true"></div>
+
     <!-- ── NAVBAR ── -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar navbar-transparent navbar-transition" id="navbar">
         <div class="nav-container">
             <a href="/" class="logo" target="_self" aria-label="Ten&See home"><img src="/assets/logo.png" alt="Ten&See logo"><span class="logo-text">Ten<span>&</span>See</span></a>
             <ul class="nav-links" id="navLinks">
@@ -55,23 +58,17 @@
 
     <!-- ── HERO ── -->
     <section class="hero" id="home">
-        <!-- Dynamic Hero Background System - CONFIGURABLE -->
-        <!-- Options: 1) Single Image, 2) Video, 3) Slideshow -->
-        <div class="hero-bg-container" id="heroBgContainer">
-            <!-- SLIDESHOW MODE: Add slides below (will auto-rotate) -->
+        <!-- Animated triangle mesh canvas background -->
+        <canvas id="heroMeshCanvas" class="hero-mesh-canvas" aria-hidden="true"></canvas>
+        <div class="hero-mesh-overlay"></div>
+
+        <!-- Legacy slideshow kept hidden as fallback (script checks id) -->
+        <div class="hero-bg-container" id="heroBgContainer" style="display:none;">
             <div class="hero-bg-slideshow" id="heroSlideshow">
                 <div class="hero-bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1920&q=80');"></div>
                 <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1920&q=80');"></div>
                 <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1920&q=80');"></div>
             </div>
-
-            <!-- VIDEO MODE: Uncomment below and comment out slideshow above -->
-            <!-- <video class="hero-bg-video" autoplay muted loop playsinline>
-                <source src="/assets/hero-video.mp4" type="video/mp4">
-            </video> -->
-
-            <!-- SINGLE IMAGE MODE: Uncomment below and comment out slideshow -->
-            <!-- <img class="hero-bg-image" src="/assets/hero-bg.jpg" alt="Background"> -->
         </div>
 
         <div class="hero-grid">
@@ -80,31 +77,52 @@
                     <i class="fas fa-map-marker-alt"></i> Built for International and Local Students
                 </div>
                 <h1 class="hero-title">
-                    Find Your <span class="accent">Perfect Room</span><br>Near Your University
+                    <span class="hero-title-line">Find Your Perfect Room</span><br>
+                    <span class="hero-title-line hero-title-line--accent">Near Your University</span>
                 </h1>
                 <p class="hero-desc">
-                    Ten&See connects International and Local students with verified, walking distance rooms to campus for univeriy students at affodable prices. No agent fees. No guesswork. Just a home.
+                    Ten&See connects international and local students with verified, walkable rooms near campus at affordable prices. No agent fees. No guesswork. Just a home.
                 </p>
+
+                <!-- Frosted glass floating search bar -->
+                <div class="hero-search-glass">
+                    <div class="hero-search-field">
+                        <label>University</label>
+                        <select id="heroUni" onchange="updateHeroAreaOptions()">
+                            <option value="">Select University</option>
+                        </select>
+                    </div>
+                    <div class="hero-search-field">
+                        <label>Area</label>
+                        <select id="heroArea">
+                            <option value="">Select Area</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-pill" onclick="heroSearch()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
                 <div class="hero-actions">
-                    <a href="/listings.html" class="btn btn-primary btn-lg" target="_self">
+                    <a href="/listings.html" class="btn btn-primary btn-lg btn-pill" target="_self">
                         <i class="fas fa-search"></i> Browse Listings
                     </a>
-                    <a href="#contact" class="btn btn-outline btn-lg" target="_self">
+                    <a href="#contact" class="btn btn-outline btn-lg btn-pill" target="_self">
                         <i class="fab fa-whatsapp"></i> WhatsApp Us
                     </a>
                 </div>
-                <div class="hero-stats">
-                    <div>
-                        <div class="hero-stat-value" id="statTotalRooms">—</div>
-                        <div class="hero-stat-label">Verified Rooms Available</div>
+                <div class="hero-stats hero-stats-chips">
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-value" data-count="6" data-suffix="">0</div>
+                        <div class="hero-stat-label">Universities</div>
                     </div>
-                    <div>
-                        <div class="hero-stat-value">6</div>
-                        <div class="hero-stat-label">Malaysian Universities</div>
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-value" data-count="400" data-prefix="RM ">0</div>
+                        <div class="hero-stat-label">Starting Price</div>
                     </div>
-                    <div>
-                        <div class="hero-stat-value">KL</div>
-                        <div class="hero-stat-label">Currently serving Kuala Lumpur</div>
+                    <div class="hero-stat-chip">
+                        <div class="hero-stat-value">No</div>
+                        <div class="hero-stat-label">Agent Fees</div>
                     </div>
                 </div>
             </div>
@@ -440,6 +458,7 @@
 
     <!-- ── FOOTER ── -->
     <footer class="footer">
+        <canvas id="footerMeshCanvas" class="footer-texture" aria-hidden="true"></canvas>
         <div class="footer-grid">
             <div class="footer-col">
                 <h4 class="footer-logo"><img src="/assets/logo.png" alt="Ten&See logo"></h4>
@@ -535,7 +554,7 @@
 
     <!-- Hero Slideshow JavaScript -->
 
-    <script src="/app.js"></script>
+    <script src="/app.js?v=2"></script>
 </body>
 </html>
 
