@@ -90,8 +90,10 @@ AOS.init({ duration: 600, once: true, offset: 60 });
 
                 // Calculate total individual rooms (sum of bedrooms across all properties)
                 const totalRooms = listings.reduce((sum, l) => sum + (l.bedrooms || 1), 0);
-                document.getElementById('statTotalRooms').textContent = totalRooms;
-                document.getElementById('wvTotalRooms').textContent = totalRooms;
+                const statTotalRooms = document.getElementById('statTotalRooms');
+                const wvTotalRooms = document.getElementById('wvTotalRooms');
+                if (statTotalRooms) statTotalRooms.textContent = totalRooms;
+                if (wvTotalRooms) wvTotalRooms.textContent = totalRooms;
 
                 const grid = document.getElementById('featuredGrid');
                 if (!listings.length) {
@@ -853,6 +855,7 @@ AOS.init({ duration: 600, once: true, offset: 60 });
             initWhatsAppQR();
             initChatScrollTransition();
             initMeshCanvas('heroMeshCanvas', { cols: 20, rows: 14, speed: 0.0004, opacity: 0.08 });
+            initCountUp();
         });
 
         // ── INLINE CHAT (contact section) — reuses same socket + session ──
@@ -998,6 +1001,34 @@ AOS.init({ duration: 600, once: true, offset: 60 });
             if (type) params.set('propertyType', type);
             if (maxPrice) params.set('maxPrice', maxPrice);
             window.location.href = `/listings.html${params.toString() ? '?' + params : ''}`;
+        }
+
+        // Count-up animation for hero stats
+        function initCountUp() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseInt(el.dataset.count || '0');
+                        const prefix = el.dataset.prefix || '';
+                        const suffix = el.dataset.suffix || '';
+                        if (!target || el.dataset.counted) return;
+                        el.dataset.counted = 'true';
+                        const duration = 1500;
+                        const start = performance.now();
+                        function tick(now) {
+                            const progress = Math.min((now - start) / duration, 1);
+                            const ease = 1 - Math.pow(1 - progress, 3);
+                            const current = Math.floor(ease * target);
+                            el.textContent = prefix + current + suffix;
+                            if (progress < 1) requestAnimationFrame(tick);
+                            else el.textContent = prefix + target + suffix;
+                        }
+                        requestAnimationFrame(tick);
+                    }
+                });
+            }, { threshold: 0.5 });
+            document.querySelectorAll('[data-count]').forEach(el => observer.observe(el));
         }
 
         // Triangle mesh canvas animation
