@@ -4489,7 +4489,7 @@ async function vgOpenFile(encPath, encName) {
     if (!res.success) {
       fileView.innerHTML = '<div class="empty-state">Failed to load file</div>';
     } else {
-      const [, bodyText] = parseFrontmatter(res.data.content);
+      const bodyText = vgStripFrontmatter(res.data.content);
       const html = vgMarkdownToHtml(bodyText);
       fileView.innerHTML = `
         <button class="vg-close" onclick="vgCloseFile()">&times;</button>
@@ -4516,6 +4516,15 @@ function vgCloseFile() {
     document.getElementById('vgSbNode').style.display = '';
     document.getElementById('vgSbFile').style.display = 'none';
   }, 300);
+}
+
+function vgStripFrontmatter(md) {
+  if (!md) return '';
+  const t = md.trim();
+  if (!t.startsWith('---')) return md;
+  const parts = t.split('---');
+  if (parts.length < 3) return md;
+  return parts.slice(2).join('---').trimStart();
 }
 
 function vgMarkdownToHtml(md) {
@@ -4830,7 +4839,7 @@ async function vgUploadPdf(input) {
 
 function vgDeleteFile(filePath, fileName) {
   if (!confirm(`Delete ${fileName}?`)) return;
-  api(`/api/vault-graph/files?path=${encodeURIComponent(filePath)}`, { method: 'DELETE' })
+  api(`/api/vault-graph/files?path=${filePath}`, { method: 'DELETE' })
     .then(res => {
       if (res.success) {
         toast('File deleted', 'success');

@@ -32,7 +32,6 @@
             "state": {
               "type": "localgraph",
               "state": {
-                "file": "04-team/Onboarding.md",
                 "options": {
                   "collapse-filter": true,
                   "search": "",
@@ -60,7 +59,7 @@
                 }
               },
               "icon": "lucide-git-fork",
-              "title": "Graph of Onboarding"
+              "title": "Graph view"
             },
             "group": "13c6357f1232f24d"
           }
@@ -224,36 +223,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "39734126c66d131a",
+  "active": "8f646473581c7648",
   "lastOpenFiles": [
-    "04-team/Onboarding.md",
     "daily/Daily Hub.md",
+    "daily/2026-06-20.md",
+    "daily",
+    "99-templates/topic.md",
+    "99-templates/hub.md",
+    "99-templates/detail.md",
+    "99-templates",
+    "99-index.md",
     "08-sops/Playbooks.md",
-    "08-sops/Runbooks.md",
     "08-sops/SOPs Hub.md",
+    "08-sops/Runbooks.md",
+    "08-sops",
     "07-competitive/Landscape.md",
     "07-competitive/Competitive Hub.md",
+    "07-competitive",
     "06-brand/Voice.md",
     "06-brand/Brand Hub.md",
-    "05-roadmap/Backlog.md",
-    "05-roadmap/Milestones.md",
+    "06-brand",
     "05-roadmap/Roadmap Hub.md",
-    "04-team/Meetings.md",
-    "04-team/Org Chart.md",
+    "05-roadmap/Milestones.md",
+    "05-roadmap/Backlog.md",
+    "05-roadmap",
     "04-team/Team Hub.md",
+    "04-team/Org Chart.md",
+    "04-team/Onboarding.md",
+    "04-team/Meetings.md",
+    "04-team",
     "03-operations/Vendors.md",
-    "03-operations/Processes.md",
     "03-operations/Service Model.md",
+    "03-operations/Processes.md",
     "03-operations/Operations Hub.md",
-    "02-product/API Reference.md",
-    "02-product/Codebase Map.md",
-    "02-product/Architecture.md",
+    "03-operations",
     "02-product/Product Hub.md",
-    "01-company/Metrics.md",
-    "01-company/Strategy.md",
-    "01-company/Overview.md",
-    "path/to",
-    "path",
-    "99-templates"
+    "02-product/Codebase Map.md",
+    "02-product",
+    "01-company"
   ]
 }
