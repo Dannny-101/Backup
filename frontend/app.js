@@ -2,7 +2,11 @@ AOS.init({ duration: 600, once: true, offset: 60 });
 
         // Navbar scroll
         window.addEventListener('scroll', () => {
-            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+            const navbar = document.getElementById('navbar');
+            const scrolled = window.scrollY > 100;
+            navbar.classList.toggle('scrolled', scrolled);
+            navbar.classList.toggle('navbar-scrolled', scrolled);
+            navbar.classList.toggle('navbar-transparent', !scrolled);
         });
 
         // Mobile nav

@@ -20,6 +20,19 @@ html { scroll-behavior: smooth; }
             box-shadow: 0 2px 20px rgba(0,0,0,0.15);
             padding: 0.75rem 2rem;
         }
+        .navbar.navbar-transition {
+            transition: background 0.35s ease, backdrop-filter 0.35s ease, box-shadow 0.35s ease, padding 0.3s ease;
+        }
+        .navbar.navbar-transparent {
+            background: transparent;
+        }
+        .navbar.navbar-scrolled {
+            background: rgba(44, 56, 48, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            padding: 0.75rem 2rem;
+        }
         .nav-container {
             max-width: 1400px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center;
