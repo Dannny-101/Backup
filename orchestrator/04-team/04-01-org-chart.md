@@ -10,84 +10,34 @@ tags:
 
 # Team / Org Chart
 
-## Current State
+## Right Now
 
-**Team size:** 1 (founder/CEO — you)
+Team size is one: you, the founder and CEO. You currently wear every hat — product and engineering, sales and landlord relations, operations and customer support, marketing and brand, finance and admin.
 
-**You currently wear all hats:**
-- Product & Engineering
-- Sales & Landlord Relations
-- Operations & Customer Support
-- Marketing & Brand
-- Finance & Admin
+## Where We Are Headed
 
-## Target Structure (Service-First Model)
+The target structure for a service-first model looks like this. The Founder and CEO sits at the top. Under that, a Head of Operations manages Student Placement Coordinators (two to three people handling lead qualification, viewing scheduling, and booking processing) and Support Agents (one to two people covering live chat via the chatQueue and WhatsApp support). A Head of Growth oversees Digital Marketing, Landlord Acquisition, and Partnerships. A Head of Product or CTO manages Full-Stack Engineers (two) and QA or DevOps (one). Finally, an Admin and Finance person handles bookkeeping and compliance.
 
-```
-Founder / CEO
-├── Head of Operations
-│   ├── Student Placement Coordinators (2-3)
-│   │   ├── Lead qualification
-│   │   ├── Viewing scheduling
-│   │   └── Booking processing
-│   └── Support Agents (1-2)
-│       ├── Live chat (via chatQueue)
-│       └── WhatsApp support
-├── Head of Growth
-│   ├── Digital Marketing (1)
-│   ├── Landlord Acquisition (1)
-│   └── Partnerships (1)
-├── Head of Product / CTO
-│   ├── Full-Stack Engineers (2)
-│   └── QA / DevOps (1)
-└── Admin / Finance (1)
-    ├── Bookkeeping
-    └── Compliance
-```
-
-## Roles & Responsibilities
+## What We Need
 
 | Role | Current | Needed | Priority |
 |------|---------|--------|----------|
 | Founder/CEO | You | You | — |
-| Student Placement Coordinator | You (part-time) | 2 FTE | **High** |
-| Support Agent | You (reactive) | 1 FTE | **High** |
+| Student Placement Coordinator | You (part-time) | 2 FTE | High |
+| Support Agent | You (reactive) | 1 FTE | High |
 | Full-Stack Developer | You | 1 FTE | Medium |
 | Digital Marketer | You | 1 FTE | Medium |
 | Landlord Relations | You | 1 FTE | Medium |
 | Admin/Finance | You | 1 part-time | Low |
 
-## Hiring Strategy
+## Hiring Timeline
 
-### Phase 1: Prove Model (Now - 3mo)
-- Hire 1x Student Placement Coordinator (contractor or intern)
-- You handle everything else
+Phase one is proving the model over the next three months. Hire one Student Placement Coordinator as a contractor or intern. You handle everything else. Phase two is stabilizing at three to six months. Hire one Support Agent and one Digital Marketer, either part-time or through an agency. Phase three is scaling at six to twelve months. Hire one Full-Stack Developer, one Landlord Relations person, and one part-time Admin and Finance role.
 
-### Phase 2: Stabilize (3-6mo)
-- Hire 1x Support Agent
-- Hire 1x Digital Marketer (part-time or agency)
+## Compensation
 
-### Phase 3: Scale (6-12mo)
-- Hire 1x Full-Stack Developer
-- Hire 1x Landlord Relations
-- Hire 1x Admin/Finance (part-time)
+Early hires get equity plus below-market cash where possible. Start with contractors, then convert to full-time after three months if the fit is strong. Tie performance bonuses to booking conversions.
 
-## Compensation Philosophy
+## AI as a Team Member
 
-- Early hires: equity + below-market cash (if possible)
-- Contractors first, convert to FTE after 3mo if fit is strong
-- Performance bonuses tied to booking conversions
-
-## AI as Team Member
-
-- **Role:** 4th team member (alongside you + 2 humans)
-- **Responsibilities:**
-  - Drafting communications (emails, WhatsApp templates)
-  - Data analysis and reporting
-  - Code review and bug fixes
-  - Knowledge base maintenance (this vault)
-  - Ideation and strategy stress-testing
-- **Limitations:** No direct customer-facing without human review. No financial decisions. No legal advice.
-
----
-
+AI is the fourth team member alongside you and two humans. Its responsibilities include drafting communications like emails and WhatsApp templates, data analysis and reporting, code review and bug fixes, knowledge base maintenance in this vault, and ideation and strategy stress-testing. AI does not face customers directly without human review, does not make financial decisions, and does not give legal advice.

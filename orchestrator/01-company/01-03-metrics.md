@@ -10,11 +10,9 @@ tags:
 
 # Metrics & KPIs
 
-## North Star Metric
+Our north star metric is **successful student placements per month** — a student who enquired, viewed, and booked through Ten&See.
 
-**Successful student placements per month** — a student who enquired, viewed, and booked through Ten&See.
-
-## Dashboard Metrics
+## Core Dashboard
 
 | Metric | Definition | Current | Target (6mo) | Target (12mo) |
 |--------|-----------|---------|--------------|---------------|
@@ -32,26 +30,15 @@ tags:
 
 ## Leading Indicators
 
-| Indicator | Why It Matters |
-|-----------|--------------|
-| Website traffic | Top of funnel |
-| Bounce rate on property pages | Content/UX quality |
-| Chat response time | Service level |
-| WhatsApp message volume | Engagement channel preference |
-| Admin dashboard login frequency | Team activity |
+These metrics predict future outcomes. Website traffic is the top of funnel. Bounce rate on property pages measures content and UX quality. Chat response time indicates service level. WhatsApp message volume shows engagement channel preference. Admin dashboard login frequency tracks team activity.
 
-## Data Collection
+## Data Sources
 
-- Booking data: `backend/models/Booking.js`
-- Lead data: `backend/models/Lead.js`
-- Chat data: `backend/models/ChatMessage.js`, `ChatSession.js`
-- Audit trail: `backend/models/auditlog.js`
+All data comes from the application itself. Booking data lives in `backend/models/Booking.js`. Lead data is in `backend/models/Lead.js`. Chat data spans `backend/models/ChatMessage.js` and `ChatSession.js`. The audit trail is maintained in `backend/models/auditlog.js`.
 
-## Reporting
+## Reporting Cadence
 
-- **Weekly:** Enquiries, bookings, active chats, admin activity
-- **Monthly:** Conversion rates, revenue, NPS, landlord satisfaction
-- **Quarterly:** Strategic review — pivot or persevere?
+Weekly reports cover enquiries, bookings, active chats, and admin activity. Monthly reports review conversion rates, revenue, NPS, and landlord satisfaction. Quarterly reports are strategic reviews that answer one question: pivot or persevere?
 
 ---
 

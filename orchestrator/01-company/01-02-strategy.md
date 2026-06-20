@@ -9,64 +9,31 @@ tags:
 
 # Strategy
 
-## Current Position
+## Where We Are
 
-We are a **feature-complete but undifferentiated** student housing listing platform. The product works (listings, leads, bookings, admin dashboard, live chat, WhatsApp/SMS/email), but it does not have a moat.
+We are a feature-complete but undifferentiated student housing listing platform. The product works — listings, leads, bookings, admin dashboard, live chat, WhatsApp, SMS, email — but it does not have a moat. Four open questions remain: what is our true differentiator (currently leaning toward high-touch service), should we own the relationship end-to-end, is the platform a tool or the business itself, and what are the unit economics of each model.
 
-## Strategic Questions (Open)
+## The Four Pivot Options
 
-| Question | Status |
-|----------|--------|
-| What is our true differentiator? | Unresolved — leaning toward high-touch service |
-| Should we own the relationship end-to-end? | Under discussion |
-| Is the platform a tool or the business? | Under discussion |
-| What is the unit economics of each model? | Not yet modeled |
+**Tech-First Differentiation** would mean building AI roommate matching based on personality and lifestyle, AR/3D virtual tours, and predictive rent pricing. The upside is scalable, defensible, and exciting to investors. The downside is that it is expensive to build and may not address what students actually complain about.
 
-## Possible Strategic Pivots
+**Service-First Differentiation** is our current lean. We become a placement service rather than a directory. A student fills a brief, we curate options, coordinate viewings, and handle the booking. This gives a premium feel, high trust, and concierge-level support. It is hard to replicate, justifies higher fees, and builds real relationships. The tradeoff is that it is labor-intensive, harder to scale, and requires a sales and operations team.
 
-### 1. Tech-First Differentiation
-- AI roommate matching based on personality/lifestyle
-- AR/3D virtual tours of properties
-- Predictive rent pricing / demand forecasting
-- **Pros:** Scalable, defensible, exciting to investors
-- **Cons:** Expensive to build, not what students actually complain about
+**Niche Domination** means focusing exclusively on international students with visa help and airport pickup, or postgraduates who want quiet study-focused longer leases, or specific cities like Subang Jaya and Sunway only. This is easier to market, generates stronger word-of-mouth, and simplifies operations. The risk is a smaller total addressable market and potentially being too narrow.
 
-### 2. Service-First Differentiation (Current Lean)
-- We become a **placement service**, not a directory
-- Student fills a brief → we curate options → we coordinate viewings → we handle booking
-- Premium feel, high trust, concierge-level
-- **Pros:** Hard to replicate, justifies higher fees, builds real relationships
-- **Cons:** Labor-intensive, harder to scale, requires sales/ops team
+**Vertical Integration** would mean leasing properties directly from landlords and subletting to students. This gives the highest margins, full control, and a real brand experience. It is also capital intensive, operationally complex, and carries regulatory risk.
 
-### 3. Niche Domination
-- Focus exclusively on **international students** (visa help, airport pickup, furnished only)
-- Or **postgraduates** (quiet, study-focused, longer leases)
-- Or **specific cities** (e.g., Subang Jaya / Sunway only)
-- **Pros:** Easier to market, stronger word-of-mouth, simpler operations
-- **Cons:** Smaller TAM, risk of being too narrow
+## How to Decide
 
-### 4. Vertical Integration
-- We lease properties directly from landlords, then sublet to students
-- Full control of inventory, pricing, and experience
-- **Pros:** Highest margins, full control, real brand experience
-- **Cons:** Capital intensive, operational complexity, regulatory risk
-
-## Decision Framework
-
-Before choosing, answer:
-1. What do students currently complain about most?
-2. What do landlords currently complain about most?
-3. What can we do 10x better than anyone else?
-4. What can we sustain with current resources?
+Before choosing, answer four questions. What do students currently complain about most? What do landlords currently complain about most? What can we do ten times better than anyone else? What can we sustain with current resources?
 
 ## Next Step
 
-Pick ONE pivot direction, build a 90-day MVP, measure retention and NPS.
+Pick one pivot direction. Build a ninety-day MVP. Measure retention and NPS.
 
 ## Related
 
 - [[01-company/01-01-overview]] — Business model this strategy serves
-- [[01-company/01-03-metrics]] — How we'll measure success
+- [[01-company/01-03-metrics]] — How we measure success
 - [[04-team/04-01-org-chart]] — Team implications of each option
 - [[05-roadmap/05-02-backlog]] — Backlog items organized by strategy
-

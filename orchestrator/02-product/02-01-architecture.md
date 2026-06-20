@@ -10,7 +10,7 @@ tags:
 
 # System Architecture
 
-## High-Level Design
+## Overview
 
 ```
 ┌─────────────────┐      ┌──────────────────┐      ┌──────────────┐
@@ -46,20 +46,13 @@ tags:
 | Auth | JWT (custom middleware) |
 | Hosting | TBD |
 
-## Key Services
+## Services
 
-- **chatQueue.js** — Agent queue system for live chat
-- **chatPager.js** — Pager/alert system for chat agents
-- **whatsapp.js** — WhatsApp Cloud API integration
-- **email.js** — Canonical email module (single source of truth)
+Four services form the core backend layer. `chatQueue.js` manages the agent queue for live chat sessions. `chatPager.js` sends alerts to agents when sessions need attention. `whatsapp.js` handles all WhatsApp Cloud API integration. `email.js` is the single canonical email module — the only source of truth for email in the application.
 
-## Security Layer
+## Security
 
-- `authMiddleware` in `routes/admin.js` protects all non-public endpoints
-- Public endpoints: GET listings/properties, POST leads, POST bookings, POST chat, WhatsApp webhook
-- CORS allowlist, Helmet, rate limiting (Express + Socket.io)
-- WhatsApp webhook HMAC-SHA256 signature verification
-- JWT_SECRET from `.env` only — no fallbacks
+The `authMiddleware` in `routes/admin.js` protects all non-public endpoints. Public endpoints are limited to: GET listings and properties, POST leads, POST bookings, POST chat, and the WhatsApp webhook. CORS uses an allowlist, Helmet headers are enabled, and rate limiting is applied on both Express and Socket.io. The WhatsApp webhook verifies HMAC-SHA256 signatures using the Meta App Secret. The `JWT_SECRET` comes exclusively from `.env` — there are no fallback secrets.
 
 ## Socket.io Events
 
@@ -71,7 +64,7 @@ tags:
 | `typing` | Bidirectional | Typing indicators |
 | `agent-join` | Server → Client | Agent assigned to session |
 
-## Environment Variables (from `.env`)
+## Environment Variables
 
 | Key | Purpose |
 |-----|---------|

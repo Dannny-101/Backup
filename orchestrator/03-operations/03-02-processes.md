@@ -12,87 +12,26 @@ tags:
 
 # Core Processes
 
-## 1. Enquiry → Lead
+## Enquiry to Lead
 
-**Trigger:** Student submits lead form, sends WhatsApp, or starts chat.
+A student submits a lead form, sends a WhatsApp message, or starts a chat. The platform captures contact information and property interest, then creates a Lead record with the source tagged as web, WhatsApp, or chat. If the source is WhatsApp, email is optional. The system triggers a notification to the admin dashboard and sends an auto-reply with next steps via WhatsApp or email template. The platform handles this automatically, and an admin follows up.
 
-**Flow:**
-1. Capture contact info + property interest
-2. Create `Lead` record (source tagged: web/whatsapp/chat)
-3. If `source === 'whatsapp'`, email is optional
-4. Trigger notification to admin dashboard
-5. Auto-reply with next steps (WhatsApp/email template)
+## Lead Qualification
 
-**Owner:** Platform (automated) + Admin (follow-up)
+When a new lead is created, the admin reviews it in the dashboard and calls or WhatsApps the student to confirm their budget, move-in timeline, room type preference, and any special requirements. The admin updates the lead status from new to contacted to qualified. If the lead is qualified, they assign it to the property and viewing pipeline. This is owned by the Sales and Operations Admin.
 
-## 2. Lead Qualification
+## Viewing Scheduling
 
-**Trigger:** New lead created.
+Once a lead is qualified and matched to a property, the operations team checks landlord and property availability, proposes two to three time slots to the student, and confirms the viewing via WhatsApp or email. The viewing is added to the admin calendar and task list. After the viewing, the lead status is updated and feedback is captured. This is owned by the Operations Admin.
 
-**Flow:**
-1. Admin reviews lead in dashboard
-2. Call/WhatsApp student to confirm:
-   - Budget
-   - Move-in timeline
-   - Room type preference
-   - Any special requirements
-3. Update lead status: `new` → `contacted` → `qualified`
-4. If qualified, assign to property/viewing pipeline
+## Booking
 
-**Owner:** Sales/Operations Admin
+When a student confirms they want to book after a viewing, the admin initiates the booking in the dashboard, collects student documents like IC or passport and student ID (plus guarantor if needed), generates a tenancy agreement from a template, collects the deposit and first month rent, marks the booking as confirmed, sends confirmation to the student and landlord, and creates a move-in checklist task. This is owned by the Operations Admin.
 
-## 3. Viewing Scheduling
+## Live Chat Support
 
-**Trigger:** Qualified lead + property match.
+When a student opens the chat widget, a chat session is created with status waiting. The chatQueue assigns the next available agent. The agent joins, the status changes to active, and real-time messaging happens via Socket.io. When the chat closes, the status changes to closed and a summary is logged. This is owned by the Support Agent.
 
-**Flow:**
-1. Check landlord/property availability
-2. Propose 2-3 time slots to student
-3. Confirm viewing (WhatsApp/email)
-4. Add to admin calendar/task list
-5. Post-viewing: update lead status, capture feedback
+## WhatsApp Outreach
 
-**Owner:** Operations Admin
-
-## 4. Booking
-
-**Trigger:** Student confirms they want to book after viewing.
-
-**Flow:**
-1. Admin initiates booking in dashboard
-2. Collect student documents (IC/passport, student ID, guarantor if needed)
-3. Generate tenancy agreement (template)
-4. Collect deposit + first month rent
-5. Mark booking as `confirmed`
-6. Send confirmation to student + landlord
-7. Create move-in checklist task
-
-**Owner:** Operations Admin
-
-## 5. Live Chat Support
-
-**Trigger:** Student opens chat widget.
-
-**Flow:**
-1. Chat session created, status `waiting`
-2. `chatQueue.js` assigns next available agent
-3. Agent joins, status → `active`
-4. Real-time messaging via Socket.io
-5. On close: status → `closed`, summary logged
-
-**Owner:** Support Agent (via `chatQueue.js`)
-
-## 6. WhatsApp Outreach
-
-**Trigger:** Automated (new listing match) or manual (follow-up).
-
-**Flow:**
-1. Compose message (template or freeform)
-2. Send via `services/whatsapp.js` → Meta WhatsApp Cloud API
-3. Log message to chat/lead history
-4. Handle incoming replies via webhook
-
-**Owner:** Platform (automated) or Admin (manual)
-
----
-
+Outreach can be automated (triggered by a new listing match) or manual (a follow-up). The team composes a message from a template or freeform text, sends it via the whatsapp service to the Meta WhatsApp Cloud API, logs the message to the chat and lead history, and handles incoming replies via the webhook. This is owned by the platform when automated, or by the admin when manual.

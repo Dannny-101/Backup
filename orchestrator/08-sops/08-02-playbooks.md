@@ -12,103 +12,34 @@ tags:
 
 # Playbooks
 
-## Playbook vs Runbook
+A playbook is how to achieve a strategic outcome, while a runbook is how to do a specific operational task.
 
-- **Runbook:** How to do a specific task (operational)
-- **Playbook:** How to achieve a strategic outcome (tactical)
+## Student Acquisition
 
-## 1. Student Acquisition Playbook
+The acquisition funnel flows from awareness through social media and SEO, to interest via website visits, to enquiry through lead forms, to qualification via calls or chat, then viewing, booking, and finally referral.
 
-### Channels
+**Channels.** Instagram and TikTok are for student life content and property tours with low budget and an expected customer acquisition cost of five to ten ringgit. Google Ads target "student housing [city]" with medium budget and an expected CAC of twenty to thirty ringgit. University partnerships through flyers, orientation booths, and email lists cost little with an expected CAC of two to five ringgit. A referral program offering "Refer a friend, get RM 50 off" has low cost and an expected CAC of ten to twenty ringgit. WhatsApp groups are free — join student groups and be helpful rather than spammy.
 
-| Channel | Tactic | Budget | Expected CAC |
-|---------|--------|--------|-------------|
-| Instagram / TikTok | Student life content, property tours | Low | RM 5-10 |
-| Google Ads | "student housing [city]" | Medium | RM 20-30 |
-| University partnerships | Flyers, orientation booth, email list | Low | RM 2-5 |
-| Referral program | "Refer a friend, get RM 50 off" | Low | RM 10-20 |
-| WhatsApp groups | Join student groups, be helpful (not spammy) | Free | Free |
+**Content Calendar.** Monday is property spotlight on Instagram. Tuesday is a student tip or guide on the blog and Instagram. Wednesday is a testimonial or review on Instagram. Thursday is a neighborhood guide on the blog and Instagram. Friday is meme or relatable student content on TikTok. Saturday is a live Q&A or property tour on Instagram Live. Sunday is user-generated content repost on Instagram.
 
-### Funnel
+## Landlord Acquisition
 
-```
-Awareness (Social, SEO) → Interest (Website visit) → Enquiry (Lead form) 
-→ Qualification (Call/chat) → Viewing → Booking → Referral
-```
+Target landlords who own three or more rooms in a student-heavy area, currently have vacancies or high turnover, are not using a property manager, and are comfortable enough with technology to use WhatsApp.
 
-### Content Calendar (Weekly)
+The outreach sequence spans twenty-one days. Day one is an introductory WhatsApp message explaining who we are and what we do. Day three is a follow-up with student demand statistics for their area. Day seven is an offer of a free listing for thirty days with no commitment, sent via WhatsApp or call. Day fourteen is a case study showing another landlord's results. Day twenty-one is the final follow-up or close.
 
-| Day | Content Type | Platform |
-|-----|-------------|----------|
-| Mon | Property spotlight | Instagram |
-| Tue | Student tip / guide | Blog / IG |
-| Wed | Testimonial / review | Instagram |
-| Thu | Neighborhood guide | Blog / IG |
-| Fri | Meme / relatable student content | TikTok |
-| Sat | Live Q&A or property tour | Instagram Live |
-| Sun | User-generated content repost | Instagram |
+Key pitch points: we only show your property to verified students, you get qualified enquiries rather than time-wasters, we handle the booking paperwork, and it is free to list with payment only when you get a tenant.
 
-## 2. Landlord Acquisition Playbook
+## Crisis Escalation
 
-### Target Profile
+Severity level one is a student complaint about property condition — the agent handles it and logs in the CRM. Level two is a landlord dispute over payment — the founder handles it and documents everything. Level three is a safety issue such as a fire hazard or illegal rental — this requires immediate escalation and legal review. Level four is a data breach or platform downtime — this triggers an all-hands incident response plan.
 
-- Owns 3+ rooms in student-heavy area
-- Currently has vacancies or high turnover
-- Not using a property manager
-- Tech-comfortable enough to use WhatsApp
+The escalation path flows from agent to team lead if one exists, then to founder, then to legal or external support.
 
-### Outreach Sequence
+## Seasonal Calendar
 
-| Day | Action | Channel |
-|-----|--------|---------|
-| 1 | Intro message: who we are, what we do | WhatsApp |
-| 3 | Follow-up: student demand stats for their area | WhatsApp |
-| 7 | Offer: free listing for 30 days, no commitment | WhatsApp / Call |
-| 14 | Case study: another landlord's results | WhatsApp |
-| 21 | Final follow-up or close | WhatsApp |
+Intake season runs July through September. This is peak demand when international students arrive for the September intake. The focus is inventory expansion and fast response times. Marketing runs the "New semester, new home" campaign.
 
-### Pitch Points
+Off-season is December through February. Demand is lower but there is more negotiating power. The focus is landlord retention and early-bird bookings. Marketing pushes "Book early, get the best rooms."
 
-- "We only show your property to verified students"
-- "You get qualified enquiries, not time-wasters"
-- "We handle the booking paperwork"
-- "Free to list, pay only when you get a tenant"
-
-## 3. Crisis / Escalation Playbook
-
-### Severity Levels
-
-| Level | Example | Response |
-|-------|---------|----------|
-| 1 | Student complaint about property condition | Agent handles, log in CRM |
-| 2 | Landlord dispute over payment | Founder handles, document everything |
-| 3 | Safety issue (fire hazard, illegal rental) | Immediate escalation, legal review |
-| 4 | Data breach / platform down | All hands, incident response plan |
-
-### Escalation Path
-
-```
-Agent → Team Lead (if exists) → Founder → Legal/External
-```
-
-## 4. Seasonal Playbook
-
-### Intake Season (July-September)
-
-- Peak demand: international students arriving for September intake
-- Focus: inventory expansion, fast response times
-- Marketing: "New semester, new home" campaign
-
-### Off-Season (December-February)
-
-- Lower demand, more negotiating power
-- Focus: landlord retention, early-bird bookings
-- Marketing: "Book early, get the best rooms"
-
-### Mid-Year Intake (January-March)
-
-- Secondary intake for some programs
-- Focus: targeted ads for mid-year starters
-
----
-
+Mid-year intake is January through March for secondary program intakes. The focus is targeted ads for mid-year starters.

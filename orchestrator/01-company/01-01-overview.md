@@ -10,48 +10,21 @@ tags:
 
 # Company Overview
 
-## Mission
+## Mission & Vision
 
-Make finding student housing in Malaysia **effortless, trustworthy, and human**.
+Our mission is to make finding student housing in Malaysia **effortless, trustworthy, and human**. Our vision is to become the most trusted name in student accommodation across Southeast Asia — not just a listing site, but a service students rely on from enquiry to move-in.
 
-## Vision
+## What We Do
 
-Become the most trusted name in student accommodation across Southeast Asia — not just a listing site, but a service students rely on from enquiry to move-in.
+We are a student housing platform where students discover, enquire about, and book their preferred accommodation. We earn commission per successful booking and are exploring management fees for landlords. Our target users are local and international students seeking off-campus housing in Malaysia, primarily in the Klang Valley and major university cities. We partner with landlords and property managers rather than owning properties ourselves.
 
-## Current Business Model
+## The Problem
 
-| Layer | Description |
-|-------|-------------|
-| **Revenue** | Commission per successful booking; potential management fees for landlords |
-| **Target users** | Students (local & international) seeking off-campus housing in Malaysia |
-| **Value prop** | Curated listings + enquiry system + booking pipeline + human support |
-| **Geography** | Malaysia (Klang Valley / major uni cities) |
-| **Properties** | Partnered with landlords/property managers; not owned |
+Students face scams and misleading listings on generic platforms, with no verification of landlords or properties, difficulty comparing options across locations, and no support during the booking process. Landlords face vacant rooms with no qualified tenant pipeline, time-wasting enquiries from unserious renters, and no streamlined booking or payment system.
 
-## The Problem We're Solving
+## Where We Stand
 
-Students face:
-- Scams and misleading listings on generic platforms
-- No verification of landlords or properties
-- Difficulty comparing options across locations
-- No support during the booking process
-
-Landlords face:
-- Vacant rooms with no qualified tenant pipeline
-- Time-wasting enquiries from unserious renters
-- No streamlined booking/payment system
-
-## Strategic Tension (Active Decision Needed)
-
-The current platform model is **functional but commoditized**. Competitors (iProperty, Mudah, Carousell, uni-official portals) offer similar listings. To win, we need a real differentiator.
-
-**Options on the table:**
-1. **Tech differentiation** — AI roommate matching, virtual tours, predictive pricing
-2. **Service differentiation** — High-touch concierge: we don't just list, we *place* students
-3. **Niche differentiation** — Focus exclusively on international students, postgrads, or specific cities
-4. **Vertical integration** — Manage properties ourselves (become a property manager, not just a platform)
-
-**Current lean:** Toward service differentiation — moving from self-serve platform to a "student housing placement service."
+The current platform model is **functional but commoditized**. Competitors like iProperty, Mudah, Carousell, and university portals offer similar listings. To win, we need a real differentiator. The options on the table are: tech differentiation (AI matching, virtual tours, predictive pricing), service differentiation (high-touch concierge where we place students rather than just listing), niche differentiation (focusing exclusively on international students, postgrads, or specific cities), and vertical integration (leasing and managing properties ourselves). Our current lean is toward service differentiation — moving from a self-serve platform to a student housing placement service.
 
 ## Key Metrics
 
@@ -64,9 +37,4 @@ The current platform model is **functional but commoditized**. Competitors (iPro
 
 ## Legal Entity
 
-- **Name:** Ten&See (brand name)
-- **Structure:** TBD / sole proprietorship or Sdn Bhd
-- **Compliance:** Needs to align with Malaysian tenancy laws, data privacy (PDPA), and student visa accommodation requirements for internationals
-
----
-
+Ten&See is the brand name. Legal structure is TBD — either sole proprietorship or Sdn Bhd. Compliance needs to align with Malaysian tenancy laws, data privacy (PDPA), and student visa accommodation requirements for internationals.

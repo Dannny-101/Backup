@@ -2,92 +2,21 @@
   "collapse-filter": false,
   "search": "",
   "showTags": true,
-  "showAttachments": false,
-  "hideUnresolved": true,
+  "showAttachments": true,
+  "hideUnresolved": false,
   "showOrphans": true,
-  "collapse-color-groups": true,
-  "colorGroups": [
-    {
-      "query": "path:01-company",
-      "color": {
-        "a": 1,
-        "rgb": 4498479
-      }
-    },
-    {
-      "query": "path:02-product",
-      "color": {
-        "a": 1,
-        "rgb": 11657298
-      }
-    },
-    {
-      "query": "path:03-operations",
-      "color": {
-        "a": 1,
-        "rgb": 14701258
-      }
-    },
-    {
-      "query": "path:04-team",
-      "color": {
-        "a": 1,
-        "rgb": 14763776
-      }
-    },
-    {
-      "query": "path:05-roadmap",
-      "color": {
-        "a": 1,
-        "rgb": 11672614
-      }
-    },
-    {
-      "query": "path:06-brand",
-      "color": {
-        "a": 1,
-        "rgb": 14069084
-      }
-    },
-    {
-      "query": "path:07-competitive",
-      "color": {
-        "a": 1,
-        "rgb": 15010043
-      }
-    },
-    {
-      "query": "path:08-sops",
-      "color": {
-        "a": 1,
-        "rgb": 5597991
-      }
-    },
-    {
-      "query": "tag:#decision-needed",
-      "color": {
-        "a": 1,
-        "rgb": 16711680
-      }
-    },
-    {
-      "query": "path:daily",
-      "color": {
-        "a": 1,
-        "rgb": 8947848
-      }
-    }
-  ],
+  "collapse-color-groups": false,
+  "colorGroups": [],
   "collapse-display": true,
   "showArrow": false,
-  "textFadeMultiplier": -1.5,
-  "nodeSizeMultiplier": 1.2,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
   "lineSizeMultiplier": 1,
   "collapse-forces": true,
-  "centerStrength": 0.5,
+  "centerStrength": 0.518713248970312,
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 0.608283480636632,
-  "close": false
+  "scale": 0.40457338476102145,
+  "close": true
 }
