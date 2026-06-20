@@ -1,0 +1,653 @@
+{
+  "nodes": [
+    {
+      "id": "00-start-here.md",
+      "title": "Ten&See \u2014 AI Context Orchestrator",
+      "section": "root",
+      "radius": 0,
+      "type": "center",
+      "tags": [
+        "overview",
+        "tenandsee",
+        "ai-orchestrator"
+      ]
+    },
+    {
+      "id": "99-index.md",
+      "title": "Index",
+      "section": "root",
+      "radius": 2,
+      "type": "hub",
+      "tags": [
+        "index",
+        "navigation"
+      ]
+    },
+    {
+      "id": "02-product/Architecture.md",
+      "title": "System Architecture",
+      "section": "02-product",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "architecture",
+        "system-design",
+        "tech-stack"
+      ]
+    },
+    {
+      "id": "02-product/API Reference.md",
+      "title": "API Reference",
+      "section": "02-product",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "api",
+        "reference",
+        "endpoints",
+        "rest",
+        "socketio"
+      ]
+    },
+    {
+      "id": "02-product/Product Hub.md",
+      "title": "Product",
+      "section": "02-product",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "product",
+        "hub"
+      ]
+    },
+    {
+      "id": "02-product/Codebase Map.md",
+      "title": "Codebase Map",
+      "section": "02-product",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "codebase",
+        "map",
+        "backend",
+        "frontend"
+      ]
+    },
+    {
+      "id": "07-competitive/Landscape.md",
+      "title": "Competitive Landscape",
+      "section": "07-competitive",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "competitive",
+        "landscape",
+        "competitors",
+        "positioning",
+        "moat"
+      ]
+    },
+    {
+      "id": "07-competitive/Competitive Hub.md",
+      "title": "Competitive",
+      "section": "07-competitive",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "competitive",
+        "hub"
+      ]
+    },
+    {
+      "id": "06-brand/Voice.md",
+      "title": "Brand Voice & Identity",
+      "section": "06-brand",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "brand",
+        "voice",
+        "tone",
+        "messaging",
+        "identity"
+      ]
+    },
+    {
+      "id": "06-brand/Brand Hub.md",
+      "title": "Brand",
+      "section": "06-brand",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "brand",
+        "hub"
+      ]
+    },
+    {
+      "id": "daily/Daily Hub.md",
+      "title": "Daily Notes",
+      "section": "daily",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "daily",
+        "hub"
+      ]
+    },
+    {
+      "id": "daily/2026-06-20.md",
+      "title": "2026-06-20 \u2014 Vault Creation Day",
+      "section": "daily",
+      "radius": 2,
+      "type": "daily",
+      "tags": [
+        "daily",
+        "vault",
+        "setup",
+        "founder"
+      ]
+    },
+    {
+      "id": "99-templates/detail.md",
+      "title": "Title",
+      "section": "99-templates",
+      "radius": 3,
+      "type": "detail",
+      "tags": [
+        "daily",
+        "tag"
+      ]
+    },
+    {
+      "id": "99-templates/topic.md",
+      "title": "Title",
+      "section": "99-templates",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "tag1",
+        "tag2"
+      ]
+    },
+    {
+      "id": "99-templates/hub.md",
+      "title": "Section Name",
+      "section": "99-templates",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "hub"
+      ]
+    },
+    {
+      "id": "04-team/Org Chart.md",
+      "title": "Team / Org Chart",
+      "section": "04-team",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "team",
+        "org-chart",
+        "hiring"
+      ]
+    },
+    {
+      "id": "04-team/Team Hub.md",
+      "title": "Team",
+      "section": "04-team",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "team",
+        "hub"
+      ]
+    },
+    {
+      "id": "04-team/Meetings.md",
+      "title": "Meetings & Decisions",
+      "section": "04-team",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "meetings",
+        "decisions",
+        "standup",
+        "reviews"
+      ]
+    },
+    {
+      "id": "04-team/Onboarding.md",
+      "title": "New Hire Onboarding",
+      "section": "04-team",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "onboarding",
+        "new-hire",
+        "checklist",
+        "training"
+      ]
+    },
+    {
+      "id": "05-roadmap/Roadmap Hub.md",
+      "title": "Roadmap",
+      "section": "05-roadmap",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "roadmap",
+        "hub"
+      ]
+    },
+    {
+      "id": "05-roadmap/Backlog.md",
+      "title": "Backlog & Ideas",
+      "section": "05-roadmap",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "backlog",
+        "ideas",
+        "experiments",
+        "tech-debt"
+      ]
+    },
+    {
+      "id": "05-roadmap/Milestones.md",
+      "title": "Milestones & Roadmap",
+      "section": "05-roadmap",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "roadmap",
+        "milestones",
+        "phases",
+        "goals"
+      ]
+    },
+    {
+      "id": "01-company/Overview.md",
+      "title": "Company Overview",
+      "section": "01-company",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "company",
+        "mission",
+        "business-model"
+      ]
+    },
+    {
+      "id": "01-company/Company Hub.md",
+      "title": "Company",
+      "section": "01-company",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "company",
+        "hub"
+      ]
+    },
+    {
+      "id": "01-company/Metrics.md",
+      "title": "Metrics & KPIs",
+      "section": "01-company",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "metrics",
+        "kpi",
+        "dashboard"
+      ]
+    },
+    {
+      "id": "01-company/Strategy.md",
+      "title": "Strategy",
+      "section": "01-company",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "strategy",
+        "decision-needed"
+      ]
+    },
+    {
+      "id": "08-sops/SOPs Hub.md",
+      "title": "SOPs",
+      "section": "08-sops",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "sops",
+        "hub"
+      ]
+    },
+    {
+      "id": "08-sops/Playbooks.md",
+      "title": "Playbooks",
+      "section": "08-sops",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "playbook",
+        "marketing",
+        "sales",
+        "acquisition",
+        "crisis"
+      ]
+    },
+    {
+      "id": "08-sops/Runbooks.md",
+      "title": "Runbooks",
+      "section": "08-sops",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "sop",
+        "runbook",
+        "procedures",
+        "operations"
+      ]
+    },
+    {
+      "id": "03-operations/Processes.md",
+      "title": "Core Processes",
+      "section": "03-operations",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "process",
+        "workflow",
+        "enquiry",
+        "booking",
+        "chat"
+      ]
+    },
+    {
+      "id": "03-operations/Operations Hub.md",
+      "title": "Operations",
+      "section": "03-operations",
+      "radius": 1,
+      "type": "hub",
+      "tags": [
+        "operations",
+        "hub"
+      ]
+    },
+    {
+      "id": "03-operations/Vendors.md",
+      "title": "Vendors & Partners",
+      "section": "03-operations",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "vendors",
+        "partners",
+        "technology",
+        "compliance"
+      ]
+    },
+    {
+      "id": "03-operations/Service Model.md",
+      "title": "Service Model",
+      "section": "03-operations",
+      "radius": 2,
+      "type": "topic",
+      "tags": [
+        "operations",
+        "service-model",
+        "pricing"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "99-index.md",
+      "target": "01-company/Overview.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "01-company/Strategy.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "01-company/Metrics.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "02-product/Architecture.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "02-product/Codebase Map.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "02-product/API Reference.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "03-operations/Service Model.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "03-operations/Processes.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "03-operations/Vendors.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "04-team/Org Chart.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "04-team/Meetings.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "04-team/Onboarding.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "05-roadmap/Milestones.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "05-roadmap/Backlog.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "06-brand/Voice.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "07-competitive/Landscape.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "08-sops/Runbooks.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "08-sops/Playbooks.md"
+    },
+    {
+      "source": "99-index.md",
+      "target": "00-start-here.md"
+    },
+    {
+      "source": "02-product/Architecture.md",
+      "target": "02-product/Product Hub.md"
+    },
+    {
+      "source": "02-product/API Reference.md",
+      "target": "02-product/Product Hub.md"
+    },
+    {
+      "source": "02-product/Product Hub.md",
+      "target": "02-product/Codebase Map.md"
+    },
+    {
+      "source": "02-product/Product Hub.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "02-product/Product Hub.md",
+      "target": "03-operations/Operations Hub.md"
+    },
+    {
+      "source": "02-product/Product Hub.md",
+      "target": "05-roadmap/Roadmap Hub.md"
+    },
+    {
+      "source": "07-competitive/Landscape.md",
+      "target": "07-competitive/Competitive Hub.md"
+    },
+    {
+      "source": "07-competitive/Competitive Hub.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "07-competitive/Competitive Hub.md",
+      "target": "06-brand/Brand Hub.md"
+    },
+    {
+      "source": "07-competitive/Competitive Hub.md",
+      "target": "03-operations/Operations Hub.md"
+    },
+    {
+      "source": "06-brand/Voice.md",
+      "target": "06-brand/Brand Hub.md"
+    },
+    {
+      "source": "06-brand/Brand Hub.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "06-brand/Brand Hub.md",
+      "target": "08-sops/SOPs Hub.md"
+    },
+    {
+      "source": "daily/Daily Hub.md",
+      "target": "daily/2026-06-20.md"
+    },
+    {
+      "source": "daily/2026-06-20.md",
+      "target": "01-company/Strategy.md"
+    },
+    {
+      "source": "04-team/Org Chart.md",
+      "target": "04-team/Team Hub.md"
+    },
+    {
+      "source": "04-team/Team Hub.md",
+      "target": "04-team/Meetings.md"
+    },
+    {
+      "source": "04-team/Team Hub.md",
+      "target": "04-team/Onboarding.md"
+    },
+    {
+      "source": "04-team/Team Hub.md",
+      "target": "03-operations/Operations Hub.md"
+    },
+    {
+      "source": "04-team/Team Hub.md",
+      "target": "05-roadmap/Roadmap Hub.md"
+    },
+    {
+      "source": "04-team/Team Hub.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "04-team/Onboarding.md",
+      "target": "01-company/Overview.md"
+    },
+    {
+      "source": "04-team/Onboarding.md",
+      "target": "08-sops/Runbooks.md"
+    },
+    {
+      "source": "04-team/Onboarding.md",
+      "target": "02-product/Codebase Map.md"
+    },
+    {
+      "source": "05-roadmap/Roadmap Hub.md",
+      "target": "05-roadmap/Milestones.md"
+    },
+    {
+      "source": "05-roadmap/Roadmap Hub.md",
+      "target": "05-roadmap/Backlog.md"
+    },
+    {
+      "source": "05-roadmap/Roadmap Hub.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "05-roadmap/Milestones.md",
+      "target": "01-company/Strategy.md"
+    },
+    {
+      "source": "01-company/Overview.md",
+      "target": "01-company/Company Hub.md"
+    },
+    {
+      "source": "01-company/Company Hub.md",
+      "target": "01-company/Strategy.md"
+    },
+    {
+      "source": "01-company/Company Hub.md",
+      "target": "01-company/Metrics.md"
+    },
+    {
+      "source": "01-company/Strategy.md",
+      "target": "01-company/Overview.md"
+    },
+    {
+      "source": "01-company/Strategy.md",
+      "target": "01-company/Metrics.md"
+    },
+    {
+      "source": "01-company/Strategy.md",
+      "target": "04-team/Org Chart.md"
+    },
+    {
+      "source": "01-company/Strategy.md",
+      "target": "05-roadmap/Backlog.md"
+    },
+    {
+      "source": "08-sops/SOPs Hub.md",
+      "target": "08-sops/Runbooks.md"
+    },
+    {
+      "source": "08-sops/SOPs Hub.md",
+      "target": "08-sops/Playbooks.md"
+    },
+    {
+      "source": "08-sops/SOPs Hub.md",
+      "target": "03-operations/Operations Hub.md"
+    },
+    {
+      "source": "08-sops/SOPs Hub.md",
+      "target": "04-team/Team Hub.md"
+    },
+    {
+      "source": "03-operations/Processes.md",
+      "target": "03-operations/Operations Hub.md"
+    },
+    {
+      "source": "03-operations/Operations Hub.md",
+      "target": "03-operations/Service Model.md"
+    },
+    {
+      "source": "03-operations/Operations Hub.md",
+      "target": "03-operations/Vendors.md"
+    },
+    {
+      "source": "03-operations/Operations Hub.md",
+      "target": "01-company/Company Hub.md"
+    }
+  ]
+}

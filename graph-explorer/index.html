@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ten&See Vault Graph</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+    #graph { width: 100vw; height: 100vh; cursor: grab; }
+    #graph:active { cursor: grabbing; }
+    
+    .sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 320px;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      padding: 24px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .sidebar .section-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .sidebar .meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .sidebar .meta span {
+      display: inline-block;
+      margin-right: 12px;
+    }
+    .sidebar .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .sidebar .tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .sidebar .links h3 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .sidebar .link-list {
+      list-style: none;
+    }
+    .sidebar .link-list li {
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--accent);
+    }
+    .sidebar .link-list li:hover { color: var(--accent-hover); }
+    .sidebar .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar .close-btn:hover { background: var(--bg); color: var(--text); }
+
+    .controls {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      min-width: 220px;
+    }
+    .controls h1 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .controls .filter-group {
+      margin-bottom: 12px;
+    }
+    .controls .filter-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .controls .filter-group .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .controls .filter-group .cb {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      user-select: none;
+    }
+    .controls .filter-group .cb input { display: none; }
+    .controls .filter-group .cb.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .controls .legend {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .controls .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .controls .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 200;
+      max-width: 240px;
+    }
+    .tooltip.visible { opacity: 1; }
+    .tooltip strong { color: var(--text); font-weight: 500; }
+    .tooltip small { color: var(--text-muted); }
+
+    .node-label {
+      font-size: 11px;
+      fill: var(--text-muted);
+      pointer-events: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+
+<div class="controls">
+  <h1>Ten&See Vault</h1>
+  <div class="filter-group">
+    <label>Sections</label>
+    <div class="checkboxes" id="section-filters"></div>
+  </div>
+  <div class="filter-group">
+    <label>Radius</label>
+    <div class="checkboxes" id="radius-filters"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div id="graph"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="closeSidebar()">&times;</button>
+  <h2 id="sb-title">Title</h2>
+  <div class="section-tag" id="sb-section">Section</div>
+  <div class="meta" id="sb-meta"></div>
+  <div class="tags" id="sb-tags"></div>
+  <div class="links">
+    <h3>Connections</h3>
+    <ul class="link-list" id="sb-links"></ul>
+  </div>
+</div>
+
+<script>
+const sectionColors = {
+  '01-company': '#7ee787',
+  '02-product': '#a5d6ff',
+  '03-operations': '#d2a8ff',
+  '04-team': '#ffca5f',
+  '05-roadmap': '#ffab70',
+  '06-brand': '#ff7b72',
+  '07-competitive': '#79c0ff',
+  '08-sops': '#56d4dd',
+  'daily': '#8b949e',
+  '99-templates': '#6e7681',
+  'root': '#58a6ff'
+};
+
+const radiusSizes = { 0: 24, 1: 16, 2: 10, 3: 6 };
+
+let svg, simulation, nodes, edges, g, zoom;
+let activeSections = new Set();
+let activeRadii = new Set([0,1,2,3]);
+let vaultData = null;
+
+async function init() {
+  const res = await fetch('vault.json');
+  vaultData = await res.json();
+  
+  nodes = vaultData.nodes.map(n => ({...n}));
+  edges = vaultData.edges.map(e => ({...e}));
+  
+  const sections = [...new Set(nodes.map(n => n.section))].sort();
+  sections.forEach(s => activeSections.add(s));
+  
+  buildFilters(sections);
+  buildLegend();
+  render();
+}
+
+function buildFilters(sections) {
+  const sf = document.getElementById('section-filters');
+  sections.forEach(s => {
+    const el = document.createElement('label');
+    el.className = 'cb active';
+    el.innerHTML = `<input type="checkbox" checked data-section="${s}">${formatSection(s)}`;
+    el.querySelector('input').addEventListener('change', e => {
+      el.classList.toggle('active', e.target.checked);
+      if (e.target.checked) activeSections.add(s); else activeSections.delete(s);
+      update();
+    });
+    sf.appendChild(el);
+  });
+
+  const rf = document.getElementById('radius-filters');
+  [0,1,2,3].forEach(r => {
+    const el = document.createElement('label');
+    el.className = 'cb active';
+    const labels = {0: 'Center', 1: 'Hub', 2: 'Topic', 3: 'Detail'};
+    el.innerHTML = `<input type="checkbox" checked data-radius="${r}">${labels[r]}`;
+    el.querySelector('input').addEventListener('change', e => {
+      el.classList.toggle('active', e.target.checked);
+      if (e.target.checked) activeRadii.add(r); else activeRadii.delete(r);
+      update();
+    });
+    rf.appendChild(el);
+  });
+}
+
+function buildLegend() {
+  const leg = document.getElementById('legend');
+  const items = [
+    { r: 0, label: 'Center' },
+    { r: 1, label: 'Hub' },
+    { r: 2, label: 'Topic' },
+    { r: 3, label: 'Detail' }
+  ];
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'legend-item';
+    div.innerHTML = `<span class="legend-dot" style="width:${radiusSizes[item.r]*1.2}px;height:${radiusSizes[item.r]*1.2}px;background:#58a6ff"></span> ${item.label}`;
+    leg.appendChild(div);
+  });
+}
+
+function formatSection(s) {
+  return s.replace(/^\d{2}-/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function getFiltered() {
+  const fNodes = nodes.filter(n => activeSections.has(n.section) && activeRadii.has(n.radius));
+  const fIds = new Set(fNodes.map(n => n.id));
+  const fEdges = edges.filter(e => fIds.has(e.source) && fIds.has(e.target));
+  return { nodes: fNodes, edges: fEdges };
+}
+
+function render() {
+  const container = document.getElementById('graph');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  svg = d3.select('#graph').append('svg')
+    .attr('width', width)
+    .attr('height', height)
+    .attr('viewBox', [0, 0, width, height]);
+
+  g = svg.append('g');
+
+  zoom = d3.zoom()
+    .scaleExtent([0.1, 4])
+    .on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoom);
+
+  simulation = d3.forceSimulation()
+    .force('link', d3.forceLink().id(d => d.id).distance(d => 
+      d.source.radius === 0 || d.target.radius === 0 ? 200 :
+      d.source.radius === 1 && d.target.radius === 1 ? 300 : 150
+    ))
+    .force('charge', d3.forceManyBody().strength(d => 
+      d.radius === 0 ? -800 : d.radius === 1 ? -500 : -200
+    ))
+    .force('center', d3.forceCenter(width/2, height/2))
+    .force('collide', d3.forceCollide().radius(d => radiusSizes[d.radius] + 10));
+
+  update();
+}
+
+function update() {
+  const { nodes: fNodes, edges: fEdges } = getFiltered();
+
+  let link = g.selectAll('.link')
+    .data(fEdges, d => d.source.id + '-' + d.target.id);
+  link.exit().remove();
+  const linkEnter = link.enter().append('line')
+    .attr('class', 'link')
+    .attr('stroke', '#30363d')
+    .attr('stroke-width', 1.5)
+    .attr('stroke-opacity', 0.6);
+  link = linkEnter.merge(link);
+
+  let node = g.selectAll('.node')
+    .data(fNodes, d => d.id);
+  node.exit().transition().duration(200).attr('r', 0).remove();
+
+  const nodeEnter = node.enter().append('g')
+    .attr('class', 'node')
+    .call(d3.drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended));
+
+  nodeEnter.append('circle')
+    .attr('r', 0)
+    .attr('fill', d => sectionColors[d.section] || '#58a6ff')
+    .attr('stroke', '#0d1117')
+    .attr('stroke-width', 2)
+    .transition().duration(300)
+    .attr('r', d => radiusSizes[d.radius] || 8);
+
+  nodeEnter.append('text')
+    .attr('class', 'node-label')
+    .attr('dy', d => radiusSizes[d.radius] + 14)
+    .attr('text-anchor', 'middle')
+    .text(d => d.title)
+    .style('opacity', d => d.radius <= 1 ? 1 : 0)
+    .transition().duration(300).style('opacity', d => d.radius <= 2 ? 1 : 0);
+
+  node = nodeEnter.merge(node);
+
+  node.select('circle')
+    .on('mouseover', function(event, d) {
+      d3.select(this).transition().duration(150).attr('r', radiusSizes[d.radius] * 1.3);
+      showTooltip(event, d);
+    })
+    .on('mouseout', function(event, d) {
+      d3.select(this).transition().duration(150).attr('r', radiusSizes[d.radius]);
+      hideTooltip();
+    })
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      showSidebar(d);
+    });
+
+  svg.on('click', () => closeSidebar());
+
+  simulation.nodes(fNodes);
+  simulation.force('link').links(fEdges);
+  simulation.alpha(1).restart();
+
+  simulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+}
+
+function showTooltip(event, d) {
+  const t = document.getElementById('tooltip');
+  t.innerHTML = `<strong>${d.title}</strong><br><small>${formatSection(d.section)} &middot; ${d.type}</small>`;
+  t.classList.add('visible');
+  t.style.left = (event.pageX + 12) + 'px';
+  t.style.top = (event.pageY + 12) + 'px';
+}
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('visible');
+}
+
+function showSidebar(d) {
+  const sb = document.getElementById('sidebar');
+  document.getElementById('sb-title').textContent = d.title;
+  const secEl = document.getElementById('sb-section');
+  secEl.textContent = formatSection(d.section);
+  secEl.style.background = (sectionColors[d.section] || '#58a6ff') + '22';
+  secEl.style.color = sectionColors[d.section] || '#58a6ff';
+  secEl.style.border = `1px solid ${sectionColors[d.section] || '#58a6ff'}44`;
+
+  document.getElementById('sb-meta').innerHTML = `
+    <span>Type: ${d.type}</span>
+    <span>Radius: ${d.radius}</span>
+    <span>Section: ${formatSection(d.section)}</span>
+  `;
+
+  const tagsEl = document.getElementById('sb-tags');
+  tagsEl.innerHTML = '';
+  (d.tags || []).forEach(tag => {
+    const sp = document.createElement('span');
+    sp.className = 'tag';
+    sp.textContent = tag;
+    tagsEl.appendChild(sp);
+  });
+
+  const linksEl = document.getElementById('sb-links');
+  linksEl.innerHTML = '';
+  const connected = edges.filter(e => e.source.id === d.id || e.target.id === d.id);
+  if (connected.length === 0) {
+    linksEl.innerHTML = '<li style="color:var(--text-muted)">No connections</li>';
+  } else {
+    connected.forEach(e => {
+      const other = e.source.id === d.id ? e.target : e.source;
+      const li = document.createElement('li');
+      li.textContent = other.title;
+      li.onclick = () => showSidebar(other);
+      linksEl.appendChild(li);
+    });
+  }
+
+  sb.classList.add('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+function dragstarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x; d.fy = d.y;
+}
+function dragged(event, d) {
+  d.fx = event.x; d.fy = event.y;
+}
+function dragended(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null; d.fy = null;
+}
+
+window.addEventListener('resize', () => {
+  const container = document.getElementById('graph');
+  svg.attr('width', container.clientWidth).attr('height', container.clientHeight);
+  simulation.force('center', d3.forceCenter(container.clientWidth/2, container.clientHeight/2));
+  simulation.alpha(0.3).restart();
+});
+
+init();
+</script>
+</body>
+</html>
