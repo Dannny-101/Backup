@@ -541,6 +541,9 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tenandsee
 })
 .catch(err => console.error('MongoDB Connection Error:', err));
 
+// Trust proxy (required for express-rate-limit behind reverse proxy / Docker)
+app.set('trust proxy', 1);
+
 // Rate limiting
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
