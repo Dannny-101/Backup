@@ -24,21 +24,21 @@ tags:
 
 ## Key Topics
 
-- #ai-orchestrator — AI integration rules and role
-- #business-model — Revenue, pricing, unit economics
-- #codebase — File maps, architecture, API docs
-- #company — Mission, vision, legal
-- #competitive — Competitors, positioning, moat
-- #decision-needed — Open strategic questions
-- #daily — Daily founder notes
-- #hiring — Roles, org chart, onboarding
-- #metrics — KPIs, targets, dashboards
-- #operations — Processes, service model, vendors
-- #roadmap — Milestones, phases, backlog
-- #security — Auth, endpoints, compliance
-- #strategy — Pivot options, differentiation
-- #student-housing — Core domain
-- #tags — This index
+- ai-orchestrator — AI integration rules and role
+- business-model — Revenue, pricing, unit economics
+- codebase — File maps, architecture, API docs
+- company — Mission, vision, legal
+- competitive — Competitors, positioning, moat
+- decision-needed — Open strategic questions
+- daily — Daily founder notes
+- hiring — Roles, org chart, onboarding
+- metrics — KPIs, targets, dashboards
+- operations — Processes, service model, vendors
+- roadmap — Milestones, phases, backlog
+- security — Auth, endpoints, compliance
+- strategy — Pivot options, differentiation
+- student-housing — Core domain
+- tags — This index
 
 ## Active Decisions (Unresolved)
 

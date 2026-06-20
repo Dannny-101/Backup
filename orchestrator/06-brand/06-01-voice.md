@@ -42,7 +42,7 @@ tags:
 
 ### WhatsApp Templates
 - ✅ "Hey [Name]! Saw you enquired about [Property]. Want me to arrange a viewing this weekend?"
-- ❌ "Your enquiry has been received. Reference number: #12345."
+- ❌ "Your enquiry has been received. Reference number: 12345."
 
 ## Visual Identity
 
