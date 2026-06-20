@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Book Your Room — Ten&See</title>
+    <meta name="description" content="Submit a booking request for your selected student room. Ten&See will confirm availability within 24 hours.">
+    <link rel="canonical" href="https://tenandsee.homes/booking.html">
+    <link rel="icon" type="image/png" href="/assets/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/theme.css">
+    <link rel="stylesheet" href="/cookie-consent.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text-main);
+            line-height: 1.6;
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000; padding: 1rem 2rem;
+            background: var(--color-primary);
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.15); padding: 0.75rem 2rem; }
+        .nav-container {
+            max-width: 1400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo {
+            text-decoration: none;
+            display: inline-flex; align-items: center;
+        }
+        .logo img { width: 56px; height: 56px; object-fit: contain; display: block; }
+        .logo-text { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; color: white; margin-left: 0.75rem; letter-spacing: -0.02em; }
+        .logo-text span { color: var(--color-accent); font-weight: 700; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; list-style: none; position: absolute; left: 50%; transform: translateX(-50%); }
+        .nav-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--color-accent); }
+        .hamburger {
+            display: none; background: none; border: none;
+            color: white; font-size: 1.5rem; cursor: pointer;
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 1.5rem; border-radius: 12px;
+            font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.2s ease;
+            border: none; text-decoration: none;
+        }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn-primary {
+            background: var(--color-accent);
+            color: var(--color-primary);
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+        .btn-primary:hover { background: #D4B55D; box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4); }
+        .btn-outline {
+            background: transparent; color: var(--color-text-main);
+            border: 1.5px solid var(--color-border);
+        }
+        .btn-outline:hover { border-color: var(--color-accent); color: var(--color-accent); }
+        .btn-block { width: 100%; justify-content: center; }
+        .btn-lg { padding: 1rem 2rem; font-size: 1.05rem; }
+
+        .page-header {
+            padding: 9rem 2rem 4rem;
+            background: var(--color-primary);
+            color: white;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .page-header p { color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto; }
+
+        .booking-layout {
+            max-width: 1100px; margin: 0 auto;
+            padding: 3rem 2rem;
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem;
+            align-items: start;
+        }
+        @media (max-width: 768px) {
+            .booking-layout { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .hamburger { display: block; }
+        }
+
+        .listing-summary {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: sticky; top: 100px;
+        }
+        .listing-summary img {
+            width: 100%; height: 220px; object-fit: cover;
+        }
+        .listing-summary-body { padding: 1.5rem; }
+        .listing-summary-body h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .listing-summary-body .location {
+            color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 1rem;
+        }
+        .listing-summary-body .price {
+            font-size: 1.4rem; font-weight: 700; color: var(--color-accent);
+        }
+        .listing-summary-body .price span { font-size: 0.85rem; font-weight: 500; color: var(--color-text-muted); }
+        .listing-features {
+            display: flex; gap: 1rem; margin-top: 1rem;
+            font-size: 0.85rem; color: var(--color-text-muted);
+        }
+        .listing-features div { display: flex; align-items: center; gap: 0.35rem; }
+
+        .booking-form-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        .booking-form-card h2 {
+            font-size: 1.35rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-main);
+        }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label {
+            display: block; font-size: 0.85rem; font-weight: 500;
+            color: var(--color-text-main); margin-bottom: 0.4rem;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 12px; padding: 0.85rem 1rem;
+            color: var(--color-text-main); font-size: 0.95rem;
+            outline: none; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--color-accent); }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+        .booking-success {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .booking-success i {
+            font-size: 3rem; color: var(--color-success);
+            margin-bottom: 1rem;
+        }
+        .booking-success h2 { margin-bottom: 0.75rem; }
+        .booking-success p { color: var(--color-text-muted); margin-bottom: 1.5rem; }
+
+        .footer {
+            background: var(--color-primary);
+            padding: 3rem 2rem 1.5rem;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+        }
+        .footer p { font-size: 0.85rem; }
+
+        .error-message {
+            color: var(--color-danger, #ef4444);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        .loading {
+            opacity: 0.6; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo" target="_self" aria-label="Ten&See home">
+                <img src="/assets/logo.png" alt="Ten&See logo">
+                <span class="logo-text">Ten<span>&</span>See</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/" target="_self">Home</a></li>
+                <li><a href="/listings.html" target="_self">Listings</a></li>
+                <li><a href="/index.html#features" target="_self">Features</a></li>
+                <li><a href="/index.html#contact" target="_self">Contact</a></li>
+            </ul>
+            <button class="hamburger" onclick="toggleMobileNav()" aria-label="Open navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <h1>Book Your Room</h1>
+        <p>Complete the form below and we will confirm availability within 24 hours.</p>
+    </header>
+
+    <main class="booking-layout">
+        <aside class="listing-summary" id="listingSummary">
+            <div class="listing-summary-body">
+                <p>Loading selected listing...</p>
+            </div>
+        </aside>
+
+        <section class="booking-form-card">
+            <div id="bookingFormWrapper">
+                <h2>Tell us about your stay</h2>
+                <form id="bookingForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required placeholder="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="you@example.com">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+60 12-345 6789">
+                        </div>
+                        <div class="form-group">
+                            <label for="occupants">Number of Occupants</label>
+                            <select id="occupants" name="occupants" required>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5+</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="checkIn">Move-in Date</label>
+                            <input type="date" id="checkIn" name="checkIn" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkOut">Move-out Date</label>
+                            <input type="date" id="checkOut" name="checkOut" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message (optional)</label>
+                        <textarea id="message" name="message" placeholder="Any questions or special requirements?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitBtn">
+                        <i class="fas fa-calendar-check"></i> Submit Booking Request
+                    </button>
+                    <p class="error-message" id="formError"></p>
+                </form>
+            </div>
+            <div class="booking-success" id="bookingSuccess">
+                <i class="fas fa-check-circle"></i>
+                <h2>Booking Request Received</h2>
+                <p>We have received your booking request. Our team will contact you within 24 hours to confirm availability and next steps.</p>
+                <a href="/listings.html" class="btn btn-primary">Browse More Listings</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Ten&See. All rights reserved.</p>
+    </footer>
+
+    <script>
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        function toggleMobileNav() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        function getListingId() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || params.get('listingId');
+        }
+
+        async function loadListing() {
+            const listingId = getListingId();
+            const container = document.getElementById('listingSummary');
+            if (!listingId) {
+                container.innerHTML = '<div class="listing-summary-body"><p>No listing selected. <a href="/listings.html">Browse listings</a></p></div>';
+                return;
+            }
+            try {
+                const res = await fetch(`/api/listings/${listingId}`);
+                const data = await res.json();
+                if (!data.success || !data.data) throw new Error(data.error || 'Listing not found');
+                const listing = data.data;
+                window.currentListing = listing;
+                const img = listing.images?.[0] || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800';
+                const typeLabel = listing.propertyType ? listing.propertyType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Room';
+                container.innerHTML = `
+                    <img src="${img}" alt="${listing.title}">
+                    <div class="listing-summary-body">
+                        <h3>${listing.title}</h3>
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i> ${listing.location?.area || listing.location?.city || 'Klang Valley'}
+                        </div>
+                        <div class="price">RM ${listing.price}<span>/${listing.pricePeriod || 'month'}</span></div>
+                        <div class="listing-features">
+                            <div><i class="fas fa-bed"></i> ${listing.bedrooms || '-'} BR</div>
+                            <div><i class="fas fa-bath"></i> ${listing.bathrooms || '-'} BA</div>
+                            <div><i class="fas fa-user-friends"></i> Max ${listing.maxOccupants || 1}</div>
+                            <div><i class="fas fa-door-open"></i> ${typeLabel}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                container.innerHTML = `<div class="listing-summary-body"><p>Could not load listing. <a href="/listings.html">Back to listings</a></p></div>`;
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const listing = window.currentListing;
+            if (!listing) {
+                document.getElementById('formError').textContent = 'No listing selected.';
+                return;
+            }
+            const btn = document.getElementById('submitBtn');
+            const form = e.target;
+            btn.classList.add('loading');
+            btn.disabled = true;
+            document.getElementById('formError').textContent = '';
+
+            const payload = {
+                listingId: listing._id,
+                name: form.name.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                numberOfOccupants: parseInt(form.occupants.value),
+                checkInDate: form.checkIn.value,
+                checkOutDate: form.checkOut.value,
+                message: form.message.value,
+                source: 'website'
+            };
+
+            try {
+                const res = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to submit booking');
+                }
+                document.getElementById('bookingFormWrapper').style.display = 'none';
+                document.getElementById('bookingSuccess').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (err) {
+                document.getElementById('formError').textContent = err.message;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        });
+
+        loadListing();
+    </script>
+    <script src="/cookie-consent.js"></script>
+</body>
+</html>

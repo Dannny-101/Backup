@@ -121,6 +121,17 @@
         .btn-whatsapp { background: #25d366; color: white; }
         .btn-whatsapp:hover { background: #128c7e; }
         .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        .btn-book {
+            width: 100%; justify-content: center;
+            padding: 1rem 1.5rem;
+            font-size: 1rem; border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(201, 168, 76, 0.35);
+        }
+        .btn-book:hover {
+            box-shadow: 0 6px 24px rgba(201, 168, 76, 0.5);
+            transform: translateY(-2px);
+        }
+        .listing-book-action { margin-top: 0.75rem; }
 
         /* ── ANIMATED BANNER LOOP ── */
         .banner-loop {
@@ -2410,6 +2421,11 @@
                             </span>
                             <button class="btn btn-primary btn-sm" onclick="event.preventDefault();event.stopPropagation();trackListingView('${listing._id}');openBooking('${listing._id}', '${listing.title.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-calendar"></i> Enquire
+                            </button>
+                        </div>
+                        <div class="listing-book-action">
+                            <button class="btn btn-primary btn-book" onclick="event.preventDefault();event.stopPropagation();trackListingView('${listing._id}');window.location.href='/booking.html?id=${listing._id}'">
+                                <i class="fas fa-calendar-check"></i> Book Now
                             </button>
                         </div>
                     </div>
