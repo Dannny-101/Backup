@@ -810,11 +810,17 @@ html { scroll-behavior: smooth; }
         .footer-col p { color: rgba(255,255,255,0.9); font-size: 0.875rem; line-height: 1.7; margin-bottom: 0.5rem; }
         .footer-col h5 { color: var(--color-accent); font-size: 0.875rem; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .footer-col a {
-            display: block; color: rgba(255,255,255,0.9);
+            display: inline-block; color: rgba(255,255,255,0.9);
             text-decoration: none; font-size: 0.875rem;
-            margin-bottom: 0.5rem; transition: color 0.2s;
+            margin-bottom: 0.25rem;
+            padding: 0.35rem 0.75rem; border-radius: 100px;
+            transition: all 0.2s ease;
         }
-        .footer-col a:hover { color: var(--color-accent); }
+        .footer-col a:hover {
+            background: rgba(201, 168, 76, 0.15);
+            color: var(--color-accent);
+            transform: translateX(4px);
+        }
         .contact-item,
         .footer .contact-item,
         .footer .contact-item a,
