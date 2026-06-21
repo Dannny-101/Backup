@@ -11,16 +11,6 @@ html { scroll-behavior: smooth; }
         }
         h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
 
-        /* ── SCROLL PROGRESS BAR ── */
-        .scroll-progress-bar {
-            position: fixed; top: 0; left: 0;
-            height: 3px; width: 0%;
-            background: var(--color-accent);
-            z-index: 1001;
-            box-shadow: 0 0 10px rgba(201, 168, 76, 0.4);
-            transition: width 0.1s linear;
-        }
-
         /* ── NAVBAR ── */
         .navbar {
             position: fixed; top: 0; left: 0; right: 0;
