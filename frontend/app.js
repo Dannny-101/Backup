@@ -1,12 +1,19 @@
 AOS.init({ duration: 600, once: true, offset: 60 });
 
-        // Navbar scroll
+        // Navbar scroll + scroll progress bar
+        const scrollProgressBar = document.getElementById('scrollProgressBar');
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             const scrolled = window.scrollY > 100;
             navbar.classList.toggle('scrolled', scrolled);
             navbar.classList.toggle('navbar-scrolled', scrolled);
             navbar.classList.toggle('navbar-transparent', !scrolled);
+
+            if (scrollProgressBar) {
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+                scrollProgressBar.style.width = `${Math.min(progress, 100)}%`;
+            }
         });
 
         // Mobile nav
