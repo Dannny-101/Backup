@@ -587,15 +587,6 @@ html { scroll-behavior: smooth; }
         .uni-card-segi { --uni-glow: rgba(30, 170, 120, 0.62); --uni-glow-soft: rgba(30, 170, 120, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
         .uni-card-sunway { --uni-glow: rgba(245, 130, 45, 0.62); --uni-glow-soft: rgba(245, 130, 45, 0.34); background: linear-gradient(135deg, rgba(44, 56, 48, 0.9) 0%, rgba(30, 40, 35, 0.9) 100%); }
         .unis-section .uni-card:hover { transform: translateY(-4px); box-shadow: 0 0 24px 6px var(--uni-glow), 0 0 8px 2px var(--uni-glow-soft), 0 20px 40px rgba(0,0,0,0.2); }
-        @media (hover: hover) and (pointer: fine) {
-            .uni-card {
-                transform-style: preserve-3d;
-                transition: transform 0.35s ease;
-            }
-            .unis-section .uni-card:hover {
-                transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
-            }
-        }
         .uni-card-content { position: relative; z-index: 2; }
         .uni-name { font-size: 1.1rem; font-weight: 700; color: white; margin-bottom: 0.25rem; }
         .uni-city { font-size: 0.85rem; color: rgba(255,255,255,0.85); font-weight: 500; }
