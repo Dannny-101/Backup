@@ -741,7 +741,7 @@ AOS.init({ duration: 600, once: true, offset: 60 });
             const popup = document.getElementById('chatPopup');
             if (popup) popup.classList.toggle('active', chatOpen);
             const icon = document.getElementById('chatIcon');
-            if (icon) icon.className = chatOpen ? 'fas fa-times' : 'fas fa-comments';
+            if (icon) icon.className = chatOpen ? 'fas fa-times' : 'fab fa-whatsapp';
             
             if (chatOpen) {
                 // Initialize socket first
