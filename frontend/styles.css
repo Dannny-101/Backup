@@ -215,26 +215,16 @@ html { scroll-behavior: smooth; }
         }
 
         .hero-stats {
-            display: flex; gap: 1rem; flex-wrap: wrap;
+            display: flex; gap: 2rem; flex-wrap: wrap;
             padding-top: 2rem;
             border-top: 1px solid rgba(255,255,255,0.08);
         }
-        .hero-stat-chip {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
-            padding: 1rem 1.5rem;
-            min-width: 140px;
-            text-align: center;
-        }
-        .hero-stat-chip .hero-stat-value {
+        .hero-stat-value {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.6rem; font-weight: 700;
+            font-size: 1.75rem; font-weight: 700;
             color: var(--color-accent);
-            line-height: 1.2;
         }
-        .hero-stat-chip .hero-stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 0.25rem; }
+        .hero-stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.85); margin-top: 2px; }
 
         /* Hero visual */
         .hero-visual {
